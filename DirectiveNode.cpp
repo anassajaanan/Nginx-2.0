@@ -2,7 +2,7 @@
 #include "ConfigNode.hpp"
 #include <string>
 
-DirectiveNode::DirectiveNode() : ConfigNode(Directive)
+DirectiveNode::DirectiveNode() : ConfigNode(NodeType::Directive)
 {
 	key = "DefaultKey";
 	value = "DefaultValue";
@@ -10,7 +10,7 @@ DirectiveNode::DirectiveNode() : ConfigNode(Directive)
 
 
 DirectiveNode::DirectiveNode(const std::string &key, const std::string &value, ConfigNode *parentNode)
-	: ConfigNode(Directive, parentNode), key(key), value(value) { }
+	: ConfigNode(NodeType::Directive, parentNode), key(key), value(value) { }
 
 DirectiveNode::~DirectiveNode() { }
 
