@@ -1,10 +1,9 @@
 # include "ContextNode.hpp"
 
-ContextNode::ContextNode(const std::string &name, ConfigNode *parentNode): ConfigNode(Context, parentNode)
-{
-	this->name = name;
-	
-}
+ContextNode::ContextNode() : ConfigNode(Context) , name("DefaultContext") { }
+
+ContextNode::ContextNode(const std::string &name, ConfigNode *parentNode) 
+	: ConfigNode(Context, parentNode) , name(name) { }
 
 const std::string	&ContextNode::getName() const
 {
