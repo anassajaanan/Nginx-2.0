@@ -1,12 +1,66 @@
+#include "ConfigNode.hpp"
 #include "DirectiveNode.hpp"
 #include "ContextNode.hpp"
+<<<<<<< HEAD
 #include "ConfigNode.hpp"
 #include "parseException.hpp"
+=======
+#include <cstddef>
+>>>>>>> 08fea6c718ecaa6d4a983d2a01c027f5922bcdc9
 #include <regex>
 #include <stack>
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
+
+
+
+
+ConfigNode	*getDirectiveNode(ConfigNode *parent, std::vector<std::string>::iterator &it)
+{
+	ConfigNode	*node = new DirectiveNode(*it, *(it + 1), parent);
+	it += 2;
+	return (node);
+}
+
+ConfigNode	*getContextNode(ConfigNode *parent, std::vector<std::string>::iterator &it)
+{
+	ConfigNode	*node = new ContextNode(*it, parent);
+	it += 2;
+	return (node);
+}
+
+
+ConfigNode	*parse(ConfigNode *parent, std::vector<std::string>::iterator &it)
+{
+	if ((*it) == "}")
+		return (parent);
+	
+	if (*(it + 1) == "{")
+	{
+		if (parent == NULL)
+		{
+			parent = getContextNode(parent, it);
+		}
+		else
+		{
+			ContextNode	*p = dynamic_cast<ContextNode *>(parent);
+			parent = getContextNode(parent, it);
+			p->getChildren().push_back(parent);
+		}
+	}
+	else
+	{
+		ConfigNode *directiveNode = getDirectiveNode(parent, it);
+		ContextNode	*p = dynamic_cast<ContextNode *>(parent);
+		p->getChildren().push_back(directiveNode);
+	}
+	parse(parent, it);
+
+	return (parent);
+}
 
 
 
@@ -126,4 +180,6 @@ int main()
 	}
 	
 	return (0);
+
+
 }
