@@ -24,4 +24,5 @@ ContextNode::~ContextNode()
 		delete (*it);
 		it++;
 	}
+	children.clear();
 }
