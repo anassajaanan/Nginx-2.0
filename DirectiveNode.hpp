@@ -1,3 +1,9 @@
+
+#pragma once
+#ifndef DIRECTIVENODE_HPP
+#define DIRECTIVENODE_HPP
+
+
 #include "ConfigNode.hpp"
 
 
@@ -21,3 +27,5 @@ public:
 	const std::string	&getValue() const;
 
 };
+
+#endif /* DIRECTIVENODE_HPP */

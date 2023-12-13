@@ -1,3 +1,10 @@
+
+
+#pragma once
+#ifndef CONTEXTNODE_HPP
+#define CONTEXTNODE_HPP
+
+
 #include "ConfigNode.hpp"
 #include <string>
 #include <vector>
@@ -17,3 +24,5 @@ public:
 	const std::string	&getName() const;
 	std::vector<ConfigNode *>	&getChildren() const;
 };
+
+#endif /* CONTEXTNODE_HPP */
