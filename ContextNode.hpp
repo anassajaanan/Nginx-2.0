@@ -22,7 +22,7 @@ public:
 
 	// getters
 	const std::string	&getName() const;
-	std::vector<ConfigNode *>	&getChildren() const;
+	std::vector<ConfigNode *>	&getChildren();
 };
 
 #endif /* CONTEXTNODE_HPP */
