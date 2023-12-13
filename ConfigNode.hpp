@@ -22,7 +22,7 @@ private:
 	ConfigNode	*parent;
 
 public:
-	ConfigNode(int type, ConfigNode *parentNode = nullptr);
+	ConfigNode(int type, ConfigNode *parentNode = NULL);
 	virtual ~ConfigNode();
 
 	// getters

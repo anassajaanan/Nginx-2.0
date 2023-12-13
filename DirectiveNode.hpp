@@ -18,7 +18,7 @@ private:
 
 public:
 	DirectiveNode();
-	DirectiveNode(const std::string &key, const std::string &value, ConfigNode *parentNode = nullptr);
+	DirectiveNode(const std::string &key, const std::string &value, ConfigNode *parentNode = NULL);
 	~DirectiveNode();
 
 
