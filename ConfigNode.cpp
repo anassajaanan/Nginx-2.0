@@ -1,14 +1,14 @@
 #include "ConfigNode.hpp"
 
 
-ConfigNode::ConfigNode(int type, ConfigNode *parentNode)
+ConfigNode::ConfigNode(NodeType type, ConfigNode *parentNode)
 	: type(type), parent(parentNode) { }
 
 
 ConfigNode::~ConfigNode() { }
 
 
-int	ConfigNode::getType() const
+NodeType	ConfigNode::getType() const
 {
 	return (this->type);
 }

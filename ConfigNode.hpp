@@ -9,7 +9,7 @@
 #include <string>
 
 
-enum NodeType
+enum class NodeType
 {
 	Context,
 	Directive,
@@ -18,15 +18,15 @@ enum NodeType
 class ConfigNode
 {
 private:
-	int			type;
+	NodeType	type;
 	ConfigNode	*parent;
 
 public:
-	ConfigNode(int type, ConfigNode *parentNode = NULL);
+	ConfigNode(NodeType type, ConfigNode *parentNode = NULL);
 	virtual ~ConfigNode();
 
 	// getters
-	int					getType() const;
+	NodeType			getType() const;
 	const ConfigNode	*getParent() const;
 
 };
