@@ -2,6 +2,8 @@
 
 ContextNode::ContextNode(const std::string &name, ConfigNode *parentNode): ConfigNode(Context, parentNode)
 {
+	this->name = name;
+	
 }
 
 const std::string	&ContextNode::getName() const
