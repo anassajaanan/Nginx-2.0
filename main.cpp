@@ -8,7 +8,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <map>
+#include <stack>
 
 
 
@@ -27,35 +28,38 @@ ConfigNode	*getContextNode(ConfigNode *parent, std::vector<std::string>::iterato
 }
 
 
+
+
 ConfigNode	*parse(ConfigNode *parent, std::vector<std::string>::iterator &it)
 {
-	if ((*it) == "}")
-		return (parent);
-	
-	if (*(it + 1) == "{")
-	{
-		if (parent == NULL)
-		{
-			parent = getContextNode(parent, it);
-		}
-		else
-		{
-			ContextNode	*p = dynamic_cast<ContextNode *>(parent);
-			parent = getContextNode(parent, it);
-			p->getChildren().push_back(parent);
-		}
-	}
-	else
-	{
-		ConfigNode *directiveNode = getDirectiveNode(parent, it);
-		ContextNode	*p = dynamic_cast<ContextNode *>(parent);
-		p->getChildren().push_back(directiveNode);
-	}
-	parse(parent, it);
+    if ((*it) == "}"){
+        it++;
+        return (parent);
+    }
 
-	return (parent);
+    if (*(it + 1) == "{")
+    {
+        if (parent == NULL)
+        {
+            parent = getContextNode(parent, it);
+        }
+        else
+        {
+            ContextNode	*p = dynamic_cast<ContextNode *>(parent);
+             ConfigNode *newp = getContextNode(parent, it);
+            p->getChildren().push_back(parse(newp, it));
+        }
+    }
+    else
+    {
+        ConfigNode *directiveNode = getDirectiveNode(parent, it);
+        ContextNode	*p = dynamic_cast<ContextNode *>(parent);
+        p->getChildren().push_back(directiveNode);
+    }
+    parse(parent, it);
+
+    return (parent);
 }
-
 
 
 
@@ -73,17 +77,17 @@ int main()
 	std::string line;
 	while(std::getline(ifs, line))
 	{
-		content += line;
+        std::istringstream iss(line);
+
+        std::string token;
+        while(iss >> token)
+        {
+            tokens.push_back(token);
+        }
 	}
 	ifs.close();
 
-	std::istringstream iss(content);
 
-	std::string token;
-	while(iss >> token)
-	{
-		tokens.push_back(token);
-	}
 
 	for (int i = 0; i < (int)tokens.size(); i++)
 	{
@@ -92,6 +96,7 @@ int main()
 
 
 	std::vector<std::string>::iterator it = tokens.begin();
+	std::vector<std::string>::iterator end = tokens.end();
 	ConfigNode *node = parse(NULL, it);
 
 
