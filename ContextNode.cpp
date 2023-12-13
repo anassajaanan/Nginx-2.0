@@ -18,4 +18,10 @@ std::vector<ConfigNode *>	&ContextNode::getChildren()
 
 ContextNode::~ContextNode()
 {
+	std::vector<ConfigNode *>::iterator it = children.begin();
+	while (it != children.end())
+	{
+		delete (*it);
+		it++;
+	}
 }
