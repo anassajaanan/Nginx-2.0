@@ -17,7 +17,7 @@ private:
 
 public:
 	ContextNode();
-	ContextNode(const std::string &name, ConfigNode *parentNode = nullptr);
+	ContextNode(const std::string &name, ConfigNode *parentNode = NULL);
 	~ContextNode();
 
 	// getters
