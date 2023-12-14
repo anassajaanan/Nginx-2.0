@@ -26,3 +26,9 @@ ContextNode::~ContextNode()
 	}
 	children.clear();
 }
+
+void	ContextNode::addChild(ConfigNode *child)
+{
+	if (child)
+		children.push_back(child);
+}
