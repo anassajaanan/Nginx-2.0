@@ -20,3 +20,13 @@ const char *ExtraCloseBraces::what() const throw()
 {
     return ("Extra } in the configruation file");
 }
+
+const char *EmptyBraces::what() const throw()
+{
+    return ("Empty Braces");
+}
+
+const char *Semicolon::what() const throw()
+{
+    return ("Semicolon Error");
+}

@@ -30,4 +30,16 @@ class ExtraCloseBraces : public std::exception
         const char *what() const throw();
 };
 
+class EmptyBraces : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
+
+class Semicolon : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
+
 #endif /* PARSEEXCEPTION_HPP */
