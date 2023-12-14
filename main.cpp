@@ -17,11 +17,10 @@
 void		semicolon(std::vector<std::string> content)
 {
 	std::vector<std::string> data;
-	data.push_back("http");
-	data.push_back("server");
-	data.push_back("location");
-	data.push_back("{");
-	data.push_back("}");
+	data.push_back("listen");
+	data.push_back("try_files");
+	data.push_back("server_name");
+	// data.push_back("");
 	std::vector<std::string>::iterator	it = content.begin();
 	std::vector<std::string>::iterator	value;
 
@@ -63,6 +62,7 @@ void		syntaxValidation(std::vector<std::string> content)
 			st.push(*it);
 			if (++tmp == content.end())
 				throw (ExtraOpenBraces());
+			--tmp;
 		}
 		if ((saveKey.find_first_not_of("abcdefghijklmnopqrstuvwxyz/") != std::string::npos && *tmp == "{}")
 		|| (*tmp == "{" && *++tmp == "}" && saveKey.find_first_not_of("abcdefghijklmnopqrstuvwxyz/") != std::string::npos)
@@ -87,6 +87,7 @@ int main()
 		std::ifstream	ifs("nginx.conf");
 		std::vector<std::string>	serverVector;
 		std::vector<std::string>::iterator it;
+		std::string							tmp;
 		// ConfigNode		head();
 		// ConfigNode			*tmp;
 		// ContextNode			*t;
@@ -98,18 +99,43 @@ int main()
 		}
 		// std::string content;
 		std::string line;
+		std::string buffer;
 		while(std::getline(ifs, line))
 		{
-			std::istringstream iss(line);
-
-			// loading inside the vector 
-			for(std::string str; iss >> str;)
+			buffer += line;
+		}
+		std::cout << "buf = " << buffer << std::endl;
+		std::cout << "len = " << buffer.length() << std::endl;
+		ifs.close();
+		std::string::iterator  buffer_it = buffer.begin();
+		for (;buffer_it != buffer.end();buffer_it++)
+		{
+			if (*buffer_it == '{')
 			{
-				std::cout << "[" << str << "]" << std::endl;
-				serverVector.push_back(str);
+				buffer.insert(buffer_it - buffer.begin(), "\n");
+				buffer.insert(buffer_it - buffer.begin() + 2, "\n");
+				buffer_it += 3;
+			}
+			if (*buffer_it == '}')
+			{
+				buffer.insert(buffer_it - buffer.begin(), "\n");
+				buffer.insert(buffer_it - buffer.begin() + 2, "\n");
+				buffer_it += 3;
+			}
+			if (*buffer_it == ';')
+			{
+				buffer.insert(buffer_it - buffer.begin(), "\n");
+				buffer.insert(buffer_it - buffer.begin() + 2, "\n");
+				buffer_it += 3;
 			}
 		}
-		ifs.close();
+		std::cout << "buf end = " << buffer << std::endl;
+
+		it = serverVector.begin();
+		// for (;it != serverVector.end(); it++)
+		// {
+		// 	std::cout << "[" << *it << "]" << std::endl;
+		// }
 		syntaxValidation(serverVector);
 		semicolon(serverVector);
 
