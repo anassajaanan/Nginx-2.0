@@ -29,35 +29,37 @@ ConfigNode	*getContextNode(ConfigNode *parent, std::vector<std::string>::iterato
 
 
 
-ConfigNode	*parse(ConfigNode *parent, std::vector<std::string>::iterator &it)
+ConfigNode	*parse(ConfigNode *parent, std::vector<std::string>::iterator &it, std::vector<std::string>::iterator &end)
 {
-    if ((*it) == "}"){
-        it++;
-        return (parent);
-    }
+	if (it == end)
+		return (NULL);
+	if (*it == "}")
+		return (parent);
 
-    if (*(it + 1) == "{")
-    {
-        if (parent == NULL)
-        {
-            parent = getContextNode(parent, it);
-        }
-        else
-        {
-            ContextNode	*p = dynamic_cast<ContextNode *>(parent);
-             ConfigNode *newp = getContextNode(parent, it);
-            p->getChildren().push_back(parse(newp, it));
-        }
-    }
-    else
-    {
-        ConfigNode *directiveNode = getDirectiveNode(parent, it);
-        ContextNode	*p = dynamic_cast<ContextNode *>(parent);
-        p->getChildren().push_back(directiveNode);
-    }
-    parse(parent, it);
+	ConfigNode	*node = NULL;
 
-    return (parent);
+	if (*(it + 1) == "{")
+	{
+		node = getContextNode(parent, it);
+		while (*it != "}")
+		{
+			parse(node, it, end);
+			if (it == end)
+				break;
+		}
+		it++;
+	}
+	else
+	{
+		node = getDirectiveNode(parent, it);
+	}
+
+	if (parent && parent->getType() == NodeType::Context)
+	{
+		static_cast<ContextNode *>(parent)->addChild(node);
+	}
+
+	return (node);
 }
 
 
