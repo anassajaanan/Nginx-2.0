@@ -3,9 +3,11 @@
 #include "ContextNode.hpp"
 #include "ConfigNode.hpp"
 #include "parseException.hpp"
+#include <cctype>
 #include <regex>
 #include <map>
 #include <algorithm>
+#include <set>
 #include <stack>
 #include <sstream>
 #include <fstream>
@@ -79,13 +81,53 @@ void		syntaxValidation(std::vector<std::string> content)
 		throw (ExtraOpenBraces());
 }
 
+
+std::vector<std::string>	tokenize(std::string &input)
+{
+	std::vector<std::string>	tokens;
+	std::string					currentToken;
+	// std::set<char>				delimiters {'{', '}', ';'};
+	std::set<char>				delimiters;
+
+	delimiters.insert('{');
+	delimiters.insert('}');
+	delimiters.insert(';');
+
+	for (std::string::iterator it = input.begin(); it != input.end(); it++)
+	{
+		char	ch = *it;
+		if (delimiters.find(ch) != delimiters.end())
+		{
+			if (!currentToken.empty())
+			{
+				tokens.push_back(currentToken);
+				currentToken.clear();
+			}
+			tokens.push_back(std::string(1, ch));
+		}
+		else if (std::isspace(ch))
+		{
+			if (!currentToken.empty())
+			{
+				tokens.push_back(currentToken);
+				currentToken.clear();
+			}
+		}
+		else {
+			currentToken += ch;
+		}
+	}
+	return (tokens);
+}
+
+
 int main()
 {
 
 	try
 	{
 		std::ifstream	ifs("nginx.conf");
-		std::vector<std::string>	serverVector;
+		std::vector<std::string>	tokens;
 		std::vector<std::string>::iterator it;
 		// ConfigNode		head();
 		// ConfigNode			*tmp;
@@ -96,22 +138,25 @@ int main()
 			std::cout << "Could Not Open the file" << std::endl;
 			return (1);
 		}
-		// std::string content;
+		std::string input;
 		std::string line;
 		while(std::getline(ifs, line))
 		{
-			std::istringstream iss(line);
-
-			// loading inside the vector 
-			for(std::string str; iss >> str;)
-			{
-				std::cout << "[" << str << "]" << std::endl;
-				serverVector.push_back(str);
-			}
+			input += line;
 		}
 		ifs.close();
-		syntaxValidation(serverVector);
-		semicolon(serverVector);
+
+		tokens = tokenize(input);
+
+		for (int i = 0; i < (int)tokens.size(); i++)
+		{
+			std::cout << "[" << tokens[i] << "]" << std::endl;
+		}
+
+
+
+		// syntaxValidation(serverVector);
+		// semicolon(serverVector);
 
 	}
 	catch (std::exception &e)
