@@ -12,7 +12,6 @@
 #include <stack>
 
 
-
 ConfigNode	*getDirectiveNode(ConfigNode *parent, std::vector<std::string>::iterator &it)
 {
 	ConfigNode	*node = new DirectiveNode(*it, *(it + 1), parent);
@@ -62,7 +61,6 @@ ConfigNode	*parse(ConfigNode *parent, std::vector<std::string>::iterator &it)
 }
 
 
-
 int main()
 {
 	std::vector<std::string> tokens;
@@ -97,7 +95,7 @@ int main()
 
 	std::vector<std::string>::iterator it = tokens.begin();
 	std::vector<std::string>::iterator end = tokens.end();
-	ConfigNode *node = parse(NULL, it);
+	ConfigNode *node = parse(NULL, it, end);
 
 
 
