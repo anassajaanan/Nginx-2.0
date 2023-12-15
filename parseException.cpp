@@ -30,3 +30,8 @@ const char *Semicolon::what() const throw()
 {
     return ("Semicolon Error");
 }
+
+const char *WrongContextName::what() const throw()
+{
+    return ("Wrong Context name");
+}

@@ -42,4 +42,10 @@ class Semicolon : public std::exception
         const char *what() const throw();
 };
 
+class WrongContextName : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
+
 #endif /* PARSEEXCEPTION_HPP */

@@ -16,6 +16,27 @@
 #include <vector>
 
 
+// void	valdiateContexts(std::vector<std::string> content)
+// {
+// 	std::vector<std::string> data;
+// 	data.push_back("server");
+// 	data.push_back("http");
+
+// 	std::vector<std::string>::iterator	it = data.begin();
+// 	std::vector<std::string>::iterator	value;
+
+// 	while (it != data.end())
+// 	{
+// 		value = std::find(content.begin(), content.end(), *it);
+// 		// std::cout << "it = " << *it << std::endl;
+// 		if (value == content.end())
+// 		{
+// 			throw (WrongContextName());
+// 		}
+// 		it++;
+// 	}  
+// }
+
 void		semicolon(std::vector<std::string> content)
 {
 	std::vector<std::string> data;
@@ -158,6 +179,7 @@ int main()
 
 
 		syntaxValidation(tokens);
+		// valdiateContexts(tokens);
 		// semicolon(serverVector);
 
 	}
