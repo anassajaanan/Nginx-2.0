@@ -40,3 +40,17 @@ const char *WrongContextName::what() const throw()
 {
     return ("Wrong Context name");
 }
+
+const char *HttpContextError::what() const throw()
+{
+    return ("http should be first");
+}
+const char *ServerContextError::what() const throw()
+{
+    return ("server doesn't take multiple parameters");
+}
+
+const char *LocationContextError::what() const throw()
+{
+    return ("location take one parameter");
+}
