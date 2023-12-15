@@ -54,4 +54,21 @@ class WrongContextName : public std::exception
         const char *what() const throw();
 };
 
+class HttpContextError : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
+
+class ServerContextError : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
+
+class LocationContextError : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
 #endif /* PARSEEXCEPTION_HPP */

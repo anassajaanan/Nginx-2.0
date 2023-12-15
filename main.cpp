@@ -21,10 +21,11 @@ void	valdiateContexts(std::vector<std::string> content)
 	std::vector<std::string> data;
 	data.push_back("server");
 	data.push_back("http");
-	data.push_back("location");
 
 	std::vector<std::string>::iterator	it = data.begin();
+	std::vector<std::string>::iterator	tmp = data.begin();
 	std::vector<std::string>::iterator	value;
+	int i = 0;
 
 	while (it != data.end())
 	{
@@ -33,6 +34,38 @@ void	valdiateContexts(std::vector<std::string> content)
 		if (value == content.end())
 		{
 			throw (WrongContextName());
+		}
+		it++;
+	}
+	it = content.begin();
+	tmp = it;
+	while (it != content.end())
+	{
+		tmp = it;
+		value = std::find(content.begin(), content.end(), *it);
+		if (*value == "http")
+		{
+			if (*value != *content.begin())
+				throw (HttpContextError());
+			if (*++tmp != "{")
+				throw (WrongContextName());
+		}
+		else if (*value == "server")
+		{
+			if (*++tmp != "{")
+				throw (ServerContextError());
+		}
+		else if (*value == "location")
+		{
+			tmp = value;
+			tmp++;
+			while (tmp != content.end() && *tmp != "{")
+			{
+				tmp++;
+				i++;
+			}
+			if (i != 1)
+				throw (LocationContextError());
 		}
 		it++;
 	}
@@ -55,7 +88,7 @@ void		syntaxValidation(std::vector<std::string> content)
 		if (*it == "{")
 		{
 			saveKey = *--tmp;
-			if (saveKey.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/") != std::string::npos)
+			if (saveKey == "{" ||  saveKey == "}")
 				throw (ExtraBraces());
 			tmp++;
 			st.push(*it);
