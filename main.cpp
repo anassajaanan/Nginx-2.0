@@ -2,7 +2,7 @@
 #include "DirectiveNode.hpp"
 #include "ContextNode.hpp"
 #include "ConfigNode.hpp"
-#include "parseException.hpp"
+#include "syntaxValidation.hpp"
 #include <cctype>
 #include <regex>
 #include <map>
@@ -15,104 +15,75 @@
 #include <string>
 #include <vector>
 
+// void	validateContextLoop(std::vector<std::string>::iterator &it, std::vector<std::string> content, std::vector<std::string> data)
+// {
+// 	std::vector<std::string>::iterator	tmp = data.begin();
+// 	std::vector<std::string>::iterator	value;
+// 	int									i = 0;
 
-void	valdiateContexts(std::vector<std::string> content)
-{
-	std::vector<std::string> data;
-	data.push_back("server");
-	data.push_back("http");
+// 	while (it != content.end())
+// 	{
+// 		tmp = it;
+// 		value = std::find(content.begin(), content.end(), *it);
+// 		if (*value == "http")
+// 		{
+// 			if (*value != *content.begin())
+// 				throw (SyntaxError(HTTP_ORDER_ERROR));
+// 			if (*++tmp != "{")
+// 				throw (SyntaxError(HTTP_CONTEXT_ERROR));
+// 		}
+// 		else if (*value == "server")
+// 		{
+// 			if (*++tmp != "{")
+// 				throw (SyntaxError(SERVER_CONTEXT_ERROR));
+// 		}
+// 		else if (*value == "location")
+// 		{
+// 			tmp = value;
+// 			tmp++;
+// 			while (tmp != content.end() && *tmp != "{")
+// 			{
+// 				tmp++;
+// 				i++;
+// 			}
+// 			if (i != 1)
+// 				throw (SyntaxError(LOCATION_CONTEXT_ERROR));
+// 		}
+// 		it++;
+// 	}
+// }
 
-	std::vector<std::string>::iterator	it = data.begin();
-	std::vector<std::string>::iterator	tmp = data.begin();
-	std::vector<std::string>::iterator	value;
-	int i = 0;
+// void	valdiateContextsSyntax(std::vector<std::string> content)
+// {
+// 	std::vector<std::string> data;
+// 	std::vector<std::string>::iterator	it = data.begin();
+// 	std::vector<std::string>::iterator	value;
 
-	while (it != data.end())
-	{
-		value = std::find(content.begin(), content.end(), *it);
-		// std::cout << "it = " << *it << std::endl;
-		if (value == content.end())
-		{
-			throw (WrongContextName());
-		}
-		it++;
-	}
-	it = content.begin();
-	tmp = it;
-	while (it != content.end())
-	{
-		tmp = it;
-		value = std::find(content.begin(), content.end(), *it);
-		if (*value == "http")
-		{
-			if (*value != *content.begin())
-				throw (HttpContextError());
-			if (*++tmp != "{")
-				throw (WrongContextName());
-		}
-		else if (*value == "server")
-		{
-			if (*++tmp != "{")
-				throw (ServerContextError());
-		}
-		else if (*value == "location")
-		{
-			tmp = value;
-			tmp++;
-			while (tmp != content.end() && *tmp != "{")
-			{
-				tmp++;
-				i++;
-			}
-			if (i != 1)
-				throw (LocationContextError());
-		}
-		it++;
-	}
-	//check for another arg for locaion
-}
+// 	data.push_back("server");
+// 	data.push_back("http");
+// 	while (it != data.end())
+// 	{
+// 		value = std::find(content.begin(), content.end(), *it);
+// 		if (value == content.end())
+// 		{
+// 			throw (SyntaxError(WRONG_CONTEXT_NAME));
+// 		}
+// 		it++;
+// 	}
+// 	validateContextLoop(it, content, data);
+// 	//check for another arg for locaion
+// }
+
+
 
 // using similar concept of RPN
-void		syntaxValidation(std::vector<std::string> content)
-{
-	std::stack<std::string>	st;
-	std::string				saveKey;
-	std::vector<std::string>::iterator	it = content.begin();
-	std::vector<std::string>::iterator	tmp = it;
 
-	if (content.empty())
-		throw (EmptyConf());
-	for(; it != content.end(); it++)
-	{
-		tmp = it;
-		if (*it == "{")
-		{
-			saveKey = *--tmp;
-			if (saveKey == "{" ||  saveKey == "}")
-				throw (ExtraBraces());
-			tmp++;
-			st.push(*it);
-			if (++tmp == content.end())
-				throw (ExtraOpenBraces());
-			--tmp;
-		}
-		if (*it == "}")
-		{
-			if (st.empty()) /* when we got '}' put no '{' inside the st  */
-				throw (ExtraCloseBraces());
-			st.pop();
-		}
-	}
-	if (st.size() > 0)
-		throw (ExtraOpenBraces());
-}
 
 
 std::vector<std::string>	tokenize(std::string &input)
 {
 	std::vector<std::string>	tokens;
 	std::string					currentToken;
-	// std::set<char>				delimiters {'{', '}', ';'};
 	std::set<char>				delimiters;
 
 	delimiters.insert('{');
@@ -156,6 +127,7 @@ int main()
 		std::vector<std::string>	tokens;
 		std::vector<std::string>::iterator it;
 		std::string							tmp;
+		// SyntaxValidator s;
 
 		if (!ifs.is_open())
 		{
@@ -178,12 +150,7 @@ int main()
 			std::cout << "[" << tokens[i] << "]" << std::endl;
 		}
 
-
-
-		syntaxValidation(tokens);
-		valdiateContexts(tokens);
-		// semicolon(serverVector);
-
+		SyntaxValidator::validate(tokens);
 	}
 	catch (std::exception &e)
 	{
