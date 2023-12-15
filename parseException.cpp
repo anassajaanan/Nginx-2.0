@@ -13,12 +13,17 @@ const char *EmptyConf::what() const throw()
 
 const char *ExtraOpenBraces::what() const throw()
 {
-    return ("Extra { in the configruation file");
+    return ("Extra { inside the configruation file");
 }
 
 const char *ExtraCloseBraces::what() const throw()
 {
-    return ("Extra } in the configruation file");
+    return ("Extra } inside the configruation file");
+}
+
+const char *ExtraBraces::what() const throw()
+{
+    return ("Extra {} inside the configruation file");
 }
 
 const char *EmptyBraces::what() const throw()
