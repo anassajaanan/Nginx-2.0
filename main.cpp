@@ -16,53 +16,27 @@
 #include <vector>
 
 
-// void	valdiateContexts(std::vector<std::string> content)
-// {
-// 	std::vector<std::string> data;
-// 	data.push_back("server");
-// 	data.push_back("http");
-
-// 	std::vector<std::string>::iterator	it = data.begin();
-// 	std::vector<std::string>::iterator	value;
-
-// 	while (it != data.end())
-// 	{
-// 		value = std::find(content.begin(), content.end(), *it);
-// 		// std::cout << "it = " << *it << std::endl;
-// 		if (value == content.end())
-// 		{
-// 			throw (WrongContextName());
-// 		}
-// 		it++;
-// 	}  
-// }
-
-void		semicolon(std::vector<std::string> content)
+void	valdiateContexts(std::vector<std::string> content)
 {
 	std::vector<std::string> data;
-	data.push_back("listen");
-	data.push_back("try_files");
-	data.push_back("server_name");
-	// data.push_back("");
-	std::vector<std::string>::iterator	it = content.begin();
+	data.push_back("server");
+	data.push_back("http");
+	data.push_back("location");
+
+	std::vector<std::string>::iterator	it = data.begin();
 	std::vector<std::string>::iterator	value;
 
-	while (it != content.end())
+	while (it != data.end())
 	{
-		value = std::find(data.begin(), data.end(), *it);
-		std::cout << "it = " << *it << std::endl;
-		if (value == data.end())
+		value = std::find(content.begin(), content.end(), *it);
+		// std::cout << "it = " << *it << std::endl;
+		if (value == content.end())
 		{
-			it++;
-			if (it == content.end())
-				throw (Semicolon());
-			std::string::difference_type n = std::count(it->begin(), it->end(), ';');
-			std::cout << "n = " << n << std::endl;
-			if (n != 1)
-				throw (Semicolon());
+			throw (WrongContextName());
 		}
 		it++;
 	}
+	//check for another arg for locaion
 }
 
 // using similar concept of RPN
@@ -81,16 +55,14 @@ void		syntaxValidation(std::vector<std::string> content)
 		if (*it == "{")
 		{
 			saveKey = *--tmp;
+			if (saveKey.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/") != std::string::npos)
+				throw (ExtraBraces());
 			tmp++;
 			st.push(*it);
 			if (++tmp == content.end())
 				throw (ExtraOpenBraces());
 			--tmp;
 		}
-		if ((saveKey.find_first_not_of("abcdefghijklmnopqrstuvwxyz/") != std::string::npos && *tmp == "{}")
-		|| (*tmp == "{" && *++tmp == "}" && saveKey.find_first_not_of("abcdefghijklmnopqrstuvwxyz/") != std::string::npos)
-		|| *tmp == "{}")
-			throw (EmptyBraces());
 		if (*it == "}")
 		{
 			if (st.empty()) /* when we got '}' put no '{' inside the st  */
@@ -151,9 +123,6 @@ int main()
 		std::vector<std::string>	tokens;
 		std::vector<std::string>::iterator it;
 		std::string							tmp;
-		// ConfigNode		head();
-		// ConfigNode			*tmp;
-		// ContextNode			*t;
 
 		if (!ifs.is_open())
 		{
@@ -179,7 +148,7 @@ int main()
 
 
 		syntaxValidation(tokens);
-		// valdiateContexts(tokens);
+		valdiateContexts(tokens);
 		// semicolon(serverVector);
 
 	}

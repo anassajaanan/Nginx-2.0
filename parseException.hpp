@@ -36,6 +36,12 @@ class EmptyBraces : public std::exception
         const char *what() const throw();
 };
 
+class ExtraBraces : public std::exception
+{
+    public:
+        const char *what() const throw();
+};
+
 class Semicolon : public std::exception
 {
     public:
