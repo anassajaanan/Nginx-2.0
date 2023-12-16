@@ -4,39 +4,37 @@
 SyntaxError::SyntaxError(const std::string &errorMessage)
 	: std::runtime_error(errorMessage) { }
 
-void	SyntaxValidator::validateBraces(const std::vector<std::string> &tokens)
+void		SyntaxValidator::validateBraces(const std::vector<std::string> &tokens)
 {
+	std::stack<std::string>	st;
+	std::vector<std::string>::const_iterator	it = tokens.begin();
+
 	if (tokens.empty())
 		throw (SyntaxError(EMPTY_CONFIG_FILE));
-
-	std::stack<std::string>	stack;
-	for (size_t i = 0; i < tokens.size(); i++)
+	
+	for(; it != tokens.end(); it++)
 	{
-		if (tokens[i] == "{")
-			stack.push(tokens[i]);
-		if (tokens[i] == "}")
+		if (*it == "{")
 		{
-			if (stack.empty())
+			if (*(it - 1) == "{")
+				throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
+			if (*(it - 1) == "}" && (*(it - 2)).find_first_not_of("server") == std::string::npos)
 				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
-			stack.pop();
+			if (*(it - 1) == "}")
+				throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
+			st.push(*it);
+			if ((it + 1) == tokens.end())
+				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
+		}
+		if (*it == "}")
+		{
+			if (st.empty()) /* when we got '}' put no '{' inside the st  */
+				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
+			st.pop();
 		}
 	}
-	if (!stack.empty())
+	if (st.size() > 0)
 		throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
-
-	for (size_t i = 0; i < tokens.size(); i++)
-	{
-		if (tokens[i] == "{")
-		{
-			if (i + 1 == tokens.size() || tokens[i + 1] == "{")
-				throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
-		}
-		if (tokens[i] == "}")
-		{
-			if ((i + 1) != tokens.size() && tokens[i + 1] == "{")
-				throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
-		}
-	}
 }
 
 void	SyntaxValidator::validateRequiredContexts(const std::vector<std::string> &tokens)
