@@ -106,7 +106,10 @@ void	logicValidation(ConfigNode *node)
 		}
 		else if (directiveNode->getKey() == "rewrite")
 		{
-			// Todo : check if the regex is valid
+			if (parentNode->getName() == "http")
+				throw (std::runtime_error("\"rewrite\" directive is not allowed in this context"));
+			if (directiveNode->getValueCount() != 2)
+				throw (std::runtime_error("invalid number of arguments in \"rewrite\" directive"));
 		}
 	}
 }
