@@ -10,7 +10,7 @@ DirectiveNode::DirectiveNode() : ConfigNode(Directive)
 
 
 DirectiveNode::DirectiveNode(const std::string &key, ConfigNode *parentNode)
-	: ConfigNode(Directive, parentNode), key(key) { }
+	: ConfigNode(Directive, parentNode), key(key), valueCount(0) { }
 
 DirectiveNode::~DirectiveNode()
 {
