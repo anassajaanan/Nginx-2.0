@@ -1,31 +1,42 @@
 
 #include "syntaxValidation.hpp"
-#include <sys/_types/_size_t.h>
 
 SyntaxError::SyntaxError(const std::string &errorMessage)
 	: std::runtime_error(errorMessage) { }
 
 void	SyntaxValidator::validateBraces(const std::vector<std::string> &tokens)
 {
-	std::stack<std::string>	stack;
-	std::vector<std::string>::const_iterator	it = tokens.begin();
-
 	if (tokens.empty())
 		throw (SyntaxError(EMPTY_CONFIG_FILE));
-	while (it != tokens.end())
+
+	std::stack<std::string>	stack;
+	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		if (*it == "{")
-			stack.push(*it);
-		if (*it == "}")
+		if (tokens[i] == "{")
+			stack.push(tokens[i]);
+		if (tokens[i] == "}")
 		{
 			if (stack.empty())
 				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
 			stack.pop();
 		}
-		it++;
 	}
-	if (stack.size() > 0)
+	if (!stack.empty())
 		throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
+
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		if (tokens[i] == "{")
+		{
+			if (i + 1 == tokens.size() || tokens[i + 1] == "{")
+				throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
+		}
+		if (tokens[i] == "}")
+		{
+			if ((i + 1) != tokens.size() && tokens[i + 1] == "{")
+				throw (SyntaxError(UNEXPECTED_OPEN_BRACE));
+		}
+	}
 }
 
 void	SyntaxValidator::validateRequiredContexts(const std::vector<std::string> &tokens)
@@ -36,61 +47,25 @@ void	SyntaxValidator::validateRequiredContexts(const std::vector<std::string> &t
 	if (std::find(tokens.begin(), tokens.end(), "server") == tokens.end())
 		throw (SyntaxError(MISSING_SERVER_CONTEXT));
 
-	for (size_t i = 0; i < tokens.size(); ++i) {
-        if (tokens[i] == "http" || tokens[i] == "server") {
-            if (i + 1 >= tokens.size() || tokens[i + 1] != "{") {
-                throw SyntaxError(tokens[i] == "http" ? HTTP_CONTEXT_ERROR : SERVER_CONTEXT_ERROR);
-            }
+	for (size_t i = 0; i < tokens.size(); ++i)
+	{
+        if (tokens[i] == "http" || tokens[i] == "server")
+		{
+			if ((i + 1) < tokens.size() && tokens[i + 1] == "}")
+				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
+			if ((i + 1) < tokens.size() && tokens[i + 1] != "{")
+				throw (SyntaxError(tokens[i] == "http" ? HTTP_CONTEXT_ERROR : SERVER_CONTEXT_ERROR));
         }
+		if (tokens[i] == "location")
+		{
+			if ((i + 1) < tokens.size() && tokens[i + 1] == "}")
+				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
+			if ((i + 1) < tokens.size() && tokens[i + 1] == "{")
+				throw (SyntaxError(LOCATION_CONTEXT_ERROR));
+			if ((i + 2) < tokens.size() && tokens[i + 2] != "{")
+				throw (SyntaxError(LOCATION_CONTEXT_ERROR));
+		}
     }
-}
-
-
-void	SyntaxValidator::validateHttpContext(const std::vector<std::string> &tokens,
-								std::stack<std::string> &contextStack, size_t i)
-{
-	if ((i + 1) < tokens.size() && tokens[i + 1] == "}")
-		throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
-	else if ((i + 1) < tokens.size() && tokens[i + 1] == "{")
-	{
-		if (!contextStack.empty())
-			throw (SyntaxError(HTTP_CONTEXT_OUTSIDE_MAIN));
-		contextStack.push("http");
-	}
-	else
-		throw (SyntaxError(MISSING_OPEN_BRACE_AFTER_HTTP));
-}
-
-void	SyntaxValidator::validateServerContext(const std::vector<std::string> &tokens,
-								std::stack<std::string> &contextStack, size_t i)
-{
-	if ((i + 1) < tokens.size() && tokens[i + 1] == "}")
-		throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
-	else if ((i + 1) < tokens.size() && tokens[i + 1] == "{")
-	{
-		if (contextStack.empty() || contextStack.top() != "http")
-			throw (SyntaxError(SERVER_CONTEXT_OUTSIDE_HTTP));
-		contextStack.push("server");
-	}
-	else
-		throw (SyntaxError(MISSING_OPEN_BRACE_AFTER_SERVER));
-}
-
-void	SyntaxValidator::validateLocationContext(const std::vector<std::string> &tokens,
-								std::stack<std::string> &contextStack, size_t i)
-{
-	if ((i + 1) < tokens.size() && tokens[i + 1] == "{")
-		throw (SyntaxError(LOCATION_CONTEXT_ERROR));
-	else if ((i + 1) < tokens.size() && tokens[i + 1] == "}")
-		throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
-	else if ((i + 2) < tokens.size() && tokens[i + 2] == "{")
-	{
-		if (contextStack.empty() || contextStack.top() != "server")
-			throw (SyntaxError(LOCATION_CONTEXT_OUTSIDE_SERVER));
-		contextStack.push("location");
-	}
-	else
-		throw (SyntaxError(MISSING_OPEN_BRACE_AFTER_LOCATION));
 }
 
 void	SyntaxValidator::validateContexts(const std::vector<std::string> &tokens)
@@ -103,17 +78,23 @@ void	SyntaxValidator::validateContexts(const std::vector<std::string> &tokens)
 	{
 		if (tokens[i] == "http")
 		{
-			validateHttpContext(tokens, contextStack, i);
+			if (!contextStack.empty())
+				throw (SyntaxError(HTTP_CONTEXT_OUTSIDE_MAIN));
+			contextStack.push("http");
 			httpContextFound = true;
 		}
 		else if (tokens[i] == "server")
 		{
-			validateServerContext(tokens, contextStack, i);
+			if (contextStack.empty() || contextStack.top() != "http")
+				throw (SyntaxError(SERVER_CONTEXT_OUTSIDE_HTTP));
+			contextStack.push("server");
 			serverContextFound = true;
 		}
 		else if (tokens[i] == "location")
 		{
-			validateLocationContext(tokens, contextStack, i);
+			if (contextStack.empty() || contextStack.top() != "server")
+				throw (SyntaxError(LOCATION_CONTEXT_OUTSIDE_SERVER));
+			contextStack.push("location");
 		}
 		else if (tokens[i] == "}")
 		{
@@ -160,7 +141,10 @@ void	SyntaxValidator::validateDirectives(const std::vector<std::string> &tokens)
 void	SyntaxValidator::validate(const std::vector<std::string> &tokens)
 {
     validateBraces(tokens);
+
     validateRequiredContexts(tokens);
+
     validateContexts(tokens);
+	
     validateDirectives(tokens);
 }

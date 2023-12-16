@@ -53,6 +53,8 @@ std::vector<std::string>	tokenize(std::string &input)
 			currentToken += ch;
 		}
 	}
+	if (!currentToken.empty())
+		tokens.push_back(currentToken);
 	return (tokens);
 }
 

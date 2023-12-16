@@ -4,7 +4,6 @@
 #define SYNTAXVALIDATOR_HPP
 
 #include <iostream>
-#include <sys/_types/_size_t.h>
 #include <vector>
 #include <exception>
 #include <unordered_set>
@@ -17,9 +16,6 @@
 #define LOCATION_CONTEXT_OUTSIDE_SERVER 	"Location context outside server"
 #define UNEXPECTED_CLOSING_BRACE 			"Unexpected \"}\""
 #define UNEXPECTED_OPEN_BRACE 				"Unexpected \"{\""
-#define MISSING_OPEN_BRACE_AFTER_HTTP 		"Missing open brace after http"
-#define MISSING_OPEN_BRACE_AFTER_SERVER 	"Missing open brace after server"
-#define MISSING_OPEN_BRACE_AFTER_LOCATION	"Missing open brace after location"
 #define MISSING_SEMICOLONE 					"Missing semicolon \";\""
 #define INVALID_LOCATION_FORMAT 			"Invalid location format"
 #define UNEXPECTED_SEMICOLONE 				"Unexpected \";\""
@@ -48,16 +44,9 @@ class SyntaxValidator
 
         static void validateRequiredContexts(const std::vector<std::string> &tokens);
 
-        static void	validateHttpContext(const std::vector<std::string> &tokens,
-            std::stack<std::string> &contextStack, size_t i);
-        static void	validateServerContext(const std::vector<std::string> &tokens,
-            std::stack<std::string> &contextStack, size_t i);
-        static void	validateLocationContext(const std::vector<std::string> &tokens,
-            std::stack<std::string> &contextStack, size_t i);
 		static void validateContexts(const std::vector<std::string> &tokens);
         
         static void	validateDirectives(const std::vector<std::string> &tokens);
-
 
     public:
         static void	validate(const std::vector<std::string> &tokens);
