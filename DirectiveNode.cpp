@@ -33,3 +33,8 @@ void	DirectiveNode::addValue(const std::string &value)
 	this->values.push_back(value);
 	this->valueCount++;
 }
+
+int	DirectiveNode::getValueCount() const
+{
+	return (this->valueCount);
+}
