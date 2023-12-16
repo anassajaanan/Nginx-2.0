@@ -1,5 +1,5 @@
 
-#include "syntaxValidation.hpp"
+#include "SyntaxValidator.hpp"
 
 SyntaxError::SyntaxError(const std::string &errorMessage)
 	: std::runtime_error(errorMessage) { }
