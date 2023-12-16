@@ -14,6 +14,7 @@ private:
 	std::string 				name;
 	std::string 				path;
 	std::vector<ConfigNode *>	children;
+	int							numChildren;
 
 public:
 	ContextNode();
@@ -22,7 +23,7 @@ public:
 
 	// getters
 	const std::string	&getName() const;
-	std::vector<ConfigNode *>	&getChildren();
+	const std::vector<ConfigNode *>	&getChildren() const;
 
 
 	void	addChild(ConfigNode *child);

@@ -28,6 +28,7 @@ public:
 	const std::vector<std::string>	&getValues() const;
 
 	void	addValue(const std::string &value);
+	int		getValueCount() const;
 
 };
 
