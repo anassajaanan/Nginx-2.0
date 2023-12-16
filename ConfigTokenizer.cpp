@@ -3,7 +3,10 @@
 void	ConfigTokenizer::tokenize(const std::string &input, std::vector<std::string> &tokens)
 {
 	std::string					currentToken;
-	std::set<char>				delimiters = {'{', '}', ';'};
+	std::set<char>				delimiters;
+	delimiters.insert('{');
+	delimiters.insert('}');
+	delimiters.insert(';');
 
 	for (std::string::const_iterator it = input.begin(); it != input.end(); it++)
 	{
@@ -26,9 +29,7 @@ void	ConfigTokenizer::tokenize(const std::string &input, std::vector<std::string
 			}
 		}
 		else
-		{
 			currentToken += ch;
-		}
 	}
 	if (!currentToken.empty())
 		tokens.push_back(currentToken);
