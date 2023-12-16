@@ -1,10 +1,10 @@
 # include "ContextNode.hpp"
 #include "ConfigNode.hpp"
 
-ContextNode::ContextNode() : ConfigNode(NodeType::Context) , name("DefaultContext") { }
+ContextNode::ContextNode() : ConfigNode(Context) , name("DefaultContext"), path("No Path Specified") { }
 
-ContextNode::ContextNode(const std::string &name, ConfigNode *parentNode) 
-	: ConfigNode(NodeType::Context, parentNode) , name(name) { }
+ContextNode::ContextNode(const std::string &name, ConfigNode *parentNode, const std::string &path) 
+	: ConfigNode(Context, parentNode) , name(name), path(path) { }
 
 const std::string	&ContextNode::getName() const
 {
