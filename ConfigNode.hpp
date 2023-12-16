@@ -7,9 +7,10 @@
 #define CONFIGNODE_HPP
 
 #include <string>
+#include <vector>
 
 
-enum class NodeType
+enum NodeType
 {
 	Context,
 	Directive,

@@ -1,5 +1,6 @@
 
 #pragma once
+#include <vector>
 #ifndef DIRECTIVENODE_HPP
 #define DIRECTIVENODE_HPP
 
@@ -12,19 +13,21 @@
 class DirectiveNode : public ConfigNode
 {
 private:
-	std::string	key;
-	std::string	value;
-
+	std::string					key;
+	std::vector<std::string>	values;
+	int							valueCount;
 
 public:
 	DirectiveNode();
-	DirectiveNode(const std::string &key, const std::string &value, ConfigNode *parentNode = NULL);
+	DirectiveNode(const std::string &key, ConfigNode *parentNode = NULL);
 	~DirectiveNode();
 
 
 	// getters
 	const std::string	&getKey() const;
-	const std::string	&getValue() const;
+	const std::vector<std::string>	&getValues() const;
+
+	void	addValue(const std::string &value);
 
 };
 

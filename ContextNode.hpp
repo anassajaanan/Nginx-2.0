@@ -1,23 +1,23 @@
 
 
 #pragma once
+#include <string>
 #ifndef CONTEXTNODE_HPP
 #define CONTEXTNODE_HPP
 
 
 #include "ConfigNode.hpp"
-#include <string>
-#include <vector>
 
 class ContextNode : public ConfigNode
 {
 private:
 	std::string 				name;
+	std::string 				path;
 	std::vector<ConfigNode *>	children;
 
 public:
 	ContextNode();
-	ContextNode(const std::string &name, ConfigNode *parentNode = NULL);
+	ContextNode(const std::string &name, ConfigNode *parentNode = NULL, const std::string &path = "No Path Specified");
 	~ContextNode();
 
 	// getters
