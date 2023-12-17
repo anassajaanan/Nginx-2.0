@@ -29,9 +29,12 @@ enum numArgs
 class   LogicValidate 
 {
     private:
-        std::map<std::string, int>  directiveContent;
+        std::map<std::string, std::pair<int , int> >  possibleDirs;
     public:
         LogicValidate();
+        void    validateDirectives(const ConfigNode *node);
+        void	validateDirectiveCodes(DirectiveNode *directiveNode);
+        void	validateDirectiveParent(const std::string &key, const std::string &parentName);
         ~LogicValidate();
 };
 
