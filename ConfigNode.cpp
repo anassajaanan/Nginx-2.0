@@ -13,7 +13,7 @@ NodeType	ConfigNode::getType() const
 	return (this->type);
 }
 
-const ConfigNode	*ConfigNode::getParent() const
+ConfigNode	*ConfigNode::getParent()
 {
 	return (this->parent);
 }

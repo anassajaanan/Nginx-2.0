@@ -16,6 +16,7 @@
 
 
 #include "TreeBuilder.hpp"
+#include "SyntaxValidator.hpp"
 
 void tokenize(const std::string &input, std::vector<std::string> &tokens)
 {
@@ -57,7 +58,7 @@ void	logicValidation(ConfigNode *node)
 {
 	if (node->getType() == Context)
 	{
-		ContextNode	*contextNode = (ContextNode *)node;
+		ContextNode	*contextNode = static_cast<ContextNode *>(node);
 		const std::vector<ConfigNode *>	&children = contextNode->getChildren();
 		for (size_t i = 0; i < children.size(); i++)
 		{
@@ -66,8 +67,8 @@ void	logicValidation(ConfigNode *node)
 	}
 	else if (node->getType() == Directive)
 	{
-		DirectiveNode *directiveNode = (DirectiveNode *)node;
-		ContextNode	*parentNode = (ContextNode *)directiveNode->getParent();
+		DirectiveNode *directiveNode = static_cast<DirectiveNode *>(node);
+		ContextNode *parentNode = static_cast<ContextNode *>(directiveNode->getParent());
 		if (directiveNode->getKey() == "listen")
 		{
 			if (parentNode->getName() != "server")
@@ -149,8 +150,13 @@ int main()
         it = tokens.begin();
         std::vector<std::string>::iterator end = tokens.end();
         
-		
+		SyntaxValidator::validate(tokens);
 		ConfigNode *root = TreeBuilder::builder(NULL, it, end);
+
+		logicValidation(root);
+
+		std::cout << "Success" << std::endl;
+		return (0);
 
 
 		return (0);

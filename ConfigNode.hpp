@@ -28,7 +28,7 @@ public:
 
 	// getters
 	NodeType			getType() const;
-	const ConfigNode	*getParent() const;
+	ConfigNode			*getParent();
 
 };
 
