@@ -10,11 +10,21 @@
 #include <map>
 #include <iostream>
 
-enum hasParent
+enum ParentPresence
 {
-    Parent,
-    NonParent
+    ParentNeeded,
+    Independent
 };
+
+enum numArgs
+{
+    OneArg,
+    TwoArgs,
+	OneOrMoreArgs,
+	TwoOrMoreArgs,
+	OneOrTwoArgs
+};
+
 
 class   LogicValidate 
 {
