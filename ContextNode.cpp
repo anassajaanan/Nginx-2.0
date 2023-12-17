@@ -33,3 +33,8 @@ void	ContextNode::addChild(ConfigNode *child)
 		children.push_back(child);
 	numChildren++;
 }
+
+int		ContextNode::getNumChildren() const
+{
+	return (this->numChildren);
+}

@@ -24,6 +24,7 @@ public:
 	// getters
 	const std::string	&getName() const;
 	const std::vector<ConfigNode *>	&getChildren() const;
+	int					getNumChildren() const;
 
 
 	void	addChild(ConfigNode *child);
