@@ -19,17 +19,6 @@ LogicValidate::LogicValidate()
 void    LogicValidate::validateDirectives(const ConfigNode *node)
 {
 	std::vector<std::string> tmp;
-	std::map<std::string, std::pair<int , int> >  possibleDirs;
-	// possibleDirs["root"] = std::make_pair(OneArg, Independent); /*only one*/
-	// possibleDirs["listen"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
-	// possibleDirs["autoindex"] = std::make_pair(OneArg, Independent); /*only one*/
-	// possibleDirs["server_name"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
-	// possibleDirs["client_max_body_size"] = std::make_pair(OneArg, Independent); /*only one*/
-	// possibleDirs["error_page"] = std::make_pair(TwoArgs, Independent); /*two or more*/
-	// possibleDirs["try_files"] = std::make_pair(TwoOrMoreArgs, ParentNeeded); /*two or more*/
-	// possibleDirs["rewrite"] = std::make_pair(TwoArgs, ParentNeeded); /* only 2*/
-	// possibleDirs["index"] = std::make_pair(OneOrMoreArgs, Independent); /*one or more*/
-	// possibleDirs["return"] = std::make_pair(OneOrTwoArgs, ParentNeeded); /*one or two*/
 
 	if (node->getType() == Context)
 	{
@@ -47,8 +36,6 @@ void    LogicValidate::validateDirectives(const ConfigNode *node)
 			
 			if (it->second.second == ParentNeeded) // validate parent
 				validateDirectiveParent(it->first, parentNode->getName());
-
-
 			if (it->second.first == OneArg && directive->getValueCount() != 1)
 				throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
 			else if (it->second.first == TwoOrMoreArgs && directive->getValueCount() < 2)
@@ -127,5 +114,4 @@ void	LogicValidate::validateDirectiveParent(const std::string &key, const std::s
 
 LogicValidate::~LogicValidate()
 {
-    //load values 
 }

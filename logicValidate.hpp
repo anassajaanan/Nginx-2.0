@@ -3,7 +3,6 @@
 #define LOGICVALIDATE_HPP
 
 #include <string>
-
 #include "ConfigNode.hpp"
 #include "ContextNode.hpp"
 #include "DirectiveNode.hpp"
