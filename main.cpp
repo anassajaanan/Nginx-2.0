@@ -17,6 +17,92 @@
 
 #include "TreeBuilder.hpp"
 #include "SyntaxValidator.hpp"
+#include "logicValidate.hpp"
+
+
+void	validateParent(const std::string &key, const std::string &parentName)
+{
+		if (key == "listen")
+		{
+			if (parentName != "server")
+				throw (std::runtime_error("\"listen\" directive is not allowed in this context"));
+		}
+		else if (key == "server_name")
+		{
+			if (parentName != "server")
+				throw (std::runtime_error("\"server_name\" directive is not allowed in this context"));
+		}
+		else if (key == "try_files")
+		{
+			if (parentName == "http")
+				throw (std::runtime_error("\"try_files\" directive is not allowed in this context"));
+		}
+		else if (key == "return")
+		{
+			if (parentName == "http")
+				throw (std::runtime_error("\"return\" directive is not allowed in this context"));
+		}
+		else if (key == "rewrite")
+		{
+			if (parentName == "http")
+				throw (std::runtime_error("\"rewrite\" directive is not allowed in this context"));
+		}
+}
+
+void    validateDirectives(const ConfigNode *node)
+{
+	std::vector<std::string> tmp;
+	std::map<std::string, std::pair<int , int> >  possibleDirs;
+	possibleDirs["root"] = std::make_pair(1, NonParent);
+	possibleDirs["listen"] = std::make_pair(1, Parent);
+	possibleDirs["autoindex"] = std::make_pair(1, NonParent);
+	possibleDirs["server_name"] = std::make_pair(1, Parent);
+	possibleDirs["client_body_size"] = std::make_pair(1, NonParent);
+	possibleDirs["error_page"] = std::make_pair(2, NonParent);
+	possibleDirs["try_files"] = std::make_pair(2, Parent);
+	// possibleDirs["rewrite"] = 2; /* only 2*/ 
+	// possibleDirs["return"] = 2; /* 1 or 2 */
+	possibleDirs["index"] = std::make_pair(3, NonParent);
+	if (node->getType() == Context)
+	{
+		const ContextNode *head = (const ContextNode *)(node);
+		for (int i = 0; i < head->getChildren().size(); i++)
+			validateDirectives(head->getChildren()[i]);
+	}
+	if (node->getType() == Directive)
+	{
+		DirectiveNode *d = (DirectiveNode *)(node);
+		std::map<std::string, std::pair<int, int> >::iterator it = possibleDirs.find(d->getKey());
+		if (it != possibleDirs.end())
+		{
+			 ContextNode *parentNode = ( ContextNode *)(d->getParent());
+			if (it->second.second == Parent)
+			{
+				std::cout << "first = " << it->first << std::endl;
+				std::cout << "name = " << parentNode->getName() << std::endl;
+				validateParent(it->first, parentNode->getName());
+			}
+			if (it->second.first == 1 && d->getValues().size() != it->second.first)
+				throw (std::runtime_error("Invalid number of arguments in \"" + d->getKey() + "\" directive"));
+			else if (it->second.first == 2 && d->getValues().size() <= 1)
+				throw (std::runtime_error("Invalid number of arguments in \"" + d->getKey() + "\" directive"));
+			else if (it->second.first == 3 && d->getValues().size() < 1)
+				throw (std::runtime_error("Invalid number of arguments in \"" + d->getKey() + "\" directive"));
+			// if (it-firdt== return )
+
+			// {
+			// 	try {
+			// 		int code = std::stoi(directiveNode->getValues()[0]);
+			// 		if (code < 100 || code > 599)
+			// 			throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
+			// 	}
+			// 	catch (std::exception &e) {
+			// 		throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
+			// 	}
+			// }
+		}
+	}
+}
 
 void tokenize(const std::string &input, std::vector<std::string> &tokens)
 {
@@ -51,68 +137,6 @@ void tokenize(const std::string &input, std::vector<std::string> &tokens)
     }
     if (!currentToken.empty())
         tokens.push_back(currentToken);
-}
-
-
-void	logicValidation(ConfigNode *node)
-{
-	if (node->getType() == Context)
-	{
-		ContextNode	*contextNode = static_cast<ContextNode *>(node);
-		const std::vector<ConfigNode *>	&children = contextNode->getChildren();
-		for (size_t i = 0; i < children.size(); i++)
-		{
-			logicValidation(children[i]);
-		}
-	}
-	else if (node->getType() == Directive)
-	{
-		DirectiveNode *directiveNode = static_cast<DirectiveNode *>(node);
-		ContextNode *parentNode = static_cast<ContextNode *>(directiveNode->getParent());
-		if (directiveNode->getKey() == "listen")
-		{
-			if (parentNode->getName() != "server")
-				throw (std::runtime_error("\"listen\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() != 1)
-				throw (std::runtime_error("invalid number of arguments in \"listen\" directive"));
-		}
-		else if (directiveNode->getKey() == "server_name")
-		{
-			if (parentNode->getName() != "server")
-				throw (std::runtime_error("\"server_name\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() != 1)
-				throw (std::runtime_error("invalid number of arguments in \"server_name\" directive"));
-		}
-		else if (directiveNode->getKey() == "try_files")
-		{
-			if (parentNode->getName() == "http")
-				throw (std::runtime_error("\"try_files\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() < 2)
-				throw (std::runtime_error("invalid number of arguments in \"try_files\" directive"));
-		}
-		else if (directiveNode->getKey() == "return")
-		{
-			if (parentNode->getName() == "http")
-				throw (std::runtime_error("\"return\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() == 0 || directiveNode->getValueCount() > 2)
-				throw (std::runtime_error("invalid number of arguments in \"return\" directive"));
-			try {
-				int code = std::stoi(directiveNode->getValues()[0]);
-				if (code < 100 || code > 599)
-					throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
-			}
-			catch (std::exception &e) {
-				throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
-			}
-		}
-		else if (directiveNode->getKey() == "rewrite")
-		{
-			if (parentNode->getName() == "http")
-				throw (std::runtime_error("\"rewrite\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() != 2)
-				throw (std::runtime_error("invalid number of arguments in \"rewrite\" directive"));
-		}
-	}
 }
 
 
@@ -153,15 +177,11 @@ int main()
 		SyntaxValidator::validate(tokens);
 		ConfigNode *root = TreeBuilder::builder(NULL, it, end);
 
-		logicValidation(root);
+		// logicValidation(root);
+		validateDirectives(root);
 
 		std::cout << "Success" << std::endl;
 		return (0);
-
-
-		return (0);
-
-        return (0);
     }
     catch (std::exception &e)
     {
