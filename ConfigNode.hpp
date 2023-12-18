@@ -7,7 +7,9 @@
 #define CONFIGNODE_HPP
 
 #include <string>
+#include <iostream>
 #include <vector>
+#include <map>
 
 
 enum NodeType
