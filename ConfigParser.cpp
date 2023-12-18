@@ -2,7 +2,7 @@
 
 
 ConfigParser::ConfigParser(const std::string &fileName)
-	: configFileName(fileName) { }
+	: configFileName(fileName) { parseConfigFile(); }
 
 void	ConfigParser::readConfigFile()
 {
@@ -53,10 +53,17 @@ void	ConfigParser::tokenizeConfigFile()
 
 void	ConfigParser::parseConfigFile()
 {
+	readConfigFile();
+	tokenizeConfigFile();
+
 	SyntaxValidator::validate(configTokens);
 	configTreeRoot = TreeBuilder::parseConfigToTree(configTokens);
 	logicValidator.validate(configTreeRoot);
 }
+
+
+
+// Getters
 
 ConfigNode	*ConfigParser::getConfigTreeRoot()
 {
