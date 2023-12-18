@@ -1,5 +1,6 @@
 # include "ContextNode.hpp"
 #include "ConfigNode.hpp"
+#include "DirectiveNode.hpp"
 
 ContextNode::ContextNode() : ConfigNode(Context) , name("DefaultContext"), path("No Path Specified"), numChildren(0) { }
 
@@ -37,4 +38,19 @@ void	ContextNode::addChild(ConfigNode *child)
 int		ContextNode::getNumChildren() const
 {
 	return (this->numChildren);
+}
+
+int	ContextNode::getCountOf(const std::string &key) const
+{
+	int	count = 0;
+	for (int i = 0; i < numChildren; i++)
+	{
+		if (children[i]->getType() == Directive)
+		{
+			DirectiveNode *directiveNode = static_cast<DirectiveNode *>(children[i]);
+			if (directiveNode->getKey() == key)
+				count++;
+		}
+	}
+	return (count);
 }
