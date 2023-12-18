@@ -1,4 +1,8 @@
 # include "LogicValidator.hpp"
+#include "ConfigNode.hpp"
+#include "ContextNode.hpp"
+#include "DirectiveNode.hpp"
+#include <stdexcept>
 
 
 LogicValidator::LogicValidator()
@@ -31,6 +35,27 @@ void	LogicValidator::validateDirectiveArgs(DirectiveNode *directive, std::map<st
 }
 
 
+void	 LogicValidator::validateDirectiveDublicates(ConfigNode *node)
+{
+	if (node->getType() == Directive)
+		return;
+	// std::set<std::string> nonDublicatesDirectives;
+	ContextNode *parent = static_cast<ContextNode *>(node);
+	// const std::vector<ConfigNode *>children = parent->getChildren();
+	for (size_t i = 0; i < parent->getChildren().size(); i++)
+	{
+		if (parent->getChildren()[i]->getType() == Directive)
+		{
+			DirectiveNode *directiveNode = static_cast<DirectiveNode *>(parent->getChildren()[i]);
+			if (directiveNode->getKey() == "root" || directiveNode->getKey() == "client_max_body_size"
+			|| directiveNode->getKey() == "try_files" || directiveNode->getKey() == "autoindex")
+				if (parent->getCountOf(directiveNode->getKey()) > 1)
+					throw (std::runtime_error("\"" + directiveNode->getKey() + "\"" + " directive is duplicated"));
+		}
+			validateDirectiveDublicates(parent->getChildren()[i]);
+	}
+}
+
 void    LogicValidator::validate(ConfigNode *node)
 {
 	if (node->getType() == Context)
@@ -49,6 +74,7 @@ void    LogicValidator::validate(ConfigNode *node)
 			ContextNode *parentNode = static_cast<ContextNode *>(directive->getParent());
 			if (it->second.second == ParentNeeded) // validate parent
 				validateDirectiveParent(it->first, parentNode->getName());
+			
 			validateDirectiveArgs(directive, it);
 			validateDirectiveCodes(directive);
 		}

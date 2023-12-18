@@ -7,6 +7,7 @@
 
 #include "ContextNode.hpp"
 #include "DirectiveNode.hpp"
+#include <set>
 
 
 
@@ -34,6 +35,7 @@ class   LogicValidator
         LogicValidator();
         void    validate(ConfigNode *node);
         void	validateDirectiveCodes(DirectiveNode *directiveNode);
+        void	validateDirectiveDublicates(ConfigNode *node);
         void	validateDirectiveParent(const std::string &key, const std::string &parentName);
 		void	validateDirectiveArgs(DirectiveNode *directive, std::map<std::string, std::pair<int, int> >::iterator it);
         ~LogicValidator();
