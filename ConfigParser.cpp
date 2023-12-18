@@ -6,11 +6,23 @@ ConfigParser::ConfigParser(const std::string &fileName)
 
 void	ConfigParser::readConfigFile()
 {
+	struct stat		fileStat;
+	if (stat(configFileName.c_str(), &fileStat) == 0)
+	{
+		if (!S_ISREG(fileStat.st_mode))
+			throw std::runtime_error("Error: The specified configuration file ('"
+			+ configFileName + "') is not a regular file. Please provide a valid file.");
+	}
+	else
+		throw std::runtime_error("Error: Unable to find the configuration file ('"
+		+ configFileName + "'). Please check the file path and try again.");
+
 	std::ifstream	file(configFileName.c_str());
 	std::string		line;
 
 	if (!file.is_open())
-		throw std::runtime_error("Failed to open the config file");
+		throw std::runtime_error("Error: Unable to open the configuration file ('"
+		+ configFileName + "') for reading. Please check file permissions and try again.");
 	while (std::getline(file, line))
 		configFileContent += line;
 	file.close();
