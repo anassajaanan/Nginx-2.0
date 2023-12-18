@@ -31,14 +31,14 @@ void	LogicValidator::validateDirectiveArgs(DirectiveNode *directive, std::map<st
 }
 
 
-void    LogicValidator::validateDirectives(ConfigNode *node)
+void    LogicValidator::validate(ConfigNode *node)
 {
 	if (node->getType() == Context)
 	{
 		ContextNode *contextNode = static_cast<ContextNode *>(node);
 		const std::vector<ConfigNode *> &children = contextNode->getChildren();
 		for (int i = 0; i < contextNode->getNumChildren(); i++)
-			validateDirectives(children[i]);
+			validate(children[i]);
 	}
 	if (node->getType() == Directive)
 	{

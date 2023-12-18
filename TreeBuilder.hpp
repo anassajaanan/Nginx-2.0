@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "ConfigNode.hpp"
 #ifndef TREEBUILDER_HPP
 #define TREEBUILDER_HPP
 
@@ -14,10 +15,13 @@ private:
 	static ConfigNode	*getDirectiveNode(ConfigNode *parent, std::vector<std::string>::iterator &it);
 	static ConfigNode	*getContextNode(ConfigNode *parent, std::vector<std::string>::iterator &it);
 	static ConfigNode	*getLocationNode(ConfigNode *parent, std::vector<std::string>::iterator &it);
+	static ConfigNode	*buildTree(ConfigNode *parent, std::vector<std::string>::iterator &it,
+									std::vector<std::string>::iterator &end);
 
 public:
-	static ConfigNode	*builder(ConfigNode *parent, std::vector<std::string>::iterator &it,
-									std::vector<std::string>::iterator &end);
+	
+
+	static ConfigNode	*parseConfigToTree(std::vector<std::string> &tokens);
 };
 
 

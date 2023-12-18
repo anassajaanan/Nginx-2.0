@@ -28,7 +28,7 @@ ConfigNode	*TreeBuilder::getLocationNode(ConfigNode *parent, std::vector<std::st
 	return (node);
 }
 
-ConfigNode	*TreeBuilder::builder(ConfigNode *parent, std::vector<std::string>::iterator &it, std::vector<std::string>::iterator &end)
+ConfigNode	*TreeBuilder::buildTree(ConfigNode *parent, std::vector<std::string>::iterator &it, std::vector<std::string>::iterator &end)
 {
 	if (it == end)
 		return (NULL);
@@ -45,21 +45,24 @@ ConfigNode	*TreeBuilder::builder(ConfigNode *parent, std::vector<std::string>::i
 			node = getContextNode(parent, it);
 		while (*it != "}")
 		{
-			builder(node, it, end);
+			buildTree(node, it, end);
 			if (it == end)
 				break;
 		}
 		it++;
 	}
 	else
-	{
 		node = getDirectiveNode(parent, it);
-	}
 
 	if (parent && parent->getType() == Context)
-	{
 		static_cast<ContextNode *>(parent)->addChild(node);
-	}
 
 	return (node);
+}
+
+ConfigNode	*TreeBuilder::parseConfigToTree(std::vector<std::string> &tokens)
+{
+	std::vector<std::string>::iterator it = tokens.begin();
+	std::vector<std::string>::iterator eit = tokens.end();
+	return (buildTree(NULL, it, eit));
 }
