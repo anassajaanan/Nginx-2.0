@@ -17,7 +17,7 @@
 
 #include "TreeBuilder.hpp"
 #include "SyntaxValidator.hpp"
-#include "logicValidate.hpp"
+#include "LogicValidator.hpp"
 
 void tokenize(const std::string &input, std::vector<std::string> &tokens)
 {
@@ -64,7 +64,7 @@ int main()
         std::vector<std::string>	tokens;
         std::vector<std::string>::iterator	it;
         std::string							tmp;
-		LogicValidate						logicValidation;
+		LogicValidator						logicValidation;
 
         if (!ifs.is_open())
         {

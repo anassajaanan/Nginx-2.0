@@ -1,7 +1,7 @@
-# include "logicValidate.hpp"
+# include "LogicValidator.hpp"
 
 
-LogicValidate::LogicValidate()
+LogicValidator::LogicValidator()
 {
     possibleDirs["root"] = std::make_pair(OneArg, Independent); /*only one*/
 	possibleDirs["listen"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
@@ -16,47 +16,48 @@ LogicValidate::LogicValidate()
 }
 
 
-void    LogicValidate::validateDirectives(const ConfigNode *node)
+void	LogicValidator::validateDirectiveArgs(DirectiveNode *directive, std::map<std::string, std::pair<int, int> >::iterator it)
 {
-	std::vector<std::string> tmp;
+	if (it->second.first == OneArg && directive->getValueCount() != 1)
+		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
+	else if (it->second.first == TwoOrMoreArgs && directive->getValueCount() < 2)
+		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
+	else if (it->second.first == OneOrMoreArgs && directive->getValueCount() < 1)
+		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
+	else if (it->second.first == TwoArgs && directive->getValueCount() != 2)
+		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
+	else if (it->second.first == OneOrTwoArgs && (directive->getValueCount() < 1 || directive->getValueCount() > 2))
+		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
+}
 
+
+void    LogicValidator::validateDirectives(ConfigNode *node)
+{
 	if (node->getType() == Context)
 	{
-		ContextNode *contextNode = (ContextNode *)(node);
+		ContextNode *contextNode = static_cast<ContextNode *>(node);
+		const std::vector<ConfigNode *> &children = contextNode->getChildren();
 		for (int i = 0; i < contextNode->getNumChildren(); i++)
-			validateDirectives(contextNode->getChildren()[i]);
+			validateDirectives(children[i]);
 	}
 	if (node->getType() == Directive)
 	{
-		DirectiveNode *directive = (DirectiveNode *)(node);
+		DirectiveNode *directive = static_cast<DirectiveNode *>(node);
 		std::map<std::string, std::pair<int, int> >::iterator it = possibleDirs.find(directive->getKey());
 		if (it != possibleDirs.end())
 		{
-			 ContextNode *parentNode = ( ContextNode *)(directive->getParent());
-			
+			ContextNode *parentNode = static_cast<ContextNode *>(directive->getParent());
 			if (it->second.second == ParentNeeded) // validate parent
 				validateDirectiveParent(it->first, parentNode->getName());
-			if (it->second.first == OneArg && directive->getValueCount() != 1)
-				throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
-			else if (it->second.first == TwoOrMoreArgs && directive->getValueCount() < 2)
-				throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
-			else if (it->second.first == OneOrMoreArgs && directive->getValueCount() < 1)
-				throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
-			else if (it->second.first == TwoArgs && directive->getValueCount() != 2)
-				throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
-			else if (it->second.first == OneOrTwoArgs && (directive->getValueCount() < 1 || directive->getValueCount() > 2))
-				throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
-
+			validateDirectiveArgs(directive, it);
 			validateDirectiveCodes(directive);
 		}
-		else {
+		else
 			throw (std::runtime_error("Unknown directive \"" + directive->getKey() + "\""));
-		
-		}
 	}
 }
 
-void	LogicValidate::validateDirectiveCodes(DirectiveNode *directiveNode)
+void	LogicValidator::validateDirectiveCodes(DirectiveNode *directiveNode)
 {
 	if (directiveNode->getKey() == "return")
 	{
@@ -83,7 +84,7 @@ void	LogicValidate::validateDirectiveCodes(DirectiveNode *directiveNode)
 	
 }
 
-void	LogicValidate::validateDirectiveParent(const std::string &key, const std::string &parentName)
+void	LogicValidator::validateDirectiveParent(const std::string &key, const std::string &parentName)
 {
 		if (key == "listen")
 		{
@@ -112,6 +113,6 @@ void	LogicValidate::validateDirectiveParent(const std::string &key, const std::s
 		}
 }
 
-LogicValidate::~LogicValidate()
+LogicValidator::~LogicValidator()
 {
 }

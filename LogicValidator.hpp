@@ -1,13 +1,14 @@
 
-#ifndef LOGICVALIDATE_HPP
-#define LOGICVALIDATE_HPP
 
-#include <string>
-#include "ConfigNode.hpp"
+#pragma once
+#ifndef LOGICVALIDATOR_HPP
+#define LOGICVALIDATOR_HPP
+
+
 #include "ContextNode.hpp"
 #include "DirectiveNode.hpp"
-#include <map>
-#include <iostream>
+
+
 
 enum ParentPresence
 {
@@ -25,17 +26,18 @@ enum numArgs
 };
 
 
-class   LogicValidate 
+class   LogicValidator 
 {
     private:
         std::map<std::string, std::pair<int , int> >  possibleDirs;
     public:
-        LogicValidate();
-        void    validateDirectives(const ConfigNode *node);
+        LogicValidator();
+        void    validateDirectives(ConfigNode *node);
         void	validateDirectiveCodes(DirectiveNode *directiveNode);
         void	validateDirectiveParent(const std::string &key, const std::string &parentName);
-        ~LogicValidate();
+		void	validateDirectiveArgs(DirectiveNode *directive, std::map<std::string, std::pair<int, int> >::iterator it);
+        ~LogicValidator();
 };
 
 
-#endif /* LOGICVALIDATE_HPP */
+#endif /* LOGICVALIDATOR_HPP */
