@@ -33,8 +33,6 @@ class SyntaxError : public std::runtime_error
 	    SyntaxError(const std::string &errorMessage);
 };
 
-
-
 class SyntaxValidator
 {
 
