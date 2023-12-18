@@ -29,6 +29,8 @@ public:
 
 	void	addChild(ConfigNode *child);
 
+	int		getCountOf(const std::string &key) const;
+
 
 
 	// TODO:
