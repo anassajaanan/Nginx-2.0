@@ -3,11 +3,12 @@
 #ifndef SYNTAXVALIDATOR_HPP
 #define SYNTAXVALIDATOR_HPP
 
-#include <iostream>
-#include <vector>
-#include <exception>
 #include <set>
 #include <stack>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <exception>
 
 #define MISSING_HTTP_CONTEXT 				"Missing Http Context"
 #define MISSING_SERVER_CONTEXT 				"Missing Server Context"
