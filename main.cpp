@@ -17,6 +17,7 @@
 
 #include "TreeBuilder.hpp"
 #include "SyntaxValidator.hpp"
+#include "LogicValidator.hpp"
 
 void tokenize(const std::string &input, std::vector<std::string> &tokens)
 {
@@ -54,68 +55,6 @@ void tokenize(const std::string &input, std::vector<std::string> &tokens)
 }
 
 
-void	logicValidation(ConfigNode *node)
-{
-	if (node->getType() == Context)
-	{
-		ContextNode	*contextNode = static_cast<ContextNode *>(node);
-		const std::vector<ConfigNode *>	&children = contextNode->getChildren();
-		for (size_t i = 0; i < children.size(); i++)
-		{
-			logicValidation(children[i]);
-		}
-	}
-	else if (node->getType() == Directive)
-	{
-		DirectiveNode *directiveNode = static_cast<DirectiveNode *>(node);
-		ContextNode *parentNode = static_cast<ContextNode *>(directiveNode->getParent());
-		if (directiveNode->getKey() == "listen")
-		{
-			if (parentNode->getName() != "server")
-				throw (std::runtime_error("\"listen\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() != 1)
-				throw (std::runtime_error("invalid number of arguments in \"listen\" directive"));
-		}
-		else if (directiveNode->getKey() == "server_name")
-		{
-			if (parentNode->getName() != "server")
-				throw (std::runtime_error("\"server_name\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() != 1)
-				throw (std::runtime_error("invalid number of arguments in \"server_name\" directive"));
-		}
-		else if (directiveNode->getKey() == "try_files")
-		{
-			if (parentNode->getName() == "http")
-				throw (std::runtime_error("\"try_files\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() < 2)
-				throw (std::runtime_error("invalid number of arguments in \"try_files\" directive"));
-		}
-		else if (directiveNode->getKey() == "return")
-		{
-			if (parentNode->getName() == "http")
-				throw (std::runtime_error("\"return\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() == 0 || directiveNode->getValueCount() > 2)
-				throw (std::runtime_error("invalid number of arguments in \"return\" directive"));
-			try {
-				int code = std::stoi(directiveNode->getValues()[0]);
-				if (code < 100 || code > 599)
-					throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
-			}
-			catch (std::exception &e) {
-				throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
-			}
-		}
-		else if (directiveNode->getKey() == "rewrite")
-		{
-			if (parentNode->getName() == "http")
-				throw (std::runtime_error("\"rewrite\" directive is not allowed in this context"));
-			if (directiveNode->getValueCount() != 2)
-				throw (std::runtime_error("invalid number of arguments in \"rewrite\" directive"));
-		}
-	}
-}
-
-
 
 int main()
 {
@@ -125,6 +64,7 @@ int main()
         std::vector<std::string>	tokens;
         std::vector<std::string>::iterator	it;
         std::string							tmp;
+		LogicValidator						logicValidation;
 
         if (!ifs.is_open())
         {
@@ -152,16 +92,11 @@ int main()
         
 		SyntaxValidator::validate(tokens);
 		ConfigNode *root = TreeBuilder::builder(NULL, it, end);
+		logicValidation.validateDirectives(root);
 
-		logicValidation(root);
-
-		std::cout << "Success" << std::endl;
+		std::cout << "nginx 2.0 : the configuration file /etc/nginx/nginx.conf syntax is ok" << std::endl
+				  << "nginx 2.0: configuration file /etc/nginx/nginx.conf test is successful" << std::endl;
 		return (0);
-
-
-		return (0);
-
-        return (0);
     }
     catch (std::exception &e)
     {

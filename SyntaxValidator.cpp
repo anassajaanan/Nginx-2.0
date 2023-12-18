@@ -1,4 +1,3 @@
-
 #include "SyntaxValidator.hpp"
 
 SyntaxError::SyntaxError(const std::string &errorMessage)
