@@ -110,7 +110,7 @@ void	SyntaxValidator::validateContexts(const std::vector<std::string> &tokens)
 
 void	SyntaxValidator::validateDirectives(const std::vector<std::string> &tokens)
 {
-	std::unordered_set<std::string> contextKeywords;
+	std::set<std::string> contextKeywords;
 
 	contextKeywords.insert("http");
 	contextKeywords.insert("server");
