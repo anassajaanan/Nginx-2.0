@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "ConfigNode.hpp"
 #ifndef LOGICVALIDATOR_HPP
 #define LOGICVALIDATOR_HPP
 
@@ -33,9 +34,10 @@ class   LogicValidator
         std::map<std::string, std::pair<int , int> >  possibleDirs;
     public:
         LogicValidator();
-        void    validate(ConfigNode *node);
+		void	validate(ConfigNode *node);
+        void    validateConfigTree(ConfigNode *node);
+        void	validateDirectiveDuplicates(ConfigNode *node);
         void	validateDirectiveCodes(DirectiveNode *directiveNode);
-        void	validateDirectiveDublicates(ConfigNode *node);
         void	validateDirectiveParent(const std::string &key, const std::string &parentName);
 		void	validateDirectiveArgs(DirectiveNode *directive, std::map<std::string, std::pair<int, int> >::iterator it);
         ~LogicValidator();

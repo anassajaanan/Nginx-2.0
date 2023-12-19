@@ -71,7 +71,6 @@ void	ConfigParser::parseConfigFile()
 	SyntaxValidator::validate(configTokens);
 	configTreeRoot = TreeBuilder::parseConfigToTree(configTokens);
 	logicValidator.validate(configTreeRoot);
-	logicValidator.validateDirectiveDublicates(configTreeRoot);
 }
 
 
