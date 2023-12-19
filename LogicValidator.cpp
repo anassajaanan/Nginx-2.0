@@ -2,6 +2,7 @@
 #include "ConfigNode.hpp"
 #include "ContextNode.hpp"
 #include "DirectiveNode.hpp"
+#include <cstddef>
 #include <stdexcept>
 
 
@@ -34,55 +35,6 @@ void	LogicValidator::validateDirectiveArgs(DirectiveNode *directive, std::map<st
 		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
 }
 
-
-void	 LogicValidator::validateDirectiveDublicates(ConfigNode *node)
-{
-	if (node->getType() == Directive)
-		return;
-	// std::set<std::string> nonDublicatesDirectives;
-	ContextNode *parent = static_cast<ContextNode *>(node);
-	// const std::vector<ConfigNode *>children = parent->getChildren();
-	for (size_t i = 0; i < parent->getChildren().size(); i++)
-	{
-		if (parent->getChildren()[i]->getType() == Directive)
-		{
-			DirectiveNode *directiveNode = static_cast<DirectiveNode *>(parent->getChildren()[i]);
-			if (directiveNode->getKey() == "root" || directiveNode->getKey() == "client_max_body_size"
-			|| directiveNode->getKey() == "try_files" || directiveNode->getKey() == "autoindex")
-				if (parent->getCountOf(directiveNode->getKey()) > 1)
-					throw (std::runtime_error("\"" + directiveNode->getKey() + "\"" + " directive is duplicated"));
-		}
-			validateDirectiveDublicates(parent->getChildren()[i]);
-	}
-}
-
-void    LogicValidator::validate(ConfigNode *node)
-{
-	if (node->getType() == Context)
-	{
-		ContextNode *contextNode = static_cast<ContextNode *>(node);
-		const std::vector<ConfigNode *> &children = contextNode->getChildren();
-		for (int i = 0; i < contextNode->getNumChildren(); i++)
-			validate(children[i]);
-	}
-	if (node->getType() == Directive)
-	{
-		DirectiveNode *directive = static_cast<DirectiveNode *>(node);
-		std::map<std::string, std::pair<int, int> >::iterator it = possibleDirs.find(directive->getKey());
-		if (it != possibleDirs.end())
-		{
-			ContextNode *parentNode = static_cast<ContextNode *>(directive->getParent());
-			if (it->second.second == ParentNeeded) // validate parent
-				validateDirectiveParent(it->first, parentNode->getName());
-			
-			validateDirectiveArgs(directive, it);
-			validateDirectiveCodes(directive);
-		}
-		else
-			throw (std::runtime_error("Unknown directive \"" + directive->getKey() + "\""));
-	}
-}
-
 void	LogicValidator::validateDirectiveCodes(DirectiveNode *directiveNode)
 {
 	if (directiveNode->getKey() == "return")
@@ -107,7 +59,6 @@ void	LogicValidator::validateDirectiveCodes(DirectiveNode *directiveNode)
 			throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"error_page\" directive"));
 		}
 	}
-	
 }
 
 void	LogicValidator::validateDirectiveParent(const std::string &key, const std::string &parentName)
@@ -138,6 +89,62 @@ void	LogicValidator::validateDirectiveParent(const std::string &key, const std::
 				throw (std::runtime_error("\"rewrite\" directive is not allowed in this context"));
 		}
 }
+
+void	 LogicValidator::validateDirectiveDuplicates(ConfigNode *node)
+{
+	if (node->getType() == Directive)
+		return;
+	ContextNode *parent = static_cast<ContextNode *>(node);
+	const std::vector<ConfigNode *>	&children = parent->getChildren();
+	for (size_t i = 0; i < children.size(); i++)
+	{
+		if (children[i]->getType() == Directive)
+		{
+			DirectiveNode *directiveNode = static_cast<DirectiveNode *>(children[i]);
+			const std::string	&key = directiveNode->getKey();
+			if (key == "root" || key == "client_max_body_size"
+			|| key == "try_files" || key == "autoindex")
+				if (parent->getCountOf(key) > 1)
+					throw (std::runtime_error("\"" + key + "\"" + " directive is duplicated"));
+		}
+		validateDirectiveDuplicates(children[i]);
+	}
+}
+
+void    LogicValidator::validateConfigTree(ConfigNode *node)
+{
+	if (node->getType() == Context)
+	{
+		ContextNode *contextNode = static_cast<ContextNode *>(node);
+		const std::vector<ConfigNode *> &children = contextNode->getChildren();
+		for (int i = 0; i < contextNode->getNumChildren(); i++)
+			validateConfigTree(children[i]);
+	}
+	if (node->getType() == Directive)
+	{
+		DirectiveNode *directive = static_cast<DirectiveNode *>(node);
+		std::map<std::string, std::pair<int, int> >::iterator it = possibleDirs.find(directive->getKey());
+		if (it != possibleDirs.end())
+		{
+			ContextNode *parentNode = static_cast<ContextNode *>(directive->getParent());
+			if (it->second.second == ParentNeeded) // validate parent
+				validateDirectiveParent(it->first, parentNode->getName());
+			
+			validateDirectiveArgs(directive, it);
+			validateDirectiveCodes(directive);
+		}
+		else
+			throw (std::runtime_error("Unknown directive \"" + directive->getKey() + "\""));
+	}
+}
+
+
+void	LogicValidator::validate(ConfigNode *node)
+{
+	validateConfigTree(node);
+	validateDirectiveDuplicates(node);
+}
+
 
 LogicValidator::~LogicValidator()
 {
