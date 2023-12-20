@@ -1,24 +1,24 @@
 
 
-#include "ConfigParser.hpp"
+// #include "ConfigParser.hpp"
+#include "ServerConfig.hpp"
+
+
 
 
 
 int main()
 {
-    try
-    {
-        ConfigParser	parser("nginx.conf");
+    try {
+		ServerConfig config;
+		config.setListen("255.0.1.1.:90");
+		std::cout << "Success!" << std::endl;
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+	return 0;
 
-		std::cout << "nginx 2.0 : the configuration file /etc/nginx/nginx.conf syntax is ok" << std::endl
-				  << "nginx 2.0: configuration file /etc/nginx/nginx.conf test is successful" << std::endl;
-
-		delete(parser.getConfigTreeRoot());
-
-		return (0);
-    }
-    catch (std::exception &e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+	
 }
