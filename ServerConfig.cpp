@@ -83,5 +83,8 @@ void	ServerConfig::processFallbackStatusCode(const std::string &statusCode)
 		if (!std::isdigit(code[j]))
 			throw std::runtime_error("invalid code in \"try_files\" directive: \"" + statusCode + "\"");
 	}
-	this->tryFiles.setFallBackStatusCode(std::stoi(code));
+	int codeInt = std::stoi(code);
+	if (codeInt < 300 || codeInt > 599)
+		throw std::runtime_error("invalid code in \"try_files\" directive: \"" + statusCode + "\"" + " (must be between 300 and 599)");
+	this->tryFiles.setFallBackStatusCode(codeInt);
 }
