@@ -101,7 +101,7 @@ void	ServerConfig::setRoot(const std::string &rootValue)
 	this->root = rootValue;
 }
 
-const	std::string &ServerConfig::getRoot()
+const	std::string &ServerConfig::getRoot() const
 {
 	return  (this->root);
 }
@@ -119,7 +119,7 @@ void	ServerConfig::setAutoindex(const std::string &autoindexValue)
 	this->autoindex = autoindexValue;
 }
 
-const	std::string &ServerConfig::getAutoindex()
+const	std::string &ServerConfig::getAutoindex() const
 {
 	return  (this->autoindex);
 }
@@ -146,17 +146,39 @@ bool	ServerConfig::isValidBodySize(const std::string &bodySize)
 	ss >> this->maxBodySize;
 	if (ss.fail())
 		throw (std::runtime_error("\"client_max_body_size\" directive invalid value"));
-	std::cout << "num = " << this->maxBodySize << std::endl;
 	return (true);
 }
 
+
+void	ServerConfig::setErrorPage(const std::string &errorCode, const std::string &directory)
+{
+	this->errorPage.push_back(errorCode);
+	this->errorPage.push_back(directory);
+}
+
+/*returns the error page code for error page*/
+int		ServerConfig::getErrorPageCode() const
+{
+	int					errorCode;
+	std::stringstream	ss;
+
+	ss << this->errorPage[0];
+	ss >> errorCode;
+	return (errorCode);
+}
+
+/*returns the error page directory for error page*/
+const std::string		&ServerConfig::getErrorPageDirectory() const
+{
+	return (this->errorPage[1]);
+}
 
 void		ServerConfig::setIndex(const std::string &indexValue)
 {
 	this->index = indexValue;
 }
 
-const std::string		&ServerConfig::getIndex()
+const std::string		&ServerConfig::getIndex() const
 {
 	return  (this->index);
 }
@@ -166,7 +188,7 @@ void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
 	isValidBodySize(bodySize);
 }
 
-int	ServerConfig::getClientMaxBodySize()
+int	ServerConfig::getClientMaxBodySize() const
 {
 	return (maxBodySize);
 }
