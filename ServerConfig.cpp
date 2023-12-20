@@ -1,4 +1,5 @@
 #include "ServerConfig.hpp"
+#include <sys/_types/_size_t.h>
 
 
 bool	ServerConfig::isValidIPv4()
@@ -54,4 +55,33 @@ void	ServerConfig::setListen(const std::string &listenValue)
 	}
 	if (!isValidPort(port))
 		throw std::runtime_error("invalid port in \"" + listenValue + "\" of the \"listen\" directive");
+}
+
+void	ServerConfig::setServerName(const std::string &serverNameValue)
+{
+	this->serverName = serverNameValue;
+}
+
+void	ServerConfig::setTryFiles(const std::vector<std::string> &tryFilesValue)
+{
+	size_t i;
+	for (i = 0; i < tryFilesValue.size() - 1; i++)
+		this->tryFiles.addPath(tryFilesValue[i]);
+	if (tryFilesValue[i][0] == '=')
+		processFallbackStatusCode(tryFilesValue[i]);
+	else
+		this->tryFiles.setFallBackUri(tryFilesValue[i]);
+}
+
+void	ServerConfig::processFallbackStatusCode(const std::string &statusCode)
+{
+	std::string code = statusCode.substr(1);
+	if (code.empty() || code.size() > 3)
+		throw std::runtime_error("invalid code in \"try_files\" directive: \"" + statusCode + "\"");
+	for (size_t j = 0; j < code.size(); j++)
+	{
+		if (!std::isdigit(code[j]))
+			throw std::runtime_error("invalid code in \"try_files\" directive: \"" + statusCode + "\"");
+	}
+	this->tryFiles.setFallBackStatusCode(std::stoi(code));
 }
