@@ -2,11 +2,14 @@
 
 
 #pragma once
+#include "TreeBuilder.hpp"
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
 #include "ContextNode.hpp"
 #include "DirectiveNode.hpp"
+#include "TryFilesConfig.hpp"
+
 #include <sstream>
 #include <string>
 #define CLIENT_MAXIMUM_BODY_SIZE 1000000 /*MB*/
@@ -22,6 +25,8 @@ class ServerConfig
 		std::string	ipAddress;
 		std::string	root;
 		std::string	autoindex;
+		std::string		serverName;
+		TryFilesConfig	tryFiles;
 
 	public:
 		void				setListen(const std::string &listenValue);
@@ -35,14 +40,10 @@ class ServerConfig
 		void				setClientMaxBodySize(const std::string &bodySize);
 		int			getClientMaxBodySize();
 		bool				isValidBodySize(const std::string &bodySize);
-
-
+		void	setServerName(const std::string &serverNameValue);
+		// set TryFiles directive
+		void	setTryFiles(const std::vector<std::string> &tryFilesValue);
+		void	processFallbackStatusCode(const std::string &statusCode);
 };
-
-
-
-
-
-
 
 #endif /* SERVERCONFIG_HPP */
