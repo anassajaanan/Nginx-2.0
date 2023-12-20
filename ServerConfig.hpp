@@ -16,6 +16,7 @@ class ServerConfig
 {
 
 private:
+
 	int			port;
 	std::string	ipAddress;
 

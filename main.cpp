@@ -11,7 +11,7 @@ int main()
 {
     try {
 		ServerConfig config;
-		config.setListen("255.0.1.1.:90");
+		config.setListen("255.0.1.1:90");
 		std::cout << "Success!" << std::endl;
 	}
 	catch (const std::exception &e)

@@ -7,10 +7,10 @@ bool	ServerConfig::isValidIPv4()
 	std::string			octet;
 	int					num;
 	int					count = 0;
-
+	if (this->ipAddress.empty() || (this->ipAddress).back() == '.')
+		return (false);
 	while (std::getline(ss, octet, '.'))
 	{
-		std::cout << "{" << octet << "}" << std::endl;
 		if (ss.fail() || ss.bad())
 			return (false);
 		if (octet.empty() || octet.size() > 3)
