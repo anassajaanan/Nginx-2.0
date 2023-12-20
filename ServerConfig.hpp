@@ -28,25 +28,29 @@ class ServerConfig
 		std::string		serverName;
 		TryFilesConfig	tryFiles;
 		std::string		index;
+		std::vector<std::string>		errorPage;
 
 	public:
-		void				setListen(const std::string &listenValue);
-		void				setRoot(const std::string &rootValue);
-		bool				isValidPort(const std::string &port);
-		bool				isValidAutoindex(const std::string &autoindexValue);
-		bool				isValidIPv4();
-		const std::string	&getRoot();
-		const std::string	&getAutoindex();
-		void				setAutoindex(const std::string &autoindexValue);
-		void				setClientMaxBodySize(const std::string &bodySize);
-		int			getClientMaxBodySize();
-		bool				isValidBodySize(const std::string &bodySize);
-		void		setServerName(const std::string &serverNameValue);
-		void		setIndex(const std::string &indexValue);
-		const std::string		&getIndex();
+		void					setListen(const std::string &listenValue);
+		void					setRoot(const std::string &rootValue);
+		bool					isValidPort(const std::string &port);
+		bool					isValidAutoindex(const std::string &autoindexValue);
+		bool					isValidIPv4();
+		const std::string		&getRoot() const;
+		const std::string		&getAutoindex() const;
+		void					setAutoindex(const std::string &autoindexValue);
+		void					setClientMaxBodySize(const std::string &bodySize);
+		int						getClientMaxBodySize()const;
+		bool					isValidBodySize(const std::string &bodySize);
+		void					setServerName(const std::string &serverNameValue);
+		void					setIndex(const std::string &indexValue);
+		const std::string		&getIndex() const;
 		// set TryFiles directive
-		void	setTryFiles(const std::vector<std::string> &tryFilesValue);
-		void	processFallbackStatusCode(const std::string &statusCode);
+		void					setTryFiles(const std::vector<std::string> &tryFilesValue);
+		void					setErrorPage(const std::string &errorCode, const std::string &directory);
+		int						getErrorPageCode() const;
+		const std::string		&getErrorPageDirectory() const;
+		void					processFallbackStatusCode(const std::string &statusCode);
 };
 
 #endif /* SERVERCONFIG_HPP */
