@@ -151,6 +151,16 @@ bool	ServerConfig::isValidBodySize(const std::string &bodySize)
 }
 
 
+void		ServerConfig::setIndex(const std::string &indexValue)
+{
+	this->index = indexValue;
+}
+
+const std::string		&ServerConfig::getIndex()
+{
+	return  (this->index);
+}
+
 void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
 {
 	isValidBodySize(bodySize);

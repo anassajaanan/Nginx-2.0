@@ -27,6 +27,7 @@ class ServerConfig
 		std::string	autoindex;
 		std::string		serverName;
 		TryFilesConfig	tryFiles;
+		std::string		index;
 
 	public:
 		void				setListen(const std::string &listenValue);
@@ -40,7 +41,9 @@ class ServerConfig
 		void				setClientMaxBodySize(const std::string &bodySize);
 		int			getClientMaxBodySize();
 		bool				isValidBodySize(const std::string &bodySize);
-		void	setServerName(const std::string &serverNameValue);
+		void		setServerName(const std::string &serverNameValue);
+		void		setIndex(const std::string &indexValue);
+		const std::string		&getIndex();
 		// set TryFiles directive
 		void	setTryFiles(const std::vector<std::string> &tryFilesValue);
 		void	processFallbackStatusCode(const std::string &statusCode);
