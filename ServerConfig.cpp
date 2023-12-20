@@ -1,4 +1,9 @@
 #include "ServerConfig.hpp"
+#include <algorithm>
+#include <cctype>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 
 
 bool	ServerConfig::isValidIPv4()
@@ -55,3 +60,72 @@ void	ServerConfig::setListen(const std::string &listenValue)
 	if (!isValidPort(port))
 		throw std::runtime_error("invalid port in \"" + listenValue + "\" of the \"listen\" directive");
 }
+
+void	ServerConfig::setRoot(const std::string &rootValue)
+{
+	if (rootValue.empty())
+		return ;
+	this->root = rootValue;
+}
+
+const	std::string &ServerConfig::getRoot()
+{
+	return  (this->root);
+}
+
+bool	ServerConfig::isValidAutoindex(const std::string &autoindexValue)
+{
+	if (autoindexValue.empty() || (autoindexValue != "on" && autoindexValue != "off"))
+		throw (std::runtime_error("invalid value \"" + autoindexValue + "\" in \"autoindex\" directive, it must be \"on\" or \"off\""));
+	return (true);
+}
+
+void	ServerConfig::setAutoindex(const std::string &autoindexValue)
+{
+	isValidAutoindex(autoindexValue);
+	this->autoindex = autoindexValue;
+}
+
+const	std::string &ServerConfig::getAutoindex()
+{
+	return  (this->autoindex);
+}
+
+bool	ServerConfig::isValidBodySize(const std::string &bodySize)
+{
+	std::string	num;
+	std::string	tmp;
+	std::stringstream	ss;
+
+	for (size_t i = 0; i < bodySize.length(); i++)
+	{
+		if (!std::isdigit(bodySize[i]))
+		{
+			num = bodySize.substr(0, i);
+			tmp = bodySize.substr(i, bodySize.length());
+			break;
+		}
+
+	}
+	if (num.empty() || tmp.find_first_not_of("KMGkmg") != std::string::npos || tmp.length() > 1)
+		throw (std::runtime_error("\"client_max_body_size\" directive invalid value"));
+	ss << num;
+	ss >> this->maxBodySize;
+	if (ss.fail())
+		throw (std::runtime_error("\"client_max_body_size\" directive invalid value"));
+	std::cout << "num = " << this->maxBodySize << std::endl;
+	return (true);
+}
+
+
+void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
+{
+	isValidBodySize(bodySize);
+}
+
+int	ServerConfig::getClientMaxBodySize()
+{
+	return (maxBodySize);
+}
+
+/* client_body_size NGINX has a limit of 1MB on file uploads*/
