@@ -5,14 +5,17 @@
 DirectiveNode::DirectiveNode() : ConfigNode(Directive)
 {
 	key = "DefaultKey";
-	value = "DefaultValue";
+	valueCount = 0;
 }
 
 
-DirectiveNode::DirectiveNode(const std::string &key, const std::string &value, ConfigNode *parentNode)
-	: ConfigNode(Directive, parentNode), key(key), value(value) { }
+DirectiveNode::DirectiveNode(const std::string &key, ConfigNode *parentNode)
+	: ConfigNode(Directive, parentNode), key(key), valueCount(0) { }
 
-DirectiveNode::~DirectiveNode() { }
+DirectiveNode::~DirectiveNode()
+{
+	values.clear();
+}
 
 
 const std::string	&DirectiveNode::getKey() const
@@ -20,7 +23,18 @@ const std::string	&DirectiveNode::getKey() const
 	return (this->key);
 }
 
-const std::string	&DirectiveNode::getValue() const
+const std::vector<std::string>	&DirectiveNode::getValues() const
 {
-	return (this->value);
+	return (this->values);
+}
+
+void	DirectiveNode::addValue(const std::string &value)
+{
+	this->values.push_back(value);
+	this->valueCount++;
+}
+
+int	DirectiveNode::getValueCount() const
+{
+	return (this->valueCount);
 }

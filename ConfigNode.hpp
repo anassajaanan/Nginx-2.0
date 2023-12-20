@@ -7,6 +7,9 @@
 #define CONFIGNODE_HPP
 
 #include <string>
+#include <iostream>
+#include <vector>
+#include <map>
 
 
 enum NodeType
@@ -18,16 +21,16 @@ enum NodeType
 class ConfigNode
 {
 private:
-	int			type;
+	NodeType	type;
 	ConfigNode	*parent;
 
 public:
-	ConfigNode(int type, ConfigNode *parentNode = NULL);
+	ConfigNode(NodeType type, ConfigNode *parentNode = NULL);
 	virtual ~ConfigNode();
 
 	// getters
-	int					getType() const;
-	const ConfigNode	*getParent() const;
+	NodeType			getType() const;
+	ConfigNode			*getParent();
 
 };
 
