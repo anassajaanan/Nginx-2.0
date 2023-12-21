@@ -2,13 +2,12 @@
 
 
 #pragma once
-#include "TreeBuilder.hpp"
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
 #include "ContextNode.hpp"
 #include "DirectiveNode.hpp"
-#include "TryFilesConfig.hpp"
+#include "TryFilesDirective.hpp"
 
 #include <sstream>
 #include <string>
@@ -20,10 +19,10 @@ class ServerConfig
 
 private:
 
-	int				port;
-	std::string		ipAddress;
-	std::string		serverName;
-	TryFilesConfig	tryFiles;
+	int					port;
+	std::string			ipAddress;
+	std::string			serverName;
+	TryFilesDirective	tryFiles;
 
 
 public:

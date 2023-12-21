@@ -1,13 +1,13 @@
 
 
 #pragma once
-#ifndef TRYFILESCONFIG_HPP
-# define TRYFILESCONFIG_HPP
+#ifndef TRYFILESDIRECTIVE_HPP
+# define TRYFILESDIRECTIVE_HPP
 
 #include <vector>
 #include <string>
 
-class TryFilesConfig
+class TryFilesDirective
 {
 private:
 	std::vector<std::string>	paths;
@@ -15,8 +15,8 @@ private:
 	int							fallBackStatusCode;
 
 public:
-	TryFilesConfig();
-	~TryFilesConfig();
+	TryFilesDirective();
+	~TryFilesDirective();
 
 	void					addPath(const std::string &path);
 	void					setFallBackUri(const std::string &uri);
@@ -31,4 +31,4 @@ public:
 
 
 
-#endif /* TRYFILESCONFIG_HPP */
+#endif /* TRYFILESDIRECTIVE_HPP */
