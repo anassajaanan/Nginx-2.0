@@ -1,10 +1,11 @@
 #include "ServerConfig.hpp"
+#include "ReturnDirective.hpp"
 #include <algorithm>
 #include <cctype>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <sys/_types/_size_t.h>
+#include <vector>
 
 
 bool	ServerConfig::isValidIPv4()
@@ -93,6 +94,36 @@ void	ServerConfig::processFallbackStatusCode(const std::string &statusCode)
 		throw std::runtime_error("invalid code in \"try_files\" directive: \"" + statusCode + "\"" + " (must be between 300 and 599)");
 	this->tryFiles.setFallBackStatusCode(codeInt);
 }
+
+
+void	ServerConfig::setReturn(const std::vector<std::string> &returnValue)
+{
+	if (returnValue.size() == 2)
+		this->returnDirective.setResponseTextOrUrl(returnValue[1]);
+	std::string code = returnValue[0];
+	if (code.empty() || code.size() > 3)
+		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"");
+	for (size_t j = 0; j < code.size(); j++)
+	{
+		if (!std::isdigit(code[j]))
+			throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"");
+	}
+	int codeInt = std::stoi(code);
+	if (codeInt < 300 || codeInt > 599)
+		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 300 and 599)");
+	this->returnDirective.setStatusCode(codeInt);
+
+}
+
+
+
+
+
+
+
+
+
+
 
 void	ServerConfig::setRoot(const std::string &rootValue)
 {
