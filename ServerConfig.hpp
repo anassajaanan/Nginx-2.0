@@ -10,6 +10,7 @@
 #include "DirectiveNode.hpp"
 #include "TryFilesDirective.hpp"
 #include "ReturnDirective.hpp"
+#include "RewriteDirective.hpp"
 
 #include <sstream>
 #include <string>
@@ -34,6 +35,7 @@ private:
 	std::string			serverName;
 	TryFilesDirective	tryFiles;
 	ReturnDirective		returnDirective;
+	RewriteDirective	rewriteDirective;
 
 public:
 	// Listen directive
@@ -50,12 +52,21 @@ public:
 	// set Return directive
 	void					setReturn(const std::vector<std::string> &returnValue);
 
+	// set Rewrite directive
+	void					setRewrite(const std::vector<std::string> &rewriteValue);
+
+	// set Autoindex directive
+	void					setAutoindex(const std::string &autoindexValue);
+	bool					isValidAutoindex(const std::string &autoindexValue);
+	
+
 
 	void					setRoot(const std::string &rootValue);
-	bool					isValidAutoindex(const std::string &autoindexValue);
+	
+
+
 	const std::string		&getRoot() const;
-	const std::string		&getAutoindex() const;
-	void					setAutoindex(const std::string &autoindexValue);
+
 	void					setClientMaxBodySize(const std::string &bodySize);
 	int						getClientMaxBodySize()const;
 	bool					isValidBodySize(const std::string &bodySize);
@@ -70,6 +81,8 @@ public:
 	void					setErrorPage(const std::string &errorCode, const std::string &directory);
 	int						getErrorPageCode() const;
 	const std::string		&getErrorPageDirectory() const;
+
+	const std::string		&getAutoindex() const;
 };
 
 #endif /* SERVERCONFIG_HPP */

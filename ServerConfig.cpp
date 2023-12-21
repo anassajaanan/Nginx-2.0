@@ -115,13 +115,11 @@ void	ServerConfig::setReturn(const std::vector<std::string> &returnValue)
 
 }
 
-
-
-
-
-
-
-
+void	ServerConfig::setRewrite(const std::vector<std::string> &rewriteValue)
+{
+	this->rewriteDirective.setPattern(rewriteValue[0]);
+	this->rewriteDirective.setSubstitution(rewriteValue[1]);
+}
 
 
 
