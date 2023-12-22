@@ -8,7 +8,7 @@
 #include <sys/_types/_size_t.h>
 #include <vector>
 
-ServerConfig::ServerConfig() { }
+
 
 
 bool	ServerConfig::isValidIPv4()
@@ -135,10 +135,7 @@ void	ServerConfig::setRoot(const std::string &rootValue)
 		this->root = rootValue;
 }
 
-const	std::string &ServerConfig::getRoot() const
-{
-	return  (this->root);
-}
+
 
 bool	ServerConfig::isValidAutoindex(const std::string &autoindexValue)
 {
@@ -208,49 +205,22 @@ void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
 }
 
 
-const	std::string &ServerConfig::getAutoindex() const
+
+
+
+
+
+void	ServerConfig::setErrorPage(const std::string &errorCode, const std::string &errorPageValue)
 {
-	return  (this->autoindex);
+	if (errorCode.empty() || errorCode.size() > 3)
+		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + errorCode + "\"");
+	for (size_t j = 0; j < errorCode.size(); j++)
+	{
+		if (!std::isdigit(errorCode[j]))
+			throw std::runtime_error("invalid code in \"error_page\" directive: \"" + errorCode + "\"");
+	}
+	int codeInt = std::stoi(errorCode);
+	if (codeInt < 300 || codeInt > 599)
+		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + errorCode + "\"" + " (must be between 300 and 599)");
+	errorPages[codeInt] = errorPageValue;
 }
-
-
-
-
-void	ServerConfig::setErrorPage(const std::string &errorCode, const std::string &directory)
-{
-	this->errorPage.push_back(errorCode);
-	this->errorPage.push_back(directory);
-}
-
-/*returns the error page code for error page*/
-int		ServerConfig::getErrorPageCode() const
-{
-	int					errorCode;
-	std::stringstream	ss;
-
-	ss << this->errorPage[0];
-	ss >> errorCode;
-	return (errorCode);
-}
-
-/*returns the error page directory for error page*/
-const std::string		&ServerConfig::getErrorPageDirectory() const
-{
-	return (this->errorPage[1]);
-}
-
-
-
-const std::string		&ServerConfig::getIndex() const
-{
-	return  (this->index);
-}
-
-
-
-int	ServerConfig::getClientMaxBodySize() const
-{
-	return (maxBodySize);
-}
-
-/* client_body_size NGINX has a limit of 1MB on file uploads*/
