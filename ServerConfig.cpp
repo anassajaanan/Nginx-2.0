@@ -5,7 +5,10 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <sys/_types/_size_t.h>
 #include <vector>
+
+ServerConfig::ServerConfig() { }
 
 
 bool	ServerConfig::isValidIPv4()
@@ -121,13 +124,15 @@ void	ServerConfig::setRewrite(const std::vector<std::string> &rewriteValue)
 	this->rewriteDirective.setSubstitution(rewriteValue[1]);
 }
 
-
+void		ServerConfig::setIndex(const std::string &indexValue)
+{
+	this->index = indexValue;
+}
 
 void	ServerConfig::setRoot(const std::string &rootValue)
 {
-	if (rootValue.empty())
-		return ;
-	this->root = rootValue;
+	if (!rootValue.empty())
+		this->root = rootValue;
 }
 
 const	std::string &ServerConfig::getRoot() const
@@ -148,35 +153,67 @@ void	ServerConfig::setAutoindex(const std::string &autoindexValue)
 	this->autoindex = autoindexValue;
 }
 
+
+
+void	ServerConfig::splitValueAndUnit(const std::string &bodySize, std::string &value, std::string &unit)
+{
+	size_t pos = bodySize.find_first_not_of("0123456789");
+	if (pos != std::string::npos)
+	{
+		value = bodySize.substr(0, pos);
+		unit = bodySize.substr(pos);
+	}
+	else
+		value = bodySize;
+}
+
+size_t	ServerConfig::safeStringToSizeT(const std::string &bodySize, const std::string value)
+{
+	try
+	{
+		return (std::stoull(value));
+		
+	}
+	catch (const std::exception &e)
+	{
+		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
+	}
+}
+
+
+void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
+{
+	size_t multiplier = 1; // in case there is no unit (bytes by default)
+	size_t numericValue, totalSize;
+	std::string value, unit;
+
+	splitValueAndUnit(bodySize, value, unit);
+
+	if (value.empty() || unit.size() > 1)
+		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
+	if (unit.size() == 1 && unit.find_first_not_of("kKmMgG") != std::string::npos)
+		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
+	if (unit == "k" || unit == "K")
+		multiplier = 1000;
+	else if (unit == "m" || unit == "M")
+		multiplier = 1000000;
+	else if (unit == "g" || unit == "G")
+		multiplier = 1000000000;
+	
+	numericValue = safeStringToSizeT(bodySize, value);
+	totalSize = numericValue * multiplier;
+	// check for overflow
+	if (totalSize / multiplier != numericValue)
+		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
+}
+
+
 const	std::string &ServerConfig::getAutoindex() const
 {
 	return  (this->autoindex);
 }
 
-bool	ServerConfig::isValidBodySize(const std::string &bodySize)
-{
-	std::string	num;
-	std::string	tmp;
-	std::stringstream	ss;
 
-	for (size_t i = 0; i < bodySize.length(); i++)
-	{
-		if (!std::isdigit(bodySize[i]))
-		{
-			num = bodySize.substr(0, i);
-			tmp = bodySize.substr(i, bodySize.length());
-			break;
-		}
-
-	}
-	if (num.empty() || tmp.find_first_not_of("KMGkmg") != std::string::npos || tmp.length() > 1)
-		throw (std::runtime_error("\"client_max_body_size\" directive invalid value"));
-	ss << num;
-	ss >> this->maxBodySize;
-	if (ss.fail())
-		throw (std::runtime_error("\"client_max_body_size\" directive invalid value"));
-	return (true);
-}
 
 
 void	ServerConfig::setErrorPage(const std::string &errorCode, const std::string &directory)
@@ -202,20 +239,14 @@ const std::string		&ServerConfig::getErrorPageDirectory() const
 	return (this->errorPage[1]);
 }
 
-void		ServerConfig::setIndex(const std::string &indexValue)
-{
-	this->index = indexValue;
-}
+
 
 const std::string		&ServerConfig::getIndex() const
 {
 	return  (this->index);
 }
 
-void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
-{
-	isValidBodySize(bodySize);
-}
+
 
 int	ServerConfig::getClientMaxBodySize() const
 {
