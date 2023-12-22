@@ -14,6 +14,7 @@ private:
 	std::string	substitution;
 
 public:
+	RewriteDirective();
 	RewriteDirective(const std::string &pattern, const std::string &substitution);
 	~RewriteDirective();
 
