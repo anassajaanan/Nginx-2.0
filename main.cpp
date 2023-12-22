@@ -10,13 +10,16 @@
 
 int main()
 {
-    try {
-		ServerConfig config;
-		config.setListen("255.0.1.1:90");
-		config.setAutoindex("on");
-		config.setClientMaxBodySize("1008m");
-		config.setErrorPage("300", "/index");
-		std::cout << "Success!" << std::endl;
+    try
+	{
+		ServerConfig	server;
+
+		server.setClientMaxBodySize("100000000000G");
+
+		std::cout << "Success" << std::endl;
+
+
+
 	}
 	catch (const std::exception &e)
 	{

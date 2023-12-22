@@ -1,6 +1,8 @@
 #include "RewriteDirective.hpp"
 
 
+RewriteDirective::RewriteDirective() { }
+
 
 RewriteDirective::RewriteDirective(const std::string &pattern, const std::string &substitution)
 	: pattern(pattern), substitution(substitution) { }

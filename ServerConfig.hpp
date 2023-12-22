@@ -2,6 +2,7 @@
 
 
 #pragma once
+#include <sys/_types/_size_t.h>
 #include <vector>
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
@@ -36,8 +37,18 @@ private:
 	TryFilesDirective	tryFiles;
 	ReturnDirective		returnDirective;
 	RewriteDirective	rewriteDirective;
+	size_t				clientMaxBodySize;
 
 public:
+	ServerConfig();
+
+
+	// Root Directive
+	void					setRoot(const std::string &rootValue);
+	
+	// set Index directive
+	void					setIndex(const std::string &indexValue);
+
 	// Listen directive
 	void					setListen(const std::string &listenValue);
 	bool					isValidPort(const std::string &port);
@@ -58,23 +69,28 @@ public:
 	// set Autoindex directive
 	void					setAutoindex(const std::string &autoindexValue);
 	bool					isValidAutoindex(const std::string &autoindexValue);
+
+	// set ClientMaxBodySize directive
+	void					setClientMaxBodySize(const std::string &bodySize);
+	void					splitValueAndUnit(const std::string &bodySize, std::string &value, std::string &unit);
+	size_t					safeStringToSizeT(const std::string &bodySize, const std::string value);
+
 	
 
 
-	void					setRoot(const std::string &rootValue);
+	
 	
 
 
 	const std::string		&getRoot() const;
 
-	void					setClientMaxBodySize(const std::string &bodySize);
-	int						getClientMaxBodySize()const;
-	bool					isValidBodySize(const std::string &bodySize);
 	
-	void					setIndex(const std::string &indexValue);
+	
+	
+	
 	const std::string		&getIndex() const;
 
-
+	int						getClientMaxBodySize()const;
 	
 
 
