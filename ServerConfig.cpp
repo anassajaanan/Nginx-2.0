@@ -91,35 +91,9 @@ void	ServerConfig::setServerName(const std::string &serverNameValue)
 	this->serverName = serverNameValue;
 }
 
-void	ServerConfig::addLocation(ContextNode *locationNode)
+void	ServerConfig::addLocation(const std::string &path, const LocationConfig &locationConfig)
 {
-	if (locations.find(locationNode->getPath()) != locations.end())
-		throw std::runtime_error("duplicate location \"" + locationNode->getPath() + "\" in Config file");
-
-	LocationConfig location(*this);
-	const std::vector<ConfigNode *> &locationChildren = locationNode->getChildren();
-	for (size_t i = 0; i < locationChildren.size(); i++)
-	{
-		if (locationChildren[i]->getType() == Directive)
-		{
-			DirectiveNode *directive = static_cast<DirectiveNode *>(locationChildren[i]);
-			if (directive->getKey() == "root")
-				location.setRoot(directive->getValues()[0]);
-			else if (directive->getKey() == "index")
-				location.setIndex(directive->getValues()[0]);
-			else if (directive->getKey() == "autoindex")
-				location.setAutoindex(directive->getValues()[0]);
-			else if (directive->getKey() == "client_max_body_size")
-				location.setClientMaxBodySize(directive->getValues()[0]);
-			else if (directive->getKey() == "error_page")
-				location.setErrorPage(directive->getKey(), directive->getValues()[0]);
-			else if (directive->getKey() == "try_files")
-				location.setTryFiles(directive->getValues());
-			else if (directive->getKey() == "return")
-				location.setReturn(directive->getValues());
-			else if (directive->getKey() == "rewrite")
-				location.setRewrite(directive->getValues());
-		}
-	}
-	locations[locationNode->getPath()] = location;
+	if (locations.find(path) != locations.end())
+		throw std::runtime_error("duplicate location \"" + path + "\" in Config file");
+	locations[path] = locationConfig;
 }
