@@ -13,12 +13,15 @@
 
 #include <sstream>
 
+#define DEFAULT_CLIENT_MAX_BODY_SIZE 1048576 // 1MB
+
 
 
 class ServerConfig
 {
 
 private:
+
 	bool					isValidPort(const std::string &port);
 	bool					isValidIPv4();
 	void					processFallbackStatusCode(const std::string &statusCode);
@@ -42,7 +45,7 @@ public:
 
 
 	// Constructors for default values
-
+	ServerConfig();
 
 	// set Root Directive
 	void					setRoot(const std::string &rootValue);
