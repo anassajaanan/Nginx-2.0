@@ -22,9 +22,10 @@ public:
 	~ContextNode();
 
 	// getters
-	const std::string	&getName() const;
+	const std::string				&getName() const;
+	const std::string				&getPath() const;
 	const std::vector<ConfigNode *>	&getChildren() const;
-	int					getNumChildren() const;
+	int								getNumChildren() const;
 
 
 	void	addChild(ConfigNode *child);
