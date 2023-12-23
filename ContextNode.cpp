@@ -12,6 +12,11 @@ const std::string	&ContextNode::getName() const
 	return (this->name);
 }
 
+const std::string	&ContextNode::getPath() const
+{
+	return (this->path);
+}
+
 const std::vector<ConfigNode *>	&ContextNode::getChildren() const
 {
 	return (this->children);

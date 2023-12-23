@@ -15,7 +15,7 @@
 
 #define DEFAULT_CLIENT_MAX_BODY_SIZE 1048576 // 1MB
 
-
+class LocationConfig;
 
 class ServerConfig
 {
@@ -24,28 +24,35 @@ private:
 
 	bool					isValidPort(const std::string &port);
 	bool					isValidIPv4();
-	void					processFallbackStatusCode(const std::string &statusCode);
 	bool					isValidAutoindex(const std::string &autoindexValue);
+	void					processFallbackStatusCode(const std::string &statusCode);
 	void					splitValueAndUnit(const std::string &bodySize, std::string &value, std::string &unit);
 	size_t					safeStringToSizeT(const std::string &bodySize, const std::string value);
+	
+	
 
 public:
 
-	int							port;
-	std::string					ipAddress;
-	std::string					root;
-	std::string					index;
-	std::string					serverName;
-	std::string					autoindex;
-	TryFilesDirective			tryFiles;
-	ReturnDirective				returnDirective;
-	RewriteDirective			rewriteDirective;
-	size_t						clientMaxBodySize;
-	std::map<int, std::string>	errorPages;
+	int										port;
+	std::string								ipAddress;
+	std::string								root;
+	std::string								index;
+	std::string								serverName;
+	std::string								autoindex;
+	TryFilesDirective						tryFiles;
+	ReturnDirective							returnDirective;
+	RewriteDirective						rewriteDirective;
+	size_t									clientMaxBodySize;
+	std::map<int, std::string>				errorPages;
+
+	std::map<std::string, LocationConfig>	locations;
 
 
 	// Constructors for default values
 	ServerConfig();
+	ServerConfig(const std::string &rootValue, const std::string &indexValue,
+				const std::string &autoindexValue, const std::string &client_max_body_size,
+				const std::vector<DirectiveNode *> &errorPagesDirectives);
 
 	// set Root Directive
 	void					setRoot(const std::string &rootValue);
@@ -76,7 +83,13 @@ public:
 	void					setClientMaxBodySize(const std::string &bodySize);
 
 	// set ErrorPage directive
-	void					setErrorPage(const std::string &errorCode, const std::string &errorPageValue);
+	void					setErrorPage(const std::string &statusCode, const std::string &uri);
+
+
+	// add Location directive
+	void					addLocation(ContextNode *locationNode);
+
+
 };
 
 #endif /* SERVERCONFIG_HPP */
