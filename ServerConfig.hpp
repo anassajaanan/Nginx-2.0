@@ -41,7 +41,7 @@ public:
 	void					setListen(const std::string &listenValue);
 	void					setServerName(const std::string &serverNameValue);
 
-	void					addLocation(ContextNode *locationNode);
+	void					addLocation(const std::string &path, const LocationConfig &locationConfig);
 };
 
 
