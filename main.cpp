@@ -48,9 +48,9 @@ void	initializeServers(ConfigNode *treeRoot, std::vector<ServerConfig> &servers)
 				const std::vector<ConfigNode *> &serverChildren = context->getChildren();
 				for (size_t j = 0; j < serverChildren.size(); j++)
 				{
-					if (serverChildren[i]->getType() == Directive)
+					if (serverChildren[j]->getType() == Directive)
 					{
-						DirectiveNode *serverDirective = static_cast<DirectiveNode *>(serverChildren[i]);
+						DirectiveNode *serverDirective = static_cast<DirectiveNode *>(serverChildren[j]);
 						if (serverDirective->getKey() == "listen")
 							server.setListen(serverDirective->getValues()[0]);
 						else if (serverDirective->getKey() == "server_name")
@@ -74,7 +74,7 @@ void	initializeServers(ConfigNode *treeRoot, std::vector<ServerConfig> &servers)
 					}
 					else
 					{
-						ContextNode *location = static_cast<ContextNode *>(serverChildren[i]);
+						ContextNode *location = static_cast<ContextNode *>(serverChildren[j]);
 						if (location->getName() == "location")
 						{
 							server.addLocation(location);
