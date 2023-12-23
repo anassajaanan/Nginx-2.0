@@ -1,14 +1,15 @@
 #include "ServerConfig.hpp"
-#include "ReturnDirective.hpp"
-#include <algorithm>
-#include <cctype>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <sys/_types/_size_t.h>
-#include <vector>
 
-
+ServerConfig::ServerConfig()
+{
+	this->port = 80;
+	this->ipAddress = "0.0.0.0";
+	this->root = "/var/www/html";
+	this->index = "index.html";
+	this->serverName = "";
+	this->autoindex = "off";
+	clientMaxBodySize = DEFAULT_CLIENT_MAX_BODY_SIZE;
+}
 
 
 bool	ServerConfig::isValidIPv4()
@@ -203,12 +204,6 @@ void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
 	if (totalSize / multiplier != numericValue)
 		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
 }
-
-
-
-
-
-
 
 void	ServerConfig::setErrorPage(const std::string &errorCode, const std::string &errorPageValue)
 {
