@@ -1,4 +1,8 @@
 #include "ServerConfig.hpp"
+#include "ConfigNode.hpp"
+#include "ContextNode.hpp"
+#include "LocationConfig.hpp"
+#include <sys/_types/_size_t.h>
 
 ServerConfig::ServerConfig()
 {
@@ -9,6 +13,30 @@ ServerConfig::ServerConfig()
 	this->serverName = "";
 	this->autoindex = "off";
 	clientMaxBodySize = DEFAULT_CLIENT_MAX_BODY_SIZE;
+}
+
+
+ServerConfig::ServerConfig(const std::string &rootValue, const std::string &indexValue,
+				const std::string &autoindexValue, const std::string &client_max_body_size,
+				const std::vector<DirectiveNode *> &errorPagesDirectives)
+{
+	this->port = 80;
+	this->ipAddress = "0.0.0.0";
+	this->root = "/var/www/html";
+	this->index = "index.html";
+	this->serverName = "";
+	this->autoindex = "off";
+	clientMaxBodySize = DEFAULT_CLIENT_MAX_BODY_SIZE;
+	
+	setRoot(rootValue);
+	setIndex(indexValue);
+	setAutoindex(autoindexValue);
+	setClientMaxBodySize(client_max_body_size);
+	for (size_t i = 0; i < errorPagesDirectives.size(); i++)
+	{
+		const std::vector<std::string> &values = errorPagesDirectives[i]->getValues();
+		setErrorPage(errorPagesDirectives[i]->getKey(), values[0]);
+	}
 }
 
 
@@ -116,7 +144,6 @@ void	ServerConfig::setReturn(const std::vector<std::string> &returnValue)
 	if (codeInt < 300 || codeInt > 599)
 		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 300 and 599)");
 	this->returnDirective.setStatusCode(codeInt);
-
 }
 
 void	ServerConfig::setRewrite(const std::vector<std::string> &rewriteValue)
@@ -205,17 +232,47 @@ void	ServerConfig::setClientMaxBodySize(const std::string &bodySize)
 		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
 }
 
-void	ServerConfig::setErrorPage(const std::string &errorCode, const std::string &errorPageValue)
+void	ServerConfig::setErrorPage(const std::string &statusCode, const std::string &uri)
 {
-	if (errorCode.empty() || errorCode.size() > 3)
-		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + errorCode + "\"");
-	for (size_t j = 0; j < errorCode.size(); j++)
+	if (statusCode.empty() || statusCode.size() > 3)
+		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + statusCode + "\"");
+	for (size_t j = 0; j < statusCode.size(); j++)
 	{
-		if (!std::isdigit(errorCode[j]))
-			throw std::runtime_error("invalid code in \"error_page\" directive: \"" + errorCode + "\"");
+		if (!std::isdigit(statusCode[j]))
+			throw std::runtime_error("invalid code in \"error_page\" directive: \"" + statusCode + "\"");
 	}
-	int codeInt = std::stoi(errorCode);
+	int codeInt = std::stoi(statusCode);
 	if (codeInt < 300 || codeInt > 599)
-		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + errorCode + "\"" + " (must be between 300 and 599)");
-	errorPages[codeInt] = errorPageValue;
+		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + statusCode + "\"" + " (must be between 300 and 599)");
+	errorPages[codeInt] = uri;
+}
+
+void	ServerConfig::addLocation(ContextNode *locationNode)
+{
+	LocationConfig location(*this);
+	const std::vector<ConfigNode *> &locationChildren = locationNode->getChildren();
+	for (size_t i = 0; i < locationChildren.size(); i++)
+	{
+		if (locationChildren[i]->getType() == Directive)
+		{
+			DirectiveNode *locationDirective = static_cast<DirectiveNode *>(locationChildren[i]);
+			if (locationDirective->getKey() == "root")
+				location.setRoot(locationDirective->getValues()[0]);
+			else if (locationDirective->getKey() == "index")
+				location.setIndex(locationDirective->getValues()[0]);
+			else if (locationDirective->getKey() == "autoindex")
+				location.setAutoindex(locationDirective->getValues()[0]);
+			else if (locationDirective->getKey() == "client_max_body_size")
+				location.setClientMaxBodySize(locationDirective->getValues()[0]);
+			else if (locationDirective->getKey() == "error_page")
+				location.setErrorPage(locationDirective->getKey(), locationDirective->getValues()[0]);
+			else if (locationDirective->getKey() == "try_files")
+				location.setTryFiles(locationDirective->getValues());
+			else if (locationDirective->getKey() == "return")
+				location.setReturn(locationDirective->getValues());
+			else if (locationDirective->getKey() == "rewrite")
+				location.setRewrite(locationDirective->getValues());
+		}
+	}
+	locations[locationNode->getPath()] = location;
 }
