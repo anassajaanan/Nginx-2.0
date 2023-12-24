@@ -28,7 +28,8 @@ private:
 	ConfigParser();
 
 public:
-	ConfigParser(ConfigNode **treeRoot, const std::string &fileName);
+	ConfigParser(const std::string &fileName);
+	~ConfigParser();
 
 	void	readConfigFile();
 	void	tokenizeConfigFile();

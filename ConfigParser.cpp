@@ -1,11 +1,13 @@
 #include "ConfigParser.hpp"
 
 
-ConfigParser::ConfigParser(ConfigNode **treeRoot, const std::string &fileName)
-	: configFileName(fileName)
+ConfigParser::ConfigParser(const std::string &fileName)
+	: configFileName(fileName), configTreeRoot(NULL) { }
+
+ConfigParser::~ConfigParser()
 {
-	configTreeRoot = *treeRoot;
-	parseConfigFile();
+	if (configTreeRoot)
+		delete configTreeRoot;
 }
 
 void	ConfigParser::readConfigFile()
