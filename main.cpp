@@ -1,24 +1,36 @@
 
 
+// #include "ConfigParser.hpp"
+#include "ConfigNode.hpp"
+#include "ServerConfig.hpp"
 #include "ConfigParser.hpp"
+#include "ConfigLoader.hpp"
 
 
 
 int main()
 {
     try
-    {
-        ConfigParser	parser("nginx.conf");
+	{
+		ConfigParser parser("nginx.conf");
+		parser.parseConfigFile();
 
-		std::cout << "nginx 2.0 : the configuration file /etc/nginx/nginx.conf syntax is ok" << std::endl
-				  << "nginx 2.0: configuration file /etc/nginx/nginx.conf test is successful" << std::endl;
+		ConfigNode *treeRoot = parser.getConfigTreeRoot();
 
-		delete(parser.getConfigTreeRoot());
+		std::vector<ServerConfig> servers;
+		
+		ConfigLoader loader(treeRoot);
+		loader.loadServers(servers);
 
-		return (0);
-    }
-    catch (std::exception &e)
-    {
-        std::cout << e.what() << std::endl;
-    }
+		std::cout << "Successfully parsed config file" << std::endl;
+
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+
+	return 0;
+
+	
 }

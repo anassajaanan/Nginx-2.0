@@ -29,6 +29,7 @@ private:
 
 public:
 	ConfigParser(const std::string &fileName);
+	~ConfigParser();
 
 	void	readConfigFile();
 	void	tokenizeConfigFile();

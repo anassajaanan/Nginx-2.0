@@ -2,7 +2,13 @@
 
 
 ConfigParser::ConfigParser(const std::string &fileName)
-	: configFileName(fileName) { parseConfigFile(); }
+	: configFileName(fileName), configTreeRoot(NULL) { }
+
+ConfigParser::~ConfigParser()
+{
+	if (configTreeRoot)
+		delete configTreeRoot;
+}
 
 void	ConfigParser::readConfigFile()
 {

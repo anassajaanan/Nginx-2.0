@@ -1,9 +1,4 @@
 # include "LogicValidator.hpp"
-#include "ConfigNode.hpp"
-#include "ContextNode.hpp"
-#include "DirectiveNode.hpp"
-#include <cstddef>
-#include <stdexcept>
 
 
 LogicValidator::LogicValidator()
@@ -33,32 +28,6 @@ void	LogicValidator::validateDirectiveArgs(DirectiveNode *directive, std::map<st
 		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
 	else if (it->second.first == OneOrTwoArgs && (directive->getValueCount() < 1 || directive->getValueCount() > 2))
 		throw (std::runtime_error("Invalid number of arguments in \"" + directive->getKey() + "\" directive"));
-}
-
-void	LogicValidator::validateDirectiveCodes(DirectiveNode *directiveNode)
-{
-	if (directiveNode->getKey() == "return")
-	{
-		try {
-			int code = std::stoi(directiveNode->getValues()[0]);
-			if (code < 100 || code > 599)
-				throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
-		}
-		catch (std::exception &e) {
-			throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"return\" directive"));
-		}
-	}
-	else if (directiveNode->getKey() == "error_page")
-	{
-		try {
-			int code = std::stoi(directiveNode->getValues()[0]);
-			if (code < 300 || code > 599)
-				throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"error_page\" directive"));
-		}
-		catch (std::exception &e) {
-			throw (std::runtime_error("invalid return code " + directiveNode->getValues()[0] + " in \"error_page\" directive"));
-		}
-	}
 }
 
 void	LogicValidator::validateDirectiveParent(const std::string &key, const std::string &parentName)
@@ -131,7 +100,6 @@ void    LogicValidator::validateConfigTree(ConfigNode *node)
 				validateDirectiveParent(it->first, parentNode->getName());
 			
 			validateDirectiveArgs(directive, it);
-			validateDirectiveCodes(directive);
 		}
 		else
 			throw (std::runtime_error("Unknown directive \"" + directive->getKey() + "\""));
