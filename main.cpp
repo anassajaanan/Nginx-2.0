@@ -13,11 +13,13 @@
 
 int main()
 {
+	ConfigNode *treeRoot = NULL;
+
     try
 	{
-		ConfigParser parser("nginx.conf");
+		ConfigParser parser(&treeRoot, "nginx.conf");
 
-		ConfigNode *treeRoot = parser.getConfigTreeRoot();
+		// ConfigNode *treeRoot = parser.getConfigTreeRoot();
 
 		std::vector<ServerConfig> servers;
 		
@@ -29,7 +31,7 @@ int main()
 
 		std::cout << "Successfully parsed config file" << std::endl;
 		
-		delete treeRoot;
+		// delete treeRoot;
 
 
 		return (0);
@@ -39,6 +41,16 @@ int main()
 	{
 		std::cerr << e.what() << std::endl;
 	}
+
+	if (treeRoot)
+	{
+		std::cout << "Tree is not empty" << std::endl;
+	}
+	else
+	{
+		std::cout << "Tree is empty" << std::endl;
+	}
+
 	return 0;
 
 	
