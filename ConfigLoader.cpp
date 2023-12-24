@@ -1,10 +1,4 @@
 #include "ConfigLoader.hpp"
-#include "ConfigNode.hpp"
-#include "ContextNode.hpp"
-#include "DirectiveNode.hpp"
-#include "ServerConfig.hpp"
-#include <sys/_types/_size_t.h>
-#include <vector>
 
 
 ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
