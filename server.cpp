@@ -1,9 +1,5 @@
-#include <cstddef>
 #include <iostream>
 #include <string>
-#include <sys/_endian.h>
-#include <sys/_select.h>
-#include <sys/_types/_size_t.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -28,6 +24,17 @@ int main()
 		if (server_fd < 0)
 		{
 			throw std::runtime_error("Failed to create socket");
+		}
+
+		// Set socket to non-blocking
+		int flags = fcntl(server_fd, F_GETFL, 0);
+		if (flags < 0)
+		{
+			throw std::runtime_error("Failed to get socket flags");
+		}
+		if (fcntl(server_fd, F_SETFL, flags | O_NONBLOCK) < 0)
+		{
+			throw std::runtime_error("Failed to set socket to non-blocking");
 		}
 
 		server_addr.sin_family = AF_INET;
@@ -119,6 +126,8 @@ int main()
 								std::cout << "Connection closed" << std::endl;
 								close(clientSockets[i]);
 								clientSockets.erase(clientSockets.begin() + i);
+								i--;
+								continue;
 							}
 							else
 							{
