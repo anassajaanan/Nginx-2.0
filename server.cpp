@@ -1,5 +1,7 @@
 #include <iostream>
+#include <stdexcept>
 #include <string>
+#include <sys/poll.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -7,17 +9,19 @@
 #include <fcntl.h>
 #include <vector>
 #include <sys/select.h>
-
-
+#include <poll.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
 
 int main()
 {
 
 	try
 	{
-		fd_set readfds, writefds, exceptfds;
-		struct sockaddr_in server_addr;
-		std::vector<int> clientSockets;
+		struct sockaddr_in			server_addr;
+		std::vector<struct pollfd>	clientSockets;
 
 
 		int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -52,93 +56,73 @@ int main()
 			throw std::runtime_error("Failed to listen on socket");
 		}
 
+		// add server socket to pollfd vector
+		struct pollfd serverPollfd;
+
+		serverPollfd.fd = server_fd;
+		serverPollfd.events = POLLIN;
+		serverPollfd.revents = 0;
+
+		clientSockets.push_back(serverPollfd);
+
 		while (1)
 		{
-			FD_ZERO(&readfds);
-			FD_ZERO(&writefds);
-			FD_ZERO(&exceptfds);
-
-			FD_SET(server_fd, &readfds);
-			FD_SET(server_fd, &exceptfds);
-
-			for (size_t i = 0; i < clientSockets.size(); i++)
-			{
-				FD_SET(clientSockets[i], &readfds);
-				FD_SET(clientSockets[i], &exceptfds);
-			}
-
-			int max_fd = server_fd;
-			for (size_t i = 0; i < clientSockets.size(); i++)
-			{
-				if (clientSockets[i] > max_fd)
-				{
-					max_fd = clientSockets[i];
-				}
-			}
-			max_fd++;
-
-			struct timeval timeout;
-			timeout.tv_sec = 3;
-			timeout.tv_usec = 0;
-
-			int activity = select(max_fd, &readfds, NULL, &exceptfds, &timeout);
+			int activity = poll(clientSockets.data(), clientSockets.size(), 3000);
 			if (activity < 0)
 			{
-				throw std::runtime_error("Error in select");
+				throw (std::runtime_error("Failed to poll sockets"));
 			}
-			else if (activity == 0)
-			{
-				std::cout << "Timeout occurred" << std::endl;
+			else if (activity == 0){
+				std::cout << "Timeout" << std::endl;
 			}
 			else
 			{
-				if (FD_ISSET(server_fd, &readfds))
+				for (int fd = 0; fd < clientSockets.size(); fd++)
 				{
-					struct sockaddr_in client_addr;
-					socklen_t client_len = sizeof(client_addr);
-
-					int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
-					if (client_fd <= 0)
+					if ((clientSockets[fd].revents & POLLIN) == POLLIN)
 					{
-						throw std::runtime_error("Failed to accept incoming connection");
-					}
-					else
-					{
-						std::cout << "New connection accepted" << std::endl;
-						clientSockets.push_back(client_fd);
-					}
-
-				}
-				else
-				{
-					for (size_t i  = 0; i < clientSockets.size(); i++)
-					{
-						if (FD_ISSET(clientSockets[i], &readfds))
+						if (clientSockets[fd].fd == server_fd) // new request
 						{
-							char buffer[1024] = {0};
-							int read_bytes = recv(clientSockets[i], buffer, 1024, 0);
-							if (read_bytes < 0)
+							struct sockaddr_in client_addr;
+							socklen_t client_addr_len = sizeof(client_addr);
+							int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
+							if (client_fd <= 0)
+							{
+								throw std::runtime_error("Failed to accept connection");
+							}
+
+							std::cout << "New connection accepted" << std::endl;
+
+							struct pollfd clientPollfd;
+							clientPollfd.fd = client_fd;
+							clientPollfd.events = POLLIN;
+							clientPollfd.revents = 0;
+							clientSockets.push_back(clientPollfd);
+						}
+						else {
+							char buffer[1024] = { 0 };
+							int readBytes = recv(clientSockets[fd].fd, buffer, 1024, 0);
+							if (readBytes < 0)
 							{
 								throw std::runtime_error("Failed to read from socket");
 							}
-							else if (read_bytes == 0)
+							else if (readBytes == 0)
 							{
-								std::cout << "Connection closed" << std::endl;
-								close(clientSockets[i]);
-								clientSockets.erase(clientSockets.begin() + i);
-								i--;
-								continue;
+								std::cout << "Client disconnected" << std::endl;
+								close(clientSockets[fd].fd);
+								clientSockets.erase(clientSockets.begin() + fd);
 							}
 							else
 							{
 								std::cout << "Received: " << buffer << std::endl;
 							}
-						
 						}
 					}
 				}
 			}
+
 		}
+		
 	}
 	catch (const std::exception& e)
 	{
