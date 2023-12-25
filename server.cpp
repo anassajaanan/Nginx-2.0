@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -15,13 +16,21 @@
 #include <sys/event.h>
 #include <sys/time.h>
 
+#define MAX_EVENTS 64
+
 int main()
 {
 
 	try
 	{
 		struct sockaddr_in			server_addr;
-		std::vector<struct pollfd>	clientSockets;
+		struct kevent				events[MAX_EVENTS];
+
+		int kq = kqueue();
+		if (kq < 0)
+		{
+			throw std::runtime_error("Failed to create kqueue");
+		}
 
 
 		int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -56,67 +65,73 @@ int main()
 			throw std::runtime_error("Failed to listen on socket");
 		}
 
-		// add server socket to pollfd vector
-		struct pollfd serverPollfd;
+		struct kevent server_event;
+		EV_SET(&server_event, server_fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+		if (kevent(kq, &server_event, 1, NULL, 0, NULL) < 0)
+		{
+			throw std::runtime_error("Failed to add server socket to kqueue");
+		}
 
-		serverPollfd.fd = server_fd;
-		serverPollfd.events = POLLIN;
-		serverPollfd.revents = 0;
-
-		clientSockets.push_back(serverPollfd);
 
 		while (1)
 		{
-			int activity = poll(clientSockets.data(), clientSockets.size(), 3000);
-			if (activity < 0)
+			// int activity = poll(clientSockets.data(), clientSockets.size(), 3000);
+			int nev = kevent(kq, NULL, 0, events, MAX_EVENTS, NULL);
+			std::cout << "nev: " << nev << std::endl;
+			if (nev < 0)
 			{
-				throw (std::runtime_error("Failed to poll sockets"));
+				throw std::runtime_error("Failed to check for events");
 			}
-			else if (activity == 0){
-				std::cout << "Timeout" << std::endl;
-			}
-			else
+			for (int i = 0; i < nev; i++)
 			{
-				for (int fd = 0; fd < clientSockets.size(); fd++)
+				if (events[i].filter == EVFILT_READ)
 				{
-					if ((clientSockets[fd].revents & POLLIN) == POLLIN)
+					if (events[i].ident == server_fd)
 					{
-						if (clientSockets[fd].fd == server_fd) // new request
+						//new connection
+						std::cout << "New connection" << std::endl;
+						struct sockaddr_in client_addr;
+						socklen_t client_len = sizeof(client_addr);
+
+						int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
+						if (client_fd < 0)
 						{
-							struct sockaddr_in client_addr;
-							socklen_t client_addr_len = sizeof(client_addr);
-							int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
-							if (client_fd <= 0)
-							{
-								throw std::runtime_error("Failed to accept connection");
-							}
-
-							std::cout << "New connection accepted" << std::endl;
-
-							struct pollfd clientPollfd;
-							clientPollfd.fd = client_fd;
-							clientPollfd.events = POLLIN;
-							clientPollfd.revents = 0;
-							clientSockets.push_back(clientPollfd);
+							throw std::runtime_error("Failed to accept connection");
 						}
-						else {
-							char buffer[1024] = { 0 };
-							int readBytes = recv(clientSockets[fd].fd, buffer, 1024, 0);
-							if (readBytes < 0)
-							{
-								throw std::runtime_error("Failed to read from socket");
-							}
-							else if (readBytes == 0)
-							{
-								std::cout << "Client disconnected" << std::endl;
-								close(clientSockets[fd].fd);
-								clientSockets.erase(clientSockets.begin() + fd);
-							}
-							else
-							{
-								std::cout << "Received: " << buffer << std::endl;
-							}
+
+						// register new client
+						struct kevent new_client_event;
+						EV_SET(&new_client_event, client_fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+						if (kevent(kq, &new_client_event, 1, NULL, 0, NULL) < 0)
+						{
+							throw std::runtime_error("Failed to add new client to kqueue");
 						}
+
+					}
+					else {
+						// read from client
+						char buffer[1024];
+						int bytes_read = recv(events[i].ident, buffer, sizeof(buffer), 0);
+						if (bytes_read < 0)
+						{
+							throw std::runtime_error("Failed to read data from client");
+						}
+						else if (bytes_read == 0)
+						{
+							// client disconnected
+							std::cout << "Client disconnected" << std::endl;
+							// remove client from kqueue
+							struct kevent del_client_event;
+							EV_SET(&del_client_event, events[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+							if (kevent(kq, &del_client_event, 1, NULL, 0, NULL) < 0)
+							{
+								throw std::runtime_error("Failed to delete client from kqueue");
+							}
+							close(events[i].ident);
+						}
+						else
+							std::cout << "Received: " << std::string(buffer, bytes_read) << std::endl;
+						
 					}
 				}
 			}
