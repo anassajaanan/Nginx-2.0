@@ -3,7 +3,7 @@
 
 Server::Server(ServerConfig &config, KqueueManager &kq) : _config(config), _kq(kq)
 {
-	std::cout << "Server constructor" << std::endl;
+	// std::cout << "Server constructor" << std::endl;
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_port = htons(_config.port);
 	_serverAddr.sin_addr.s_addr = inet_addr(_config.ipAddress.c_str());
@@ -21,6 +21,7 @@ Server::~Server()
 		it++;
 	}
 	_clients.clear();
+	_kq.unregisterEvent(_socket, EVFILT_READ);
 	close(_socket);
 }
 
@@ -104,5 +105,4 @@ void	Server::stop()
 		it++;
 	}
 	_clients.clear();
-	close(_socket);
 }

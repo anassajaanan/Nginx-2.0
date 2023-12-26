@@ -8,10 +8,24 @@
 #include "Server.hpp"
 #include "KqueueManager.hpp"
 
+#include <csignal>
+
+int running = 1;
+
+void	signalHandler(int signum)
+{
+	std::cout << "Signal " << signum << " received" << std::endl;
+	if (signum == SIGINT || signum == SIGTERM)
+		running = 0;
+}
+
 int main()
 {
     try
 	{
+		signal(SIGINT, signalHandler);
+		signal(SIGTERM, signalHandler);
+
 		ConfigParser parser("nginx.conf");
 		parser.parseConfigFile();
 
@@ -39,9 +53,12 @@ int main()
 		std::cout << "Successfully started server" << std::endl;
 		std::cout << "Listening on port " << serverConfigs[0].port << std::endl;
 
-		while (true)
+		while (running)
 		{
+			std::cout << "Waiting for events" << std::endl;
 			int nev = kqueue.waitForEvents();
+			if (!running)
+				break;
 			std::cout << "nev: " << nev << std::endl; // TODO: remove this line
 			if (nev < 0)
 				throw std::runtime_error("Error in kqueue");
@@ -69,6 +86,7 @@ int main()
 
 		for (size_t i = 0; i < servers.size(); i++)
 		{
+			servers[i]->stop();
 			delete servers[i];
 		}
 		
