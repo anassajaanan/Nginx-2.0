@@ -6,6 +6,7 @@
 #define SERVER_HPP
 
 #include "ServerConfig.hpp"
+#include "KqueueManager.hpp"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -15,27 +16,38 @@
 
 
 
+
 #define SERVER_BACKLOG 30
 
 
 class Server
 {
 private:
-	ServerConfig		&_config;
-	int					_socket;
-	int					_kq;
-	struct sockaddr_in	_serverAddr;
+
 
 public:
-	Server(ServerConfig &config, int kq);
+	Server(ServerConfig &config, KqueueManager &kq);
 	~Server();
+
+	ServerConfig						&_config;
+	KqueueManager						&_kq;
+	int									_socket;
+	struct sockaddr_in					_serverAddr;
+	int									_running;
+	std::map<int, struct sockaddr_in>	_clients;
+
+
 
 	void	createServerSocket();
 	void	setSocketToNonBlocking();
 	void	bindAndListen();
+	void	acceptNewConnection();
+	void	handleClientDisconnection(int clientSocket);
+	void	handleClientRequest(int clientSocket);
 
 
-
+	void	run();
+	void	stop();
 
 };
 

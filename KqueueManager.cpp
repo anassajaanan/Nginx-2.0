@@ -1,4 +1,7 @@
 #include "KqueueManager.hpp"
+#include <sys/_types/_int16_t.h>
+#include <sys/_types/_intptr_t.h>
+#include <sys/event.h>
 
 KqueueManager::KqueueManager()
 {
@@ -32,4 +35,14 @@ void	KqueueManager::unregisterEvent(int fd, int16_t filter)
 	{
 		throw std::runtime_error("failed to unregister the event");
 	}
+}
+
+int	KqueueManager::waitForEvents()
+{
+	int nev = kevent(this->kq, NULL, 0, this->events, MAX_EVENTS, NULL);
+	if (nev < 0)
+	{
+		throw std::runtime_error("kevent() failed");
+	}
+	return (nev);
 }
