@@ -18,17 +18,17 @@
 
 class KqueueManager
 {
-private:
-	int				kq;
-	struct kevent	events[MAX_EVENTS];
-
-
 public:
 	KqueueManager();
 	~KqueueManager();
 
+
+	int				kq;
+	struct kevent	events[MAX_EVENTS];
+
 	void			registerEvent(int fd, int16_t filter);
 	void			unregisterEvent(int fd, int16_t filter);
+	int				waitForEvents();
 
 };
 
