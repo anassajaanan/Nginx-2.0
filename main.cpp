@@ -6,9 +6,7 @@
 #include "ConfigParser.hpp"
 #include "ConfigLoader.hpp"
 #include "Server.hpp"
-#include <stdexcept>
-#include <sys/event.h>
-
+#include "KqueueManager.hpp"
 
 int main()
 {
@@ -27,12 +25,7 @@ int main()
 		// std::cout << "Successfully parsed config file" << std::endl;
 
 
-		int kq = kqueue();
-		if (kq == -1)
-		{
-			throw std::runtime_error("kqueue() failed");
-		}
-
+		KqueueManager	kqueue;
 
 	}
 	catch (const std::exception &e)

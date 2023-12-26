@@ -6,6 +6,7 @@
 # define KQUEUE_MANAGER_HPP
 
 #include <unistd.h>
+#include <iostream>
 #include <stdexcept>
 #include <sys/types.h>
 #include <sys/event.h>
@@ -30,13 +31,6 @@ public:
 	void			unregisterEvent(int fd, int16_t filter);
 
 };
-
-
-
-
-
-
-
 
 
 #endif /* KQUEUE_MANAGER_HPP */
