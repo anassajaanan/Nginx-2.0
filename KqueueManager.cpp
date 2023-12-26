@@ -39,10 +39,11 @@ void	KqueueManager::unregisterEvent(int fd, int16_t filter)
 
 int	KqueueManager::waitForEvents()
 {
-	int nev = kevent(this->kq, NULL, 0, this->events, MAX_EVENTS, NULL);
-	if (nev < 0)
-	{
-		throw std::runtime_error("kevent() failed");
-	}
+	struct timespec timeout;
+	timeout.tv_sec = 5;
+	timeout.tv_nsec = 0;
+
+
+	int nev = kevent(this->kq, NULL, 0, this->events, MAX_EVENTS, &timeout);
 	return (nev);
 }
