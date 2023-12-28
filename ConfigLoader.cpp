@@ -4,7 +4,7 @@
 ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
 {
 	this->root = DEFAULT_HTTP_ROOT_VALUE;
-	this->index = DEFAULT_HTTP_INDEX_VALUE;
+	this->index.push_back(DEFAULT_HTTP_INDEX_VALUE);
 	this->autoindex = DEFAULT_HTTP_AUTOINDEX_VALUE;
 	this->client_max_body_size = DEFAULT_HTTP_CLIENT_MAX_BODY_SIZE;
 	this->treeRoot = treeRoot;
@@ -22,7 +22,7 @@ void ConfigLoader::processLocationNode(ContextNode* locationNode, LocationConfig
 			if (directive->getKey() == "root")
 				locationConfig.setRoot(directive->getValues()[0]);
 			else if (directive->getKey() == "index")
-				locationConfig.setIndex(directive->getValues()[0]);
+				locationConfig.setIndex(directive->getValues());
 			else if (directive->getKey() == "autoindex")
 				locationConfig.setAutoindex(directive->getValues()[0]);
 			else if (directive->getKey() == "client_max_body_size")
@@ -59,7 +59,7 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			else if (directive->getKey() == "root")
 				serverConfig.setRoot(directive->getValues()[0]);
 			else if (directive->getKey() == "index")
-				serverConfig.setIndex(directive->getValues()[0]);
+				serverConfig.setIndex(directive->getValues());
 			else if (directive->getKey() == "autoindex")
 				serverConfig.setAutoindex(directive->getValues()[0]);
 			else if (directive->getKey() == "try_files")
@@ -97,7 +97,7 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 			if (directive->getKey() == "root")
 				this->root = directive->getValues()[0];
 			else if (directive->getKey() == "index")
-				this->index = directive->getValues()[0];
+				this->index = directive->getValues();
 			else if (directive->getKey() == "autoindex")
 				this->autoindex = directive->getValues()[0];
 			else if (directive->getKey() == "client_max_body_size")

@@ -3,13 +3,13 @@
 
 ServerConfig::ServerConfig() { }
 
-ServerConfig::ServerConfig(const std::string &rootValue, const std::string &indexValue,
+ServerConfig::ServerConfig(const std::string &rootValue, const std::vector<std::string> &indexValues,
 				const std::string &autoindexValue, const std::string &client_max_body_size,
 				const std::vector<DirectiveNode *> &errorPagesDirectives)
 {
 	setDefaultValues();
 	setRoot(rootValue);
-	setIndex(indexValue);
+	setIndex(indexValues);
 	setAutoindex(autoindexValue);
 	setClientMaxBodySize(client_max_body_size);
 	for (size_t i = 0; i < errorPagesDirectives.size(); i++)
@@ -24,7 +24,7 @@ void	ServerConfig::setDefaultValues()
 	this->port = DEFAULT_SERVER_PORT;
 	this->ipAddress = DEFAULT_SERVER_IP;
 	this->root = DEFAULT_SERVER_ROOT;
-	this->index = DEFAULT_SERVER_INDEX;
+	this->index.push_back(DEFAULT_SERVER_INDEX);
 	this->serverName = DEFAULT_SERVER_NAME;
 	this->autoindex = DEFAULT_SERVER_AUTOINDEX;
 	this->clientMaxBodySize = DEFAULT_CLIENT_MAX_BODY_SIZE;

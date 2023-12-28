@@ -32,7 +32,7 @@ public:
 	std::map<std::string, LocationConfig>	locations;
 
 	ServerConfig();
-	ServerConfig(const std::string &rootValue, const std::string &indexValue,
+	ServerConfig(const std::string &rootValue, const std::vector<std::string> &indexValues,
 				const std::string &autoindexValue, const std::string &client_max_body_size,
 				const std::vector<DirectiveNode *> &errorPagesDirectives);
 

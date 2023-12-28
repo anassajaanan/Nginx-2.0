@@ -26,7 +26,7 @@ private:
 
 public:
 	std::string								root;
-	std::string								index;
+	std::vector<std::string>				index;
 	std::string								autoindex;
 	std::map<int, std::string>				errorPages;
 	size_t									clientMaxBodySize;
@@ -35,7 +35,7 @@ public:
 	RewriteDirective						rewriteDirective;
 
 	void					setRoot(const std::string &rootValue);
-	void					setIndex(const std::string &indexValue);
+	void					setIndex(const std::vector<std::string> &indexValues);
 	void					setAutoindex(const std::string &autoindexValue);
 	void					setErrorPage(const std::string &statusCode, const std::string &uri);
 	void					setClientMaxBodySize(const std::string &bodySize);

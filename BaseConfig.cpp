@@ -7,9 +7,9 @@ void	BaseConfig::setRoot(const std::string &rootValue)
 		this->root = rootValue;
 }
 
-void		BaseConfig::setIndex(const std::string &indexValue)
+void		BaseConfig::setIndex(const std::vector<std::string> &indexValues)
 {
-	this->index = indexValue;
+	this->index = indexValues;
 }
 
 bool	BaseConfig::isValidAutoindex(const std::string &autoindexValue)
