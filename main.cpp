@@ -50,8 +50,6 @@ int main()
 			servers.push_back(server);
 		}
 
-		std::cout << "Successfully started server" << std::endl;
-		std::cout << "Listening on port " << serverConfigs[0].port << std::endl;
 
 		while (running)
 		{
@@ -59,7 +57,7 @@ int main()
 			int nev = kqueue.waitForEvents();
 			if (!running)
 				break;
-			std::cout << "nev: " << nev << std::endl; // TODO: remove this line
+			std::cout << "nev: " << nev << std::endl;
 			if (nev < 0)
 				throw std::runtime_error("Error in kqueue");
 			for (int ev = 0; ev < nev; ev++)

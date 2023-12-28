@@ -9,6 +9,7 @@
 #include "KqueueManager.hpp"
 
 #include <fcntl.h>
+#include <fstream>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
