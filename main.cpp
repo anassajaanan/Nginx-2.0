@@ -8,6 +8,8 @@
 #include "Server.hpp"
 #include "KqueueManager.hpp"
 
+#include "RequestHandler.hpp"
+
 #include <csignal>
 
 int running = 1;
@@ -89,9 +91,11 @@ int main()
 		loader.loadServers(serverConfigs);
 
 		// std::cout << "Successfully parsed config file" << std::endl;
-		start(servers, serverConfigs);
+		// start(servers, serverConfigs);
 
-		
+		RequestHandler handler(serverConfigs[0]);
+
+		handler.handleRequest(HttpRequest());
 		
 	}
 	catch (const std::exception &e)

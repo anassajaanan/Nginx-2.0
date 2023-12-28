@@ -26,6 +26,11 @@ public:
 	bool			fileExists(const std::string& path);
 	bool			isDirectory(const std::string& path);
 
+	bool			fileExistsAndAccessible(const std::string& path);
+	HttpResponse	serveFile(const std::string& path);
+
+
+
 	HttpResponse	handleRequest(const HttpRequest &request);
 };
 
