@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "HttpRequest.hpp"
 
 Server::Server(ServerConfig &config, KqueueManager &kq) : _config(config), _kq(kq)
 {
@@ -93,8 +94,10 @@ void	Server::handleClientRequest(int clientSocket)
 	if (bytesRead < 0)
 		throw std::runtime_error("Error: recv failed");
 	buffer[bytesRead] = '\0';
+	HttpRequest	req(buffer);
 	std::cout << "Request from client: " << std::endl;
-	std::cout << buffer << std::endl;
+
+	// std::cout << buffer << std::endl;
 	
 	std::istringstream iss(buffer);
 	std::vector<std::string> parsed((std::istream_iterator<std::string>(iss)),
