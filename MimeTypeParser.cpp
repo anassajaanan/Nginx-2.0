@@ -31,7 +31,7 @@ void	MimeTypeParser::readMimeTypeFile()
 		throw std::runtime_error("Error: Unable to open the MIME type file ('"
 		+ mimeTypeFileName + "') for reading. Please check file permissions and try again.");
 	while (std::getline(file, line))
-		mimeTypeFileContent += line;
+		mimeTypeFileContent += line + "\n";
 	file.close();
 }
 
@@ -77,7 +77,7 @@ void	MimeTypeParser::parseMimeTypeFile()
 	readMimeTypeFile();
 	tokenizeMimeTypeFile();
 
-	if (mimeTypeTokens.size() < 3)
+	if (mimeTypeTokens.size() == 0)
 		throw std::runtime_error("Error: The MIME type file ('"
 		+ mimeTypeFileName + "') is empty. Please provide a valid file.");
 	if (mimeTypeTokens[0] != "types")
@@ -105,8 +105,10 @@ void	MimeTypeParser::parseMimeTypeFile()
 		else
 			throw (std::runtime_error("unexpected \"" + mimeTypeTokens[i] + "\" in MIME type file"));
 	}
+	if (i == mimeTypeTokens.size())
+		throw (std::runtime_error("unexpected end of file in MIME type file"));
 	if (i != mimeTypeTokens.size() - 1)
-		throw (std::runtime_error("unexpected \"" + mimeTypeTokens[i] + "\" in MIME type file"));
+		throw (std::runtime_error("unexpected \"" + mimeTypeTokens[i + 1] + "\" in MIME type file"));
 }
 
 void	MimeTypeParser::printMimeTypeTokens()

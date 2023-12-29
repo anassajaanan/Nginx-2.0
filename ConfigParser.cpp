@@ -30,7 +30,7 @@ void	ConfigParser::readConfigFile()
 		throw std::runtime_error("Error: Unable to open the configuration file ('"
 		+ configFileName + "') for reading. Please check file permissions and try again.");
 	while (std::getline(file, line))
-		configFileContent += line;
+		configFileContent += line + "\n";
 	file.close();
 }
 
