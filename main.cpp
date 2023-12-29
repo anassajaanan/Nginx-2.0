@@ -10,6 +10,8 @@
 
 #include "RequestHandler.hpp"
 
+#include "MimeTypeParser.hpp"
+
 #include <csignal>
 
 int running = 1;
@@ -76,26 +78,30 @@ int main()
 {
     try
 	{
-		signal(SIGINT, signalHandler);
-		signal(SIGTERM, signalHandler);
+		// signal(SIGINT, signalHandler);
+		// signal(SIGTERM, signalHandler);
 
-		ConfigParser parser("nginx.conf");
-		parser.parseConfigFile();
+		// ConfigParser parser("nginx.conf");
+		// parser.parseConfigFile();
 
-		ConfigNode *treeRoot = parser.getConfigTreeRoot();
+		// ConfigNode *treeRoot = parser.getConfigTreeRoot();
 
-		std::vector<ServerConfig>	serverConfigs;
-		std::vector<Server *> 		servers;
+		// std::vector<ServerConfig>	serverConfigs;
+		// std::vector<Server *> 		servers;
 		
-		ConfigLoader loader(treeRoot);
-		loader.loadServers(serverConfigs);
+		// ConfigLoader loader(treeRoot);
+		// loader.loadServers(serverConfigs);
 
-		// std::cout << "Successfully parsed config file" << std::endl;
+		// // std::cout << "Successfully parsed config file" << std::endl;
 		// start(servers, serverConfigs);
 
-		RequestHandler handler(serverConfigs[0]);
 
-		handler.handleRequest(HttpRequest());
+		MimeTypeParser parser("mime.types");
+		parser.parseMimeTypeFile();
+		parser.printMimeTypeTokens();
+		parser.printMimeTypeMap();
+
+		
 		
 	}
 	catch (const std::exception &e)

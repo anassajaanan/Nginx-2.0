@@ -15,6 +15,7 @@ class RequestHandler
 
 private:
 	ServerConfig	&serverConfig;
+	std::map<std::string, std::string>	mimeTypes;
 
 public:
 	RequestHandler(ServerConfig &serverConfig);

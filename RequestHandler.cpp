@@ -8,7 +8,10 @@
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig)
-	: serverConfig(serverConfig) { }
+	: serverConfig(serverConfig)
+{
+	
+}
 
 RequestHandler::~RequestHandler() { }
 
@@ -60,6 +63,13 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	if (!fileExistsAndAccessible(path))
 	{
 		// 403 Forbidden
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("403");
+		response.setStatusMessage("Forbidden");
+		response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+		response.setHeader("Connection", "close");
 	}
 	else {
 		// response.setStatusCode(200);
@@ -92,7 +102,7 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 		else
 		{
 			std::cout << "File is not a directory" << std::endl;
-			serveFile(path);
+			return serveFile(path);
 			// response.setStatusCode(200);
 			// serve file
 

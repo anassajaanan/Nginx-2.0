@@ -1,5 +1,8 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
+#include "RequestHandler.hpp"
+#include <unistd.h>
 
 Server::Server(ServerConfig &config, KqueueManager &kq) : _config(config), _kq(kq)
 {
@@ -94,115 +97,13 @@ void	Server::handleClientRequest(int clientSocket)
 	if (bytesRead < 0)
 		throw std::runtime_error("Error: recv failed");
 	buffer[bytesRead] = '\0';
-	HttpRequest	req(buffer);
-	std::cout << "Request from client: " << std::endl;
-
-	// std::cout << buffer << std::endl;
 	
-	std::istringstream iss(buffer);
-	std::vector<std::string> parsed((std::istream_iterator<std::string>(iss)),
-		std::istream_iterator<std::string>());
-	if (parsed.size() > 3 && parsed[0] == "GET")
-	{
-		int statusCode = 200;
-		std::string contentType = "text/html";
-		std::string content;
-		std::string fileName = parsed[1].substr(1);
-		
-		// check the file extension
-		if (fileName.substr(fileName.length() - 4) == ".css")
-		{
-			contentType = "text/css";
-		}
-		else if (fileName.substr(fileName.length() - 3) == ".js")
-		{
-			contentType = "text/javascript";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".png")
-		{
-			contentType = "image/png";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".jpg")
-		{
-			contentType = "image/jpg";
-		}
-		else if (fileName.substr(fileName.length() - 5) == ".jpeg")
-		{
-			contentType = "image/jpeg";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".gif")
-		{
-			contentType = "image/gif";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".ico")
-		{
-			contentType = "image/x-icon";
-		}
-		else if (fileName.substr(fileName.length() - 5) == ".json")
-		{
-			contentType = "application/json";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".pdf")
-		{
-			contentType = "application/pdf";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".svg")
-		{
-			contentType = "image/svg+xml";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".txt")
-		{
-			contentType = "text/plain";
-		}
-		else if (fileName.substr(fileName.length() - 5) == ".woff")
-		{
-			contentType = "font/woff";
-		}
-		else if (fileName.substr(fileName.length() - 6) == ".woff2")
-		{
-			contentType = "font/woff2";
-		}
-		else if (fileName.substr(fileName.length() - 4) == ".xml")
-		{
-			contentType = "application/xml";
-		}
-		else if (fileName.substr(fileName.length() - 5) == ".webp")
-		{
-			contentType = "image/webp";
-		}
+	RequestHandler handler(_config);
 
-
-		if (fileName == "")
-		{
-			fileName = "index.html";
-		}
-		std::ifstream file;
-		file.open(fileName);
-		
-		if (file.is_open())
-		{
-			std::string line;
-			
-			while (std::getline(file, line))
-				content += line;
-			file.close();
-		}
-		else {
-			statusCode = 404;
-			content = "<h1>404 Not Found</h1>";
-		}
-
-		std::string header = "HTTP/1.1 " + std::to_string(statusCode) + " OK\r\nContent-Type: " + contentType + "\r\n";
-		// add connection keep-alive header
-		header += "Connection: keep-alive\r\n";
-		// add content length header
-		header += "Content-Length: " + std::to_string(content.length()) + "\r\n";
-		header += "\r\n";
-		header += content;
-		// std::cout << header << std::endl;
-		send(clientSocket, header.c_str(), header.length(), 0);
-		// close(clientSocket);
-	}
+	HttpResponse res = handler.handleRequest(HttpRequest(buffer));
+	std::string response = res.buildResponse();
+	send(clientSocket, response.c_str(), response.length(), 0);
+	close(clientSocket);
 
 }
 

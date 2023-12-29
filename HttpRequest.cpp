@@ -34,11 +34,11 @@ void HttpRequest::requestTokenizer(const std::string &requestString)
 	validateRequesLine(requestVec[0]);
 	loadRequestContent(requestVec);
 	std::cout << std::endl << std::endl;
-	std::map<std::string, std::string>::iterator	t = requestContent.begin();
-	for (;t != requestContent.end(); t++)
+	std::map<std::string, std::string>::iterator	t = headers.begin();
+	for (;t != headers.end(); t++)
 		std::cout << "{" << t->first << "}" << "==>" << t->second << std::endl;
 	std::cout << "Method  ==> " << getRequestMethod() << std::endl;
-	std::cout << "Path    ==> " << geturi() << std::endl;
+	std::cout << "Path    ==> " << getUri() << std::endl;
 	std::cout << "Host    ==> " << getHost() << std::endl;
 	std::cout << "Version ==> " << getVersion() << std::endl;
 	std::cout << "Accept  ==> " << getFromRequest("Accept") << std::endl;
@@ -83,11 +83,11 @@ void	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 		splitedTokens = splitByString(*it, ": ");
 		if (splitedTokens.size() < 2)
 			throw (std::runtime_error("Bad Request"));
-		this->requestContent.insert(std::pair<std::string, std::string>(splitedTokens[0], splitedTokens[1]));
+		this->headers.insert(std::pair<std::string, std::string>(splitedTokens[0], splitedTokens[1]));
 	}
-	if (this->requestContent.find("Host") == this->requestContent.end())
+	if (this->headers.find("Host") == this->headers.end())
 		throw (std::runtime_error("Bad Request")); // 400 bad request
-	this->setHost((this->requestContent.find("Host"))->second);
+	this->setHost((this->headers.find("Host"))->second);
 }
 
 
@@ -134,7 +134,7 @@ const std::string	&HttpRequest::getFromRequest(const std::string &key) const
 	// static std::string	s = "";
 	 std::string	s = std::string("");
 	// if (this->requestContent.find(key) != this->requestContent.end())
-		return (this->requestContent.find(key)->second);
+		return (this->headers.find(key)->second);
 	// else
 	// 	return (s);
 }
@@ -162,22 +162,22 @@ void	HttpRequest::seturi(const std::string &str)
 
 void	HttpRequest::setRequestMethod(const std::string &str)
 {
-	this->requestMethod = str;
+	this->method = str;
 }
 
 const std::string	&HttpRequest::getRequestMethod() const
 {
-	return (this->requestMethod);
+	return (this->method);
 }
 
-const std::string	&HttpRequest::geturi() const
+const std::string	&HttpRequest::getUri() const
 {
 	return (this->uri);
 }
 
 const std::map<std::string, std::string> &HttpRequest::getRequestContent() const
 {
-	return (this->requestContent);
+	return (this->headers);
 }
 
 HttpRequest::~HttpRequest()
