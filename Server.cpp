@@ -35,6 +35,13 @@ void	Server::createServerSocket()
 		throw std::runtime_error("Error: socket creation failed");
 }
 
+void	Server::setSocketOptions()
+{
+	int opt = 1;
+	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+		throw std::runtime_error("Error: setsockopt failed");
+}
+
 
 void	Server::setSocketToNonBlocking()
 {
@@ -74,7 +81,7 @@ void	Server::handleClientDisconnection(int clientSocket)
 	close(clientSocket);
 }
 
-void	Server::handleClientRequest(int clientSocket)
+void	Server::handleClientRequest(int clientSocket, MimeTypeParser &mimeTypes)
 {
 	// std::cout << "Handling client request" << std::endl;
 	// std::string buffer;
@@ -92,18 +99,19 @@ void	Server::handleClientRequest(int clientSocket)
 	
 
 	// read request from an http client (web browser)
+
 	char buffer[1024];
 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 	if (bytesRead < 0)
 		throw std::runtime_error("Error: recv failed");
 	buffer[bytesRead] = '\0';
 	
-	RequestHandler handler(_config);
+	RequestHandler handler(_config, mimeTypes);
 
 	HttpResponse res = handler.handleRequest(HttpRequest(buffer));
 	std::string response = res.buildResponse();
 	send(clientSocket, response.c_str(), response.length(), 0);
-	close(clientSocket);
+	// close(clientSocket);
 
 }
 
@@ -111,6 +119,7 @@ void	Server::handleClientRequest(int clientSocket)
 void	Server::run()
 {
 	createServerSocket();
+	setSocketOptions();
 	setSocketToNonBlocking();
 	bindAndListen();
 	_kq.registerEvent(_socket, EVFILT_READ);

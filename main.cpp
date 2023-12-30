@@ -23,7 +23,7 @@ void	signalHandler(int signum)
 		running = 0;
 }
 
-void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConfigs)
+void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypeParser)
 {
 	KqueueManager	kqueue;
 
@@ -58,7 +58,7 @@ void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConf
 						if (kqueue.events[ev].flags & EV_EOF)
 							servers[i]->handleClientDisconnection(kqueue.events[ev].ident);
 						else
-							servers[i]->handleClientRequest(kqueue.events[ev].ident);
+							servers[i]->handleClientRequest(kqueue.events[ev].ident, mimeTypeParser);
 					}
 					break;
 				}
@@ -78,28 +78,32 @@ int main()
 {
     try
 	{
-		// signal(SIGINT, signalHandler);
-		// signal(SIGTERM, signalHandler);
+		signal(SIGINT, signalHandler);
+		signal(SIGTERM, signalHandler);
 
-		// ConfigParser parser("nginx.conf");
-		// parser.parseConfigFile();
+		ConfigParser parser("nginx.conf");
+		parser.parseConfigFile();
 
-		// ConfigNode *treeRoot = parser.getConfigTreeRoot();
+		MimeTypeParser mimeTypeParser("mime.types");
+		mimeTypeParser.parseMimeTypeFile();
 
-		// std::vector<ServerConfig>	serverConfigs;
-		// std::vector<Server *> 		servers;
+		ConfigNode *treeRoot = parser.getConfigTreeRoot();
+
+		std::vector<ServerConfig>	serverConfigs;
+		std::vector<Server *> 		servers;
 		
-		// ConfigLoader loader(treeRoot);
-		// loader.loadServers(serverConfigs);
+		ConfigLoader loader(treeRoot);
+		loader.loadServers(serverConfigs);
 
-		// // std::cout << "Successfully parsed config file" << std::endl;
-		// start(servers, serverConfigs);
+		// std::cout << "Successfully parsed config file" << std::endl;
+		start(servers, serverConfigs, mimeTypeParser);
 
 
-		MimeTypeParser parser("mime.types");
-		parser.parseMimeTypeFile();
-		parser.printMimeTypeTokens();
-		parser.printMimeTypeMap();
+		
+
+
+		
+		
 
 		
 		

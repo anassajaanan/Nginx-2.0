@@ -1,6 +1,5 @@
 #include "RequestHandler.hpp"
-#include "MimeTypeParser.hpp"
-#include <fstream>
+#include <string>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -61,6 +60,28 @@ bool	RequestHandler::fileExistsAndAccessible(const std::string &path)
 	return (true);
 }
 
+std::string	RequestHandler::generateDirectoryListing(const std::string &uri, const std::string &path)
+{
+	std::string htmlContent = "<html><head><title>Index of " + uri + "</title></head><body><h1>Index of " + uri + "</h1><hr><pre>";
+
+	DIR *dir = opendir(path.c_str());
+	if (dir == NULL)
+		return (htmlContent + "</pre><hr></body></html>");
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL)
+	{
+		std::string fileName = entry->d_name;
+		if (fileName == "." || fileName == "..")
+			continue;
+		if (isDirectory(path + "/" + fileName))
+			fileName += "/";
+		htmlContent += "<a href=\"" + fileName + "\">" + fileName + "</a><br>";
+	}
+	htmlContent += "</pre><hr></body></html>";
+	closedir(dir);
+	return (htmlContent);
+}
+
 HttpResponse	RequestHandler::serveFile(const std::string &path)
 {
 	HttpResponse	response;
@@ -97,11 +118,11 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		}
 		else
 		{
-			
+			// Handle large file (streaming)
+            // Note: we will need a different mechanism to stream the file, as HTTPResponse can't hold the entire file
+            // This might involve setting headers correctly and handling the actual file streaming elsewhere in our code
 		}
 	}
-	
-
 	return (response);
 }
 
@@ -111,7 +132,7 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 {
 	HttpResponse	response;
 
-	std::string	path = resolvePath("/index.html");
+	std::string	path = resolvePath(request.getUri());
 
 	std::cout << "path: " << path << std::endl;
 
@@ -122,24 +143,60 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 		if (isDirectory(path))
 		{
 			std::cout << "File is a directory" << std::endl;
-			// response.setStatusCode(200);
+			for (size_t i = 0; i < serverConfig.index.size(); i++)
+			{
+				std::string indexPath = path + "/" + serverConfig.index[i];
+				if (fileExists(indexPath))
+				{
+					std::cout << "Index file exists" << std::endl;
+					return serveFile(indexPath);
+				}
+			}
+			// handle autoindex directive
+			if (serverConfig.autoindex == "off")
+			{
+				std::cout << "Autoindex is off -> 403" << std::endl;
+				// // 403 Forbidden
+				response.setVersion("HTTP/1.1");
+				response.setStatusCode("403");
+				response.setStatusMessage("Forbidden");
+				response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
+				response.setHeader("Content-Type", "text/html");
+				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+				response.setHeader("Server", "Nginx 2.0");
+				response.setHeader("Connection", "keep-alive");
+			}
+			else
+			{
+				std::cout << "Autoindex is on -> 200" << std::endl;
+				response.setVersion("HTTP/1.1");
+				response.setStatusCode("200");
+				response.setStatusMessage("OK");
+				response.setBody(generateDirectoryListing(request.getUri(), path));
+				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+				response.setHeader("Content-Type", "text/html");
+				response.setHeader("Server", "Nginx 2.0");
+				response.setHeader("Connection", "keep-alive");
+			}
 		}
 		else
 		{
 			std::cout << "File is not a directory" << std::endl;
 			return serveFile(path);
-			// response.setStatusCode(200);
-			// serve file
-
 		}
 	}
 	else
 	{
 		std::cout << "File does not exist" << std::endl;
 		// response.setStatusCode(404);
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("404");
+		response.setStatusMessage("Not Found");
+		response.setBody("<html><body><h1>404 Not Found</h1></body></html>");
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
 	}
-
-
-
 	return (response);
 }

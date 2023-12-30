@@ -7,6 +7,7 @@
 
 #include "ServerConfig.hpp"
 #include "KqueueManager.hpp"
+#include "MimeTypeParser.hpp"
 
 #include <fcntl.h>
 #include <fstream>
@@ -40,11 +41,12 @@ public:
 
 
 	void	createServerSocket();
+	void	setSocketOptions();
 	void	setSocketToNonBlocking();
 	void	bindAndListen();
 	void	acceptNewConnection();
 	void	handleClientDisconnection(int clientSocket);
-	void	handleClientRequest(int clientSocket);
+	void	handleClientRequest(int clientSocket, MimeTypeParser &mimeTypes);
 
 
 	void	run();
