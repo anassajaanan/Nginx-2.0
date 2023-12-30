@@ -1,14 +1,10 @@
 #include "RequestHandler.hpp"
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
-#include <iostream>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "MimeTypeParser.hpp"
+#include <fstream>
 
 
-
-RequestHandler::RequestHandler(ServerConfig &serverConfig)
-	: serverConfig(serverConfig)
+RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
+	: serverConfig(serverConfig), mimeTypes(mimeTypes)
 {
 	
 }
@@ -42,6 +38,15 @@ bool	RequestHandler::isDirectory(const std::string &path)
 	return (false);
 }
 
+long	RequestHandler::getFileSize(const std::string &path)
+{
+	struct stat fileStat;
+
+	if (stat(path.c_str(), &fileStat) == 0)
+		return (fileStat.st_size);
+	return (-1);
+}
+
 
 bool	RequestHandler::fileExistsAndAccessible(const std::string &path)
 {
@@ -69,11 +74,31 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
 		response.setHeader("Content-Type", "text/html");
 		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-		response.setHeader("Connection", "close");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
 	}
-	else {
-		// response.setStatusCode(200);
-		// serve file
+	else
+	{
+		// 200 OK
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("200");
+		response.setStatusMessage("OK");
+		long fileSize = getFileSize(path);
+		if (fileSize <= MAX_IN_MEMORY_SIZE)
+		{
+			std::ifstream file(path, std::ios::binary);
+			std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+			response.setBody(content);
+			response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+			response.setHeader("Server", "Nginx 2.0");
+			response.setHeader("Connection", "keep-alive");
+			file.close();
+		}
+		else
+		{
+			
+		}
 	}
 	
 

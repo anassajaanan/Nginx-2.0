@@ -7,18 +7,21 @@
 #include "ServerConfig.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "MimeTypeParser.hpp"
 #include <sys/stat.h>
+
+#define MAX_IN_MEMORY_SIZE 5242880 // 5MB
 
 
 class RequestHandler
 {
 
 private:
-	ServerConfig	&serverConfig;
-	std::map<std::string, std::string>	mimeTypes;
+	ServerConfig						&serverConfig;
+	MimeTypeParser						&mimeTypes;
 
 public:
-	RequestHandler(ServerConfig &serverConfig);
+	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
 	~RequestHandler();
 
 
@@ -26,6 +29,7 @@ public:
 	std::string		resolvePath(const std::string& uri);
 	bool			fileExists(const std::string& path);
 	bool			isDirectory(const std::string& path);
+	long			getFileSize(const std::string& path);
 
 	bool			fileExistsAndAccessible(const std::string& path);
 	HttpResponse	serveFile(const std::string& path);

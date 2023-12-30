@@ -1,5 +1,7 @@
 #include "MimeTypeParser.hpp"
+#include <algorithm>
 #include <stdexcept>
+#include <string>
 #include <sys/_types/_size_t.h>
 
 MimeTypeParser::MimeTypeParser(const std::string &fileName)
@@ -111,11 +113,20 @@ void	MimeTypeParser::parseMimeTypeFile()
 		throw (std::runtime_error("unexpected \"" + mimeTypeTokens[i + 1] + "\" in MIME type file"));
 }
 
-void	MimeTypeParser::printMimeTypeTokens()
+std::string	MimeTypeParser::getMimeType(const std::string &filePath)
 {
-	for (std::vector<std::string>::iterator it = mimeTypeTokens.begin(); it != mimeTypeTokens.end(); it++)
-		std::cout << *it << std::endl;
-	std::cout << "****************" << std::endl << std::endl;
+	std::string	extension;
+	size_t		pos = filePath.find_last_of('.');
+	if (pos != std::string::npos)
+		extension = filePath.substr(pos + 1);
+	else
+		return ("application/octet-stream");
+	// convert extension to lowercase
+	std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+	std::map<std::string, std::string>::iterator it = mimeTypeMap.find(extension);
+	if (it != mimeTypeMap.end())
+		return (it->second);
+	return ("application/octet-stream");
 }
 
 void	MimeTypeParser::printMimeTypeMap()

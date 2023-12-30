@@ -26,12 +26,12 @@ public:
 	MimeTypeParser(const std::string &fileName);
 	~MimeTypeParser();
 
-	void	readMimeTypeFile();
-	void	tokenizeMimeTypeFile();
-	void	parseMimeTypeFile();
+	void		readMimeTypeFile();
+	void		tokenizeMimeTypeFile();
+	void		parseMimeTypeFile();
+	std::string	getMimeType(const std::string &filePath);
 
-	void	printMimeTypeTokens();
-	void	printMimeTypeMap();
+	void		printMimeTypeMap();
 
 	// Getters
 	std::map<std::string, std::string>	&getMimeTypeMap();
