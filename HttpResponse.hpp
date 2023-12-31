@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include <sys/_types/_size_t.h>
 #ifndef HTTPRESPONSE_HPP
 #define HTTPRESPONSE_HPP
 
@@ -10,43 +11,48 @@
 
 #define CHUNK_SIZE 8192 // 8 KB
 
+enum	ResponseType { SMALL_FILE, LARGE_FILE };
 
 class HttpResponse
 {
 
 	private:
-
+		ResponseType						type;
 		std::string							version;
 		std::string							statusCode;
 		std::string							statusMessage;
 		std::map<std::string, std::string>	headers;
 		std::string							body;
 
-	public:
+		
 
+	public:
 		HttpResponse();
 
+		std::string							filePath;
+		size_t								fileSize;
 
-		void	setVersion(const std::string& version);
-		void	setStatusCode(const std::string& statusCode);
-		void	setStatusMessage(const std::string& statusMessage);
-		void	setHeader(const std::string& key, const std::string& value);
-		void	setBody(const std::string& body);
+		void			setType(ResponseType type);
+		void			setVersion(const std::string& version);
+		void			setStatusCode(const std::string& statusCode);
+		void			setStatusMessage(const std::string& statusMessage);
+		void			setHeader(const std::string& key, const std::string& value);
+		void			setBody(const std::string& body);
 
 
-		std::string	getVersion() const;
-		std::string	getStatusCode() const;
-		std::string	getStatusMessage() const;
-		std::string	getHeader(const std::string& key) const;
-		std::string	getBody() const;
+		ResponseType	getType() const;
+		std::string		getVersion() const;
+		std::string		getStatusCode() const;
+		std::string		getStatusMessage() const;
+		std::string		getHeader(const std::string& key) const;
+		std::string		getBody() const;
 
 
 		std::string getStatusLine() const;
 		std::string getHeadersAsString() const;
 
-		std::string buildResponse() const;
-
-
+		std::string buildResponse() const; // for small files
+		std::string	buildResponseHeaders() const; // for large files
 
 };
 
@@ -54,7 +60,6 @@ class ResponseState
 {
 
 public:
-	enum	ResponseType { SMALL_FILE, LARGE_FILE };
 
 	ResponseState(const std::string &smallFileResponse); // small file
 	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large file
@@ -62,10 +67,13 @@ public:
 	ResponseType		getType() const;
 
 	const std::string	&getSmallFileResponse() const;
+	const std::string	&getHeaders() const;
 
 	std::string			getNextChunk();
 
 	bool				isFinished() const;
+
+	bool				isHeaderSent;
 
 private:
 	ResponseType	type;
@@ -75,7 +83,7 @@ private:
 	std::ifstream	fileStream;
 	size_t			fileSize;
 	size_t			bytesSent;
-
+	
 };
 
 

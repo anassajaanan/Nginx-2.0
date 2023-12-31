@@ -54,7 +54,7 @@ void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConf
 				{
 					if (servers[i]->_responses.count(kqueue.events[ev].ident) > 0)
 					{
-						// servers[i]->handleClientResponse(kqueue.events[ev].ident);
+						servers[i]->handleClientResponse(kqueue.events[ev].ident);
 						break;
 					}
 				}
@@ -78,26 +78,9 @@ void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConf
 					}
 				}
 			}
-			else if (kqueue.events[ev].filter == EVFILT_TIMER)
+			else if (kqueue.events[ev].filter == EVFILT_EXCEPT)
 			{
-				for (size_t i = 0; i < servers.size(); i++)
-				{
-					if (servers[i]->_clients.count(kqueue.events[ev].ident) > 0)
-					{
-						// servers[i]->handleClientTimeout(kqueue.events[ev].ident);
-						break;
-					}
-				}
-			}
-			else if (kqueue.events[ev].filter == EVFILT_SIGNAL)
-			{
-				std::cout << "Signal received" << std::endl;
-				running = 0;
-			}
-			else if (kqueue.events[ev].filter == EVFILT_USER)
-			{
-				std::cout << "User event received" << std::endl;
-				running = 0;
+				std::cout << "Exception" << std::endl;
 			}
 		}
 		

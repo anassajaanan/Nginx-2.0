@@ -32,7 +32,7 @@ public:
 	std::string		resolvePath(const std::string& uri);
 	bool			fileExists(const std::string& path);
 	bool			isDirectory(const std::string& path);
-	long			getFileSize(const std::string& path);
+	size_t			getFileSize(const std::string& path);
 
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);
 

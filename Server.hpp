@@ -52,6 +52,7 @@ public:
 	void	acceptNewConnection();
 	void	handleClientDisconnection(int clientSocket);
 	void	handleClientRequest(int clientSocket);
+	void	handleClientResponse(int clientSocket);
 
 
 	void	run();

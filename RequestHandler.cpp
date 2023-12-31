@@ -37,7 +37,7 @@ bool	RequestHandler::isDirectory(const std::string &path)
 	return (false);
 }
 
-long	RequestHandler::getFileSize(const std::string &path)
+size_t	RequestHandler::getFileSize(const std::string &path)
 {
 	struct stat fileStat;
 
@@ -104,7 +104,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
-		long fileSize = getFileSize(path);
+		size_t fileSize = getFileSize(path);
 		if (fileSize <= MAX_FILE_SIZE)
 		{
 			std::ifstream file(path, std::ios::binary);
@@ -118,9 +118,16 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		}
 		else
 		{
-			// Handle large file (streaming)
-            // Note: we will need a different mechanism to stream the file, as HTTPResponse can't hold the entire file
-            // This might involve setting headers correctly and handling the actual file streaming elsewhere in our code
+			// send large file in chunks
+			response.filePath = path;
+			response.fileSize = fileSize;
+
+
+			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+			response.setHeader("Server", "Nginx 2.0");
+			response.setHeader("Connection", "keep-alive");
+			response.setHeader("Transfer-Encoding", "chunked");
+
 		}
 	}
 	return (response);

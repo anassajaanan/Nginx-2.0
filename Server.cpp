@@ -1,4 +1,6 @@
 #include "Server.hpp"
+#include "HttpResponse.hpp"
+#include <sstream>
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq)
 {
@@ -79,8 +81,6 @@ void	Server::handleClientDisconnection(int clientSocket)
 
 void	Server::handleClientRequest(int clientSocket)
 {
-
-
 	char buffer[1024];
 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
 	if (bytesRead < 0)
@@ -89,12 +89,77 @@ void	Server::handleClientRequest(int clientSocket)
 	
 	RequestHandler handler(_config, _mimeTypes);
 
-	HttpResponse res = handler.handleRequest(HttpRequest(buffer));
-	std::string response = res.buildResponse();
+	HttpResponse response = handler.handleRequest(HttpRequest(buffer));
 
-	send(clientSocket, response.c_str(), response.length(), 0);
-	// close(clientSocket);
+	ResponseState *responseState;
+	if (response.getType() == SMALL_FILE)
+		responseState = new ResponseState(response.buildResponse());
+	else 
+		responseState = new ResponseState(response.buildResponseHeaders(), response.filePath, response.fileSize);
+	_responses[clientSocket] = responseState;
 
+	// register for write events
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
+
+void	Server::handleClientResponse(int clientSocket)
+{
+	ResponseState *responseState = _responses[clientSocket];
+
+	if (responseState->getType() == SMALL_FILE)
+	{
+		const std::string &response = responseState->getSmallFileResponse();
+		int bytesSent = send(clientSocket, response.c_str(), response.length(), 0);
+		if (bytesSent < 0)
+			throw std::runtime_error("Error: send failed");
+		if (bytesSent == (int)response.length())
+		{
+			_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+			_responses.erase(clientSocket);
+			delete responseState;
+		}
+	}
+	else if (responseState->getType() == LARGE_FILE)
+	{
+		// send headers first, then send file in chunks
+		if (!responseState->isHeaderSent)
+		{
+			const std::string &headers = responseState->getHeaders();
+			int bytesSent = send(clientSocket, headers.c_str(), headers.length(), 0);
+			if (bytesSent < 0)
+				throw std::runtime_error("Error: send failed");
+			if (bytesSent == (int)headers.length())
+				responseState->isHeaderSent = true;
+		}
+		else
+		{
+			// send file in chunks
+			std::string chunk = responseState->getNextChunk();
+
+			// convert chunk size to hex
+			std::stringstream ss;
+			ss << std::hex << chunk.length();
+			std::string chunkSizeHex = ss.str();
+
+			std::string formattedChunk = chunkSizeHex + "\r\n" + chunk + "\r\n";
+			int bytesSent = send(clientSocket, formattedChunk.c_str(), formattedChunk.length(), 0);
+			if (bytesSent < 0)
+				throw std::runtime_error("Error: send failed");
+			if (bytesSent == (int)formattedChunk.length())
+			{
+				if (responseState->isFinished())
+				{
+					std::string endChunk = "0\r\n\r\n";
+					int bytesSent = send(clientSocket, endChunk.c_str(), endChunk.length(), 0);
+					if (bytesSent < 0)
+						throw std::runtime_error("Error: send failed");
+					_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+					_responses.erase(clientSocket);
+					delete responseState;
+				}
+			}
+		}
+	}
 }
 
 

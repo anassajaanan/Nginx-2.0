@@ -1,14 +1,15 @@
 #include "HttpResponse.hpp"
-#include <fstream>
-#include <ios>
-#include <string>
-#include <sys/_types/_size_t.h>
 
 
-HttpResponse::HttpResponse() { }
+HttpResponse::HttpResponse(): type(SMALL_FILE) { }
 
 
-void HttpResponse::setVersion(const std::string& version)
+void	HttpResponse::setType(ResponseType type)
+{
+	this->type = type;
+}
+
+void	HttpResponse::setVersion(const std::string& version)
 {
 	this->version = version;
 }
@@ -31,6 +32,11 @@ void	HttpResponse::setHeader(const std::string& key, const std::string& value)
 void	HttpResponse::setBody(const std::string& body)
 {
 	this->body = body;
+}
+
+ResponseType	HttpResponse::getType() const
+{
+	return this->type;
 }
 
 std::string	HttpResponse::getVersion() const
@@ -81,18 +87,23 @@ std::string HttpResponse::buildResponse() const
 	return this->getStatusLine() + "\r\n" + this->getHeadersAsString() + "\r\n" + this->getBody();
 }
 
+std::string HttpResponse::buildResponseHeaders() const
+{
+	return this->getStatusLine() + "\r\n" + this->getHeadersAsString() + "\r\n";
+}
+
 // #======================# ResponseState #======================#
 
 ResponseState::ResponseState(const std::string &smallFileResponse)
 	: type(SMALL_FILE), smallFileResponse(smallFileResponse) { }
 
 ResponseState::ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize)
-	: type(LARGE_FILE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0)
+	: type(LARGE_FILE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0), isHeaderSent(false)
 {
 	fileStream.open(filePath, std::ifstream::binary);
 }
 
-ResponseState::ResponseType ResponseState::getType() const
+ResponseType ResponseState::getType() const
 {
 	return type;
 }
@@ -100,6 +111,11 @@ ResponseState::ResponseType ResponseState::getType() const
 const std::string &ResponseState::getSmallFileResponse() const
 {
 	return (smallFileResponse);
+}
+
+const std::string &ResponseState::getHeaders() const
+{
+	return (headers);
 }
 
 std::string ResponseState::getNextChunk()
