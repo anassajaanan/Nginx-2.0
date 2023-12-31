@@ -105,7 +105,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
 		long fileSize = getFileSize(path);
-		if (fileSize <= MAX_IN_MEMORY_SIZE)
+		if (fileSize <= MAX_FILE_SIZE)
 		{
 			std::ifstream file(path, std::ios::binary);
 			std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());

@@ -1,10 +1,6 @@
 #include "Server.hpp"
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
-#include "RequestHandler.hpp"
-#include <unistd.h>
 
-Server::Server(ServerConfig &config, KqueueManager &kq) : _config(config), _kq(kq)
+Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq)
 {
 	// std::cout << "Server constructor" << std::endl;
 	_serverAddr.sin_family = AF_INET;
@@ -81,24 +77,9 @@ void	Server::handleClientDisconnection(int clientSocket)
 	close(clientSocket);
 }
 
-void	Server::handleClientRequest(int clientSocket, MimeTypeParser &mimeTypes)
+void	Server::handleClientRequest(int clientSocket)
 {
-	// std::cout << "Handling client request" << std::endl;
-	// std::string buffer;
-	// buffer.resize(1024);
-	// int bytesReceived = recv(clientSocket, &buffer[0], buffer.size(), 0);
-	// if (bytesReceived < 0)
-	// 	throw std::runtime_error("Error: recv failed");
-	// buffer.resize(bytesReceived);
-	// std::cout << "Received: " << buffer << std::endl;
 
-	// std::cout << "Incoming connection accepted" << std::endl;
-	// clientSockets.push_back(clientSocket);
-	// std::string message = "Hello from server";
-	// send(clientSocket, message.c_str(), message.length(), 0);
-	
-
-	// read request from an http client (web browser)
 
 	char buffer[1024];
 	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
@@ -106,10 +87,11 @@ void	Server::handleClientRequest(int clientSocket, MimeTypeParser &mimeTypes)
 		throw std::runtime_error("Error: recv failed");
 	buffer[bytesRead] = '\0';
 	
-	RequestHandler handler(_config, mimeTypes);
+	RequestHandler handler(_config, _mimeTypes);
 
 	HttpResponse res = handler.handleRequest(HttpRequest(buffer));
 	std::string response = res.buildResponse();
+
 	send(clientSocket, response.c_str(), response.length(), 0);
 	// close(clientSocket);
 

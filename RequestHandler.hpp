@@ -12,7 +12,8 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-#define MAX_IN_MEMORY_SIZE 5242880 // 5MB
+
+#define MAX_FILE_SIZE 2097152 // 2 MB
 
 
 class RequestHandler

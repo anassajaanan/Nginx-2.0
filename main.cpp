@@ -13,6 +13,7 @@
 #include "MimeTypeParser.hpp"
 
 #include <csignal>
+#include <sys/event.h>
 
 int running = 1;
 
@@ -23,14 +24,14 @@ void	signalHandler(int signum)
 		running = 0;
 }
 
-void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypeParser)
+void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypes)
 {
 	KqueueManager	kqueue;
 
 	for (size_t i = 0; i < serverConfigs.size(); i++)
 	{
 
-		Server *server = new Server(serverConfigs[i], kqueue);
+		Server *server = new Server(serverConfigs[i], mimeTypes, kqueue);
 		server->run();
 		servers.push_back(server);
 	}
@@ -47,21 +48,56 @@ void	start(std::vector<Server *> &servers, std::vector<ServerConfig> &serverConf
 			throw std::runtime_error("Error in kqueue");
 		for (int ev = 0; ev < nev; ev++)
 		{
-			for (size_t i = 0; i < servers.size(); i++)
+			if (kqueue.events[ev].filter == EVFILT_WRITE)
 			{
-				if (kqueue.events[ev].ident == servers[i]->_socket || servers[i]->_clients.count(kqueue.events[ev].ident) > 0)
+				for (size_t i = 0; i < servers.size(); i++)
 				{
-					if (kqueue.events[ev].ident == servers[i]->_socket)
-						servers[i]->acceptNewConnection();
-					else
+					if (servers[i]->_responses.count(kqueue.events[ev].ident) > 0)
 					{
-						if (kqueue.events[ev].flags & EV_EOF)
-							servers[i]->handleClientDisconnection(kqueue.events[ev].ident);
-						else
-							servers[i]->handleClientRequest(kqueue.events[ev].ident, mimeTypeParser);
+						// servers[i]->handleClientResponse(kqueue.events[ev].ident);
+						break;
 					}
-					break;
 				}
+			}
+			else if (kqueue.events[ev].filter == EVFILT_READ)
+			{
+				for (size_t i = 0; i < servers.size(); i++)
+				{
+					if (kqueue.events[ev].ident == servers[i]->_socket || servers[i]->_clients.count(kqueue.events[ev].ident) > 0)
+					{
+						if (kqueue.events[ev].ident == servers[i]->_socket)
+							servers[i]->acceptNewConnection();
+						else
+						{
+							if (kqueue.events[ev].flags & EV_EOF)
+								servers[i]->handleClientDisconnection(kqueue.events[ev].ident);
+							else
+								servers[i]->handleClientRequest(kqueue.events[ev].ident);
+						}
+						break;
+					}
+				}
+			}
+			else if (kqueue.events[ev].filter == EVFILT_TIMER)
+			{
+				for (size_t i = 0; i < servers.size(); i++)
+				{
+					if (servers[i]->_clients.count(kqueue.events[ev].ident) > 0)
+					{
+						// servers[i]->handleClientTimeout(kqueue.events[ev].ident);
+						break;
+					}
+				}
+			}
+			else if (kqueue.events[ev].filter == EVFILT_SIGNAL)
+			{
+				std::cout << "Signal received" << std::endl;
+				running = 0;
+			}
+			else if (kqueue.events[ev].filter == EVFILT_USER)
+			{
+				std::cout << "User event received" << std::endl;
+				running = 0;
 			}
 		}
 		
