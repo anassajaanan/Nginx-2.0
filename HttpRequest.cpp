@@ -15,7 +15,7 @@ void HttpRequest::requestTokenizer(const std::string &requestString)
 	std::string			line;
 	std::string			tmp = requestString;
 	std::vector<std::string>	requestVec;
-	std::cout << requestString << std::endl;
+	// std::cout << requestString << std::endl;
 	for (size_t i = 0; i < tmp.length(); i++)
 	{
 		line = tmp.substr(0, tmp.find("\r\n"));
@@ -30,18 +30,18 @@ void HttpRequest::requestTokenizer(const std::string &requestString)
 	}
 	std::vector<std::string>::iterator	it = requestVec.begin();
 	for (;it != requestVec.end(); it++)
-		std::cout << "{" << *it << "}" << std::endl;
+		// std::cout << "{" << *it << "}" << std::endl;
 	validateRequesLine(requestVec[0]);
 	loadRequestContent(requestVec);
 	std::cout << std::endl << std::endl;
 	std::map<std::string, std::string>::iterator	t = headers.begin();
-	for (;t != headers.end(); t++)
-		std::cout << "{" << t->first << "}" << "==>" << t->second << std::endl;
-	std::cout << "Method  ==> " << getRequestMethod() << std::endl;
-	std::cout << "Path    ==> " << getUri() << std::endl;
-	std::cout << "Host    ==> " << getHost() << std::endl;
-	std::cout << "Version ==> " << getVersion() << std::endl;
-	std::cout << "Accept  ==> " << getFromRequest("Accept") << std::endl;
+	// for (;t != headers.end(); t++)
+	// 	std::cout << "{" << t->first << "}" << "==>" << t->second << std::endl;
+	// std::cout << "Method  ==> " << getRequestMethod() << std::endl;
+	// std::cout << "Path    ==> " << getUri() << std::endl;
+	// std::cout << "Host    ==> " << getHost() << std::endl;
+	// std::cout << "Version ==> " << getVersion() << std::endl;
+	// std::cout << "Accept  ==> " << getFromRequest("Accept") << std::endl;
 }
 
 void	HttpRequest::validateRequesLine(const std::string &requestLine)

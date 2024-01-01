@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include <iostream>
 #include <string>
 
 
@@ -96,7 +97,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		response.setHeader("Content-Type", "text/html");
 		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "keep-alive");
+		response.setHeader("Connection", "close");
 	}
 	else
 	{
@@ -107,6 +108,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 		size_t fileSize = getFileSize(path);
 		if (fileSize <= MAX_FILE_SIZE)
 		{
+			std::cout << "File size is small" << std::endl;
 			std::ifstream file(path, std::ios::binary);
 			std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 			response.setBody(content);
@@ -121,6 +123,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 			// send large file in chunks
 			response.filePath = path;
 			response.fileSize = fileSize;
+			response.setType(LARGE_FILE);
 
 
 			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
@@ -171,7 +174,7 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 				response.setHeader("Content-Type", "text/html");
 				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "keep-alive");
+				response.setHeader("Connection", "close");
 			}
 			else
 			{
@@ -195,7 +198,6 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	else
 	{
 		std::cout << "File does not exist" << std::endl;
-		// response.setStatusCode(404);
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("404");
 		response.setStatusMessage("Not Found");
