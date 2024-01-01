@@ -13,7 +13,7 @@
 #include <dirent.h>
 
 
-#define MAX_FILE_SIZE 2097152 // 2 MB
+#define MAX_FILE_SIZE 16384 // 16 KB
 
 
 class RequestHandler

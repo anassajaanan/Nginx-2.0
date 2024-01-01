@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 
-#define CHUNK_SIZE 8192 // 8 KB
+#define CHUNK_SIZE 3 * 1024 // 8 KB
 
 enum	ResponseType { SMALL_FILE, LARGE_FILE };
 

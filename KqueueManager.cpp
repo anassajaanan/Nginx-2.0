@@ -33,7 +33,17 @@ void	KqueueManager::unregisterEvent(int fd, int16_t filter)
 	EV_SET(&event, fd, filter, EV_DELETE, 0, 0, NULL);
 	if (kevent(this->kq, &event, 1, NULL, 0, NULL) < 0)
 	{
-		throw std::runtime_error("failed to unregister the event");
+		// throw std::runtime_error("failed to unregister the event");
+		std::cerr << "failed to unregister the event ";
+		if (filter == EVFILT_READ)
+			std::cerr << "EVFILT_READ";
+		else if (filter == EVFILT_WRITE)
+			std::cerr << "EVFILT_WRITE";
+		else if (filter == EVFILT_EXCEPT)
+			std::cerr << "EVFILT_EXCEPT";
+		else
+			std::cerr << "Unknown filter " << filter;
+		std::cerr << std::endl;
 	}
 }
 
