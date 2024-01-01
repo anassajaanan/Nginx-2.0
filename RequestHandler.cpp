@@ -135,7 +135,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 
 
 
-HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
+HttpResponse	RequestHandler::handleRequest(const Method &request)
 {
 	HttpResponse	response;
 
