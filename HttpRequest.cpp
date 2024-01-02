@@ -143,6 +143,8 @@ void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
 		std::getline(ss, token, ':');
 		lowerString.resize(token.size());
 		std::transform(token.begin(), token.end(), lowerString.begin(), ::tolower);
+		if (token.find(' ') != std::string::npos)
+			throw (std::runtime_error("400 Bad Request"));
 		if (lowerString  == "host")
 			validateHost(value);
 		else
