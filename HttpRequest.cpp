@@ -109,6 +109,20 @@ void	Method::checkArgsNumber(const std::string &arg)
 	content = arg;
 }
 
+bool	Method::checkDuplicatedHost()
+{
+	std::map<std::string, std::string>::iterator mapIt = this->requestContent.begin();
+	std::string	lowerKey;
+	for (;mapIt != this->requestContent.end(); mapIt++)
+	{
+		lowerKey.resize(mapIt->first.size());
+		std::transform(mapIt->first.begin(), mapIt->first.end(), lowerKey.begin(), ::tolower);
+		if (lowerKey == "host")
+			return false;
+	}
+	return true;
+}
+
 void	Method::searchForHost()
 {
 	std::map<std::string, std::string>::iterator mapIt = this->requestContent.begin();
@@ -143,12 +157,15 @@ void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
 		std::getline(ss, token, ':');
 		lowerString.resize(token.size());
 		std::transform(token.begin(), token.end(), lowerString.begin(), ::tolower);
+		std::cout << "token = " << token << std::endl;
 		if (token.find(' ') != std::string::npos)
 			throw (std::runtime_error("400 Bad Request"));
 		if (lowerString  == "host")
 			validateHost(value);
 		else
 			validateValue(value);
+		if (lowerString == "host" && !this->checkDuplicatedHost())
+			throw (std::runtime_error("400 Bad Request"));
 		this->requestContent.insert(std::pair<std::string, std::string>(token, value));
 	}
 	this->searchForHost();
@@ -162,11 +179,7 @@ void			Method::validateHost(std::string &hostName)
 	std::stringstream	ss;
 	std::string	token;
 	std::vector<std::string>			tokens;
-	static int k;
 
-
-	if (k > 0)
-		throw (std::runtime_error("400 Bad Request"));
 	tmp = hostName;
 	if (hostName.empty())
 	{
@@ -185,7 +198,6 @@ void			Method::validateHost(std::string &hostName)
 	if (tokens.size() != 1 || tokens[0][0] == ':')
 		throw (std::runtime_error("400 Bad Request"));
 	hostName = tokens[0];
-	k++;
 }
 
 void	Method::validateValue(std::string &hostName)
