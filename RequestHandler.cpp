@@ -68,6 +68,7 @@ std::string	RequestHandler::generateDirectoryListing(const std::string &uri, con
 	DIR *dir = opendir(path.c_str());
 	if (dir == NULL)
 		return (htmlContent + "</pre><hr></body></html>");
+	htmlContent += "<a href=\"../\">../</a><br>";
 	struct dirent *entry;
 	while ((entry = readdir(dir)) != NULL)
 	{

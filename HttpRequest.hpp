@@ -25,7 +25,7 @@ private:
 		std::string							host;
 		std::string							version;
 		// int									status;
-		// std::string							body;
+		std::string							body;
 		std::map<std::string, std::string>	requestContent;
 		void				setUri(const std::string &str);
 		void				setVersion(const std::string &str);
@@ -54,8 +54,6 @@ private:
 		const std::string	&getFromRequest(const std::string &key) const;
 		const std::map<std::string, std::string> &getRequestContent() const;
 		~Method();
-	
-
 };
 
 
