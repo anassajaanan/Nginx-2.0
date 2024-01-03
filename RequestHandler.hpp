@@ -39,7 +39,7 @@ public:
 
 	bool			fileExistsAndAccessible(const std::string &path);
 
-
+	// LocationConfig	*matchLocation(const std::string &uri);
 
 	HttpResponse	serveFile(const std::string& path);
 	HttpResponse	serveError(int statusCode);

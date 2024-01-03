@@ -42,6 +42,10 @@ public:
 	void					setServerName(const std::string &serverNameValue);
 
 	void					addLocation(const std::string &path, const LocationConfig &locationConfig);
+
+	std::map<std::string, LocationConfig>	&getLocations();
+
+	LocationConfig			*matchLocation(const std::string &uri);
 };
 
 

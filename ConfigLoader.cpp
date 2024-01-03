@@ -74,7 +74,7 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			ContextNode	*locationNode = static_cast<ContextNode *>(serverChildren[i]);
 			if (locationNode->getName() == "location")
 			{
-				LocationConfig location(serverConfig);
+				LocationConfig location(locationNode->getPath(), serverConfig);
 				processLocationNode(locationNode, location);
 				serverConfig.addLocation(locationNode->getPath(), location);
 			}

@@ -1,8 +1,6 @@
 #include "RequestHandler.hpp"
-#include "HttpResponse.hpp"
-#include <iostream>
-#include <string>
-#include <sys/_types/_size_t.h>
+#include "ServerConfig.hpp"
+#include <cstddef>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -107,6 +105,7 @@ std::string	RequestHandler::generateDirectoryListing(const std::string &uri, con
 	return (htmlContent);
 }
 
+
 HttpResponse	RequestHandler::serveFile(const std::string &path)
 {
 	HttpResponse	response;
@@ -158,111 +157,80 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 {
 	HttpResponse	response;
 
-
-	// if (serverConfig.tryFiles.isEnabled())
-	// {
-	// 	const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
-	// 	for (size_t i = 0; i < paths.size(); i++)
-	// 	{
-	// 		std::string path = serverConfig.root + paths[i];
-	// 		if (fileExists(path))
-	// 		{
-	// 			std::cout << "File exists" << std::endl;
-	// 			if (isDirectory(path))
-	// 			{
-	// 				std::cout << "File is a directory" << std::endl;
-	// 				for (size_t i = 0; i < serverConfig.index.size(); i++)
-	// 				{
-	// 					std::string indexPath = path + "/" + serverConfig.index[i];
-	// 					if (fileExists(indexPath))
-	// 					{
-	// 						std::cout << "Index file exists" << std::endl;
-	// 						return serveFile(indexPath);
-	// 					}
-	// 				}
-	// 				// handle autoindex directive
-	// 				if (serverConfig.autoindex == "off")
-	// 				{
-	// 					std::cout << "Autoindex is off -> 403" << std::endl;
-	// 					// // 403 Forbidden
-	// 					response.setVersion("HTTP/1.1");
-	// 					response.setStatusCode("403");
-	// 					response.setStatusMessage("Forbidden");
-	// 					response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
-	// 					response.setHeader("Content-Type", "text/html");
-	// 					response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	// 					response.setHeader("Server", "Nginx 2.0");
-	// 					response.setHeader("Connection", "close");
-	// 				}
-	// 				else
-	// 				{
-	// 					std::cout << "Autoindex is on -> 200" << std::endl;
-	// 					response.setVersion("HTTP/1.1");
-	// 					response.setStatusCode("200");
-	// 					response.setStatusMessage("OK");
-	// 					response.setBody(generateDirectoryListing(request.getUri(), path));
-	// 					response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	// 					response.setHeader("Content-Type", "text/html");
-	// 					response.setHeader("Server", "Nginx 2.0");
-	// 					response.setHeader("Connection", "keep-alive");
-	// 				}
-	// 			}
-	// 			else
-	// 			{
-	// 				std::cout << "File is not a directory" << std::endl;
-	// 				return serveFile(path);
-	// 			}
-	// 		}
-	// 	}
-	// }
+	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
+	if (locationConfig == NULL)
+		return serveError(404);
+	else
+	{
+		
+	}
 
 	std::string	path = resolvePath(request.getUri());
 
 	std::cout << "path: " << path << std::endl;
 
+	if (!fileExists(path))
+		return serveError(404);
 
-	if (fileExists(path))
+	if (serverConfig.tryFiles.isEnabled())
 	{
-		std::cout << "File exists" << std::endl;
-		if (isDirectory(path))
+		const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
+		for (size_t i = 0; i < paths.size(); i++)
 		{
-			std::cout << "File is a directory" << std::endl;
-			for (size_t i = 0; i < serverConfig.index.size(); i++)
+			std::string path = serverConfig.root + paths[i];
+			if (fileExists(path))
 			{
-				std::string indexPath = path + "/" + serverConfig.index[i];
-				if (fileExists(indexPath))
+				if (!isDirectory(path))
+					return serveFile(path);
+				else
 				{
-					std::cout << "Index file exists" << std::endl;
-					return serveFile(indexPath);
+					if (paths[i].back() == '/')
+					{
+						// redirect to path
+						// response.setVersion("HTTP/1.1");
+						// response.setStatusCode("301");
+						// response.setStatusMessage("Moved Permanently");
+						// response.
+
+					}
+					
+
 				}
 			}
-			// handle autoindex directive
-			if (serverConfig.autoindex == "off")
+		}
+	}
+
+	if (!isDirectory(path))
+			return serveFile(path);
+	else
+	{
+		std::cout << "File is a directory" << std::endl;
+		for (size_t i = 0; i < serverConfig.index.size(); i++)
+		{
+			std::string indexPath = path + "/" + serverConfig.index[i];
+			if (fileExists(indexPath))
 			{
-				return serveError(403);
+				std::cout << "Index file exists" << std::endl;
+				return serveFile(indexPath);
 			}
-			else
-			{
-				std::cout << "Autoindex is on -> 200" << std::endl;
-				response.setVersion("HTTP/1.1");
-				response.setStatusCode("200");
-				response.setStatusMessage("OK");
-				response.setBody(generateDirectoryListing(request.getUri(), path));
-				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-				response.setHeader("Content-Type", "text/html");
-				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "keep-alive");
-			}
+		}
+		// handle autoindex directive
+		if (serverConfig.autoindex == "off")
+		{
+			return serveError(403);
 		}
 		else
 		{
-			std::cout << "File is not a directory" << std::endl;
-			return serveFile(path);
+			std::cout << "Autoindex is on -> 200" << std::endl;
+			response.setVersion("HTTP/1.1");
+			response.setStatusCode("200");
+			response.setStatusMessage("OK");
+			response.setBody(generateDirectoryListing(request.getUri(), path));
+			response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+			response.setHeader("Content-Type", "text/html");
+			response.setHeader("Server", "Nginx 2.0");
+			response.setHeader("Connection", "keep-alive");
 		}
-	}
-	else
-	{
-		response = serveError(404);
 	}
 	return (response);
 }

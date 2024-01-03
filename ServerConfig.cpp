@@ -97,3 +97,32 @@ void	ServerConfig::addLocation(const std::string &path, const LocationConfig &lo
 		throw std::runtime_error("duplicate location \"" + path + "\" in Config file");
 	locations[path] = locationConfig;
 }
+
+std::map<std::string, LocationConfig>	&ServerConfig::getLocations()
+{
+	return (this->locations);
+}
+
+LocationConfig	*ServerConfig::matchLocation(const std::string &uri)
+{
+	LocationConfig	*location = NULL;
+	std::string		path;
+
+	std::map<std::string, LocationConfig>::iterator it = locations.begin();
+	
+	for (; it != locations.end(); it++)
+	{
+		std::string locationPath = it->first;
+		if (locationPath.back() == '/')
+			locationPath.pop_back();
+		if (uri.substr(0, locationPath.length()) == locationPath)
+		{
+			if (location == NULL || locationPath.length() > path.length())
+			{
+				location = &(it->second);
+				path = locationPath;
+			}
+		}
+	}
+	return (location);
+}
