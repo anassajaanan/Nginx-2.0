@@ -15,6 +15,7 @@ Method::Method(const std::string &requestString)
 	if (requestString.empty())
 		throw (std::runtime_error("Error While Getting The Request"));
 	std::cout << requestString << std::endl;
+	this->status = 200;
 	this->requestTokenizer(requestString);
 }
 
@@ -46,7 +47,6 @@ void Method::requestTokenizer(const std::string &requestString)
 	// for (;it != requestVec.end(); it++)
 	// 	std::cout << "{" << *it << "}" << std::endl;
 	validateRequesLine(requestVec[0]);
-	// std::cout << "request line = " << requestVec[0] << std::endl;
 	loadRequestContent(requestVec);
 	// std::cout << std::endl << std::endl;
 	// std::map<std::string, std::string>::iterator	t = requestContent.begin();
@@ -74,7 +74,7 @@ void	Method::validateRequesLine(const std::string &requestLine)
 	while (std::getline(ss, token, ' '))
 	{
 		if (i == 0 && std::find(possibleMethods.begin(), possibleMethods.end(), token) == possibleMethods.end())
-			throw (std::runtime_error(token + " Is Unkown Method")); //400 bad request
+			throw (std::runtime_error("400 Bad Request")); //400 bad request
 		if (i == 0 && !token.empty())
 			this->setRequestMethod(token);
 		if (i == 1 && !token.empty())
@@ -92,6 +92,16 @@ void	Method::validateRequesLine(const std::string &requestLine)
 	}
 	if (i != 3)
 		throw (std::runtime_error("400 Bad Request"));
+}
+
+void	Method::setStatus(const int statusNum)
+{
+	this->status = statusNum;
+}
+
+int	Method::getStatus() const
+{
+	return (this->status);
 }
 
 void	Method::validateUri(const std::string &str)

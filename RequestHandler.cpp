@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include "HttpRequest.hpp"
 #include <iostream>
 #include <string>
 
@@ -138,11 +139,23 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 
 
 
-HttpResponse	RequestHandler::handleRequest(const Method &request)
+HttpResponse	RequestHandler::handleRequest(const std::string &rawRequest)
 {
 	HttpResponse	response;
+	Method *request;
 
-	std::string	path = resolvePath(request.getUri());
+	try
+	{
+		request = new Method(rawRequest);
+	}
+	catch (std::exception &e)
+	{
+		std::cout << e.what() << std::endl;
+		
+		return (response);
+		// 
+	}
+	std::string	path = resolvePath(request->getUri());
 
 	std::cout << "path: " << path << std::endl;
 
@@ -182,7 +195,7 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 				response.setVersion("HTTP/1.1");
 				response.setStatusCode("200");
 				response.setStatusMessage("OK");
-				response.setBody(generateDirectoryListing(request.getUri(), path));
+				response.setBody(generateDirectoryListing(request->getUri(), path));
 				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 				response.setHeader("Content-Type", "text/html");
 				response.setHeader("Server", "Nginx 2.0");
@@ -207,5 +220,6 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 		response.setHeader("Server", "Nginx 2.0");
 		response.setHeader("Connection", "keep-alive");
 	}
+	delete request;
 	return (response);
 }

@@ -1,5 +1,7 @@
 #include "Server.hpp"
+#include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include <exception>
 #include <sstream>
 #include <sys/errno.h>
 #include <sys/event.h>
@@ -106,7 +108,7 @@ void	Server::handleClientRequest(int clientSocket)
 	
 	RequestHandler handler(_config, _mimeTypes);
 
-	HttpResponse response = handler.handleRequest(Method(buffer));
+	HttpResponse response = handler.handleRequest(buffer);
 
 	ResponseState *responseState;
 	if (response.getType() == SMALL_FILE)

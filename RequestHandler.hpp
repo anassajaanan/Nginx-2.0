@@ -41,7 +41,7 @@ public:
 
 
 
-	HttpResponse	handleRequest(const Method &request);
+	HttpResponse	handleRequest(const std::string &request);
 };
 
 
