@@ -1,12 +1,10 @@
 #include "RequestHandler.hpp"
-#include "ServerConfig.hpp"
-#include <cstddef>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes)
 {
-	
+	initStatusCodeMessages();
 }
 
 RequestHandler::~RequestHandler() { }
@@ -157,12 +155,19 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 {
 	HttpResponse	response;
 
+	// return serveError(200);
+
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 	if (locationConfig == NULL)
+	{
+		// std::cerr << "Location not found" << std::endl;
 		return serveError(404);
+	}
 	else
 	{
-		
+		// std::cerr << "Location found" << std::endl;
+		// std::cerr << locationConfig->getPath() << std::endl;
+		return serveError(200);
 	}
 
 	std::string	path = resolvePath(request.getUri());
@@ -172,33 +177,33 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 	if (!fileExists(path))
 		return serveError(404);
 
-	if (serverConfig.tryFiles.isEnabled())
-	{
-		const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
-		for (size_t i = 0; i < paths.size(); i++)
-		{
-			std::string path = serverConfig.root + paths[i];
-			if (fileExists(path))
-			{
-				if (!isDirectory(path))
-					return serveFile(path);
-				else
-				{
-					if (paths[i].back() == '/')
-					{
-						// redirect to path
-						// response.setVersion("HTTP/1.1");
-						// response.setStatusCode("301");
-						// response.setStatusMessage("Moved Permanently");
-						// response.
+	// if (serverConfig.tryFiles.isEnabled())
+	// {
+	// 	const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
+	// 	for (size_t i = 0; i < paths.size(); i++)
+	// 	{
+	// 		std::string path = serverConfig.root + paths[i];
+	// 		if (fileExists(path))
+	// 		{
+	// 			if (!isDirectory(path))
+	// 				return serveFile(path);
+	// 			else
+	// 			{
+	// 				if (paths[i].back() == '/')
+	// 				{
+	// 					// redirect to path
+	// 					// response.setVersion("HTTP/1.1");
+	// 					// response.setStatusCode("301");
+	// 					// response.setStatusMessage("Moved Permanently");
+	// 					// response.
 
-					}
+	// 				}
 					
 
-				}
-			}
-		}
-	}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	if (!isDirectory(path))
 			return serveFile(path);
@@ -238,6 +243,8 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 HttpResponse	RequestHandler::serveError(int statusCode)
 {
 	HttpResponse	response;
+
+	std::cout << "server Errrorrrrrrrrrrr" << std::endl;
 
 	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
 		statusCode = 500;
