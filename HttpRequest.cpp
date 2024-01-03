@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 #include <algorithm>
@@ -34,9 +35,8 @@ void Method::requestTokenizer(const std::string &requestString)
 			requestVec.push_back(line);
 			break ;
 		}
-		// std::cout << "line = " << "{" << line << "}" << std::endl;
 		if (line.empty())
-			throw (std::runtime_error("Get Error"));
+			throw (this->setStatus(400) , std::runtime_error("Get Error"));
 		requestVec.push_back(line);
 		tmp = tmp.substr(tmp.find("\r\n") + 2, tmp.length());
 		if (tmp.empty() || tmp == "\r\n")
@@ -62,7 +62,7 @@ void Method::requestTokenizer(const std::string &requestString)
 void	Method::validateRequesLine(const std::string &requestLine)
 {
 	if (requestLine.empty())
-		throw (std::runtime_error("Missing Method Type"));
+		throw (this->setStatus(400), std::runtime_error("Missing Method Type"));
 	std::string					token;
 	std::stringstream			ss(requestLine);
 	std::vector<std::string>	possibleMethods;
@@ -74,7 +74,7 @@ void	Method::validateRequesLine(const std::string &requestLine)
 	while (std::getline(ss, token, ' '))
 	{
 		if (i == 0 && std::find(possibleMethods.begin(), possibleMethods.end(), token) == possibleMethods.end())
-			throw (std::runtime_error("400 Bad Request")); //400 bad request
+			throw (this->setStatus(400), std::runtime_error("400 Bad Request")); //400 bad request
 		if (i == 0 && !token.empty())
 			this->setRequestMethod(token);
 		if (i == 1 && !token.empty())
@@ -91,7 +91,7 @@ void	Method::validateRequesLine(const std::string &requestLine)
 			i++;
 	}
 	if (i != 3)
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 }
 
 void	Method::setStatus(const int statusNum)
@@ -107,7 +107,7 @@ int	Method::getStatus() const
 void	Method::validateUri(const std::string &str)
 {
 	if (str.empty() || str.find("/") == std::string::npos)
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 }
 
 void	Method::checkArgsNumber(const std::string &arg)
@@ -145,7 +145,7 @@ void	Method::searchForHost()
 		if (lowerKey == "host")
 			return ;
 	}
-	throw (std::runtime_error("400 bad Request"));
+	throw (this->setStatus(400), std::runtime_error("400 bad Request"));
 }
 
 void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
@@ -169,13 +169,13 @@ void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
 		std::transform(token.begin(), token.end(), lowerString.begin(), ::tolower);
 		std::cout << "token = " << token << std::endl;
 		if (token.find(' ') != std::string::npos)
-			throw (std::runtime_error("400 Bad Request"));
+			throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 		if (lowerString  == "host")
 			validateHost(value);
 		else
 			validateValue(value);
 		if (lowerString == "host" && !this->checkDuplicatedHost())
-			throw (std::runtime_error("400 Bad Request"));
+			throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 		this->requestContent.insert(std::pair<std::string, std::string>(token, value));
 	}
 	this->searchForHost();
@@ -198,7 +198,7 @@ void			Method::validateHost(std::string &hostName)
 	}
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
 	if (value.empty())
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 	ss << value;
 	while (std::getline(ss, token, ' '))
 	{
@@ -206,7 +206,7 @@ void			Method::validateHost(std::string &hostName)
 			tokens.push_back(token);
 	}
 	if (tokens.size() != 1 || tokens[0][0] == ':')
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 	hostName = tokens[0];
 }
 
@@ -223,7 +223,7 @@ void	Method::validateValue(std::string &hostName)
 		return;
 	}
 	if (tmp.find(':') == std::string::npos && tmp.find(' ') != std::string::npos)
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
 	if (value.empty() || value == hostName)
 		hostName = "";
@@ -241,7 +241,7 @@ bool	Method::checkVersionNumber(const std::string &str)
 		if (version >= 1 && version <= 1.9)
 			return true;
 		else
-			throw (std::runtime_error("505 HTTP Version Not Supported"));
+			throw (this->setStatus(505), std::runtime_error("505 HTTP Version Not Supported"));
 	}
 	return false;
 }
@@ -249,20 +249,20 @@ bool	Method::checkVersionNumber(const std::string &str)
 void	Method::validateVersion(const std::string &version)
 {
 	if (version.empty() || version.find("/") == std::string::npos || version.find(".") == std::string::npos)
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 	if (std::count(version.begin(), version.end(), '.') != 1)
-		throw (std::runtime_error("400 Bad Request"));
+		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 	std::stringstream	ss(version);
 	std::string			token;
 	int					i = 0;
 	while (std::getline(ss, token, '/'))
 	{
 		if (i == 0 && token != "HTTP")
-			throw (std::runtime_error("400 Bad Request"));
+			throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 		if (i == 1)
 		{
 			if (!this->checkVersionNumber(token))
-				throw (std::runtime_error("400 Bad Request"));
+				throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
 		}
 		i++;
 
@@ -359,4 +359,6 @@ const std::map<std::string, std::string> &Method::getRequestContent() const
 
 Method::~Method()
 {
+	write(2, "i went out Dumbass", 19);
+	std::cout << "i went out Dumbass" << std::endl;
 }

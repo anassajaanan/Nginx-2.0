@@ -25,7 +25,7 @@ private:
 		std::string							host;
 		std::string							version;
 		int									status;
-		// std::string							body;
+		std::string							body;
 		std::map<std::string, std::string>	requestContent;
 		void				setUri(const std::string &str);
 		void				setVersion(const std::string &str);
@@ -42,20 +42,18 @@ private:
 		void				loadRequestContent(const std::vector<std::string> &requestVec);
 		std::vector<std::string> splitByString(const std::string &str, const char *del);
 		bool				checkDuplicatedHost();
-		void				setStatus(const int statusNum);
 	public:
 		Method(const std::string &content);
+		void				setStatus(const int statusNum);
 		void				setHost(const std::string &hostName);
 		const std::string	&getHost() const;
-		int			getStatus() const;
+		int					getStatus() const;
 		const std::string	&getRequestMethod() const;
 		const std::string	&getVersion() const;
 		const std::string	&getUri() const;
 		const std::string	&getFromRequest(const std::string &key) const;
 		const std::map<std::string, std::string> &getRequestContent() const;
 		~Method();
-	
-
 };
 
 

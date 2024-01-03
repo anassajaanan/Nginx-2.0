@@ -1,7 +1,6 @@
 
 
 #pragma once
-#include <string>
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -22,11 +21,13 @@ class RequestHandler
 private:
 	ServerConfig						&serverConfig;
 	MimeTypeParser						&mimeTypes;
+	std::map<int, std::string>			statusCodeMessages;
 
 public:
 	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
 	~RequestHandler();
 
+	void			initStatusCodeMessages();
 
 	// facilitators
 	std::string		resolvePath(const std::string& uri);
@@ -37,9 +38,11 @@ public:
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);
 
 	bool			fileExistsAndAccessible(const std::string &path);
+
+	// LocationConfig	*matchLocation(const std::string &uri);
+
 	HttpResponse	serveFile(const std::string& path);
-
-
+	HttpResponse	serveError(int statusCode);
 
 	HttpResponse	handleRequest(const std::string &request);
 };

@@ -10,10 +10,14 @@
 
 class LocationConfig : public BaseConfig
 {
+private:
+	std::string		path;
 
 public:
 	LocationConfig();
-	LocationConfig(const ServerConfig &serverConfig);
+	LocationConfig(const std::string &path, const ServerConfig &serverConfig);
+
+	const std::string	&getPath() const;
 };
 
 #endif /* LOCATIONCONFIG_HPP */
