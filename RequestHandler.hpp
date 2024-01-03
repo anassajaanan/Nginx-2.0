@@ -5,6 +5,7 @@
 #define REQUESTHANDLER_HPP
 
 #include "ServerConfig.hpp"
+#include "LocationConfig.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "MimeTypeParser.hpp"

@@ -113,9 +113,12 @@ LocationConfig	*ServerConfig::matchLocation(const std::string &uri)
 	for (; it != locations.end(); it++)
 	{
 		std::string locationPath = it->first;
-		if (locationPath.back() == '/')
-			locationPath.pop_back();
-		if (uri.substr(0, locationPath.length()) == locationPath)
+		if (locationPath[0] == '=') // exact matching
+		{
+			if (uri == locationPath.substr(1))
+				return &(it->second);
+		}
+		else if (uri.substr(0, locationPath.length()) == locationPath) // prefix matching
 		{
 			if (location == NULL || locationPath.length() > path.length())
 			{
