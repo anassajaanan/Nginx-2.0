@@ -24,6 +24,8 @@ public:
 	void					setFallBackUri(const std::string &uri);
 	void					setFallBackStatusCode(int code);
 	bool					isEnabled() const;
+
+	const std::vector<std::string>	&getPaths() const;
 };
 
 

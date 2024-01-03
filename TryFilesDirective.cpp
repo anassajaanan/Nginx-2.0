@@ -29,3 +29,8 @@ bool	TryFilesDirective::isEnabled() const
 {
 	return (this->_isEnabled);
 }
+
+const std::vector<std::string>	&TryFilesDirective::getPaths() const
+{
+	return (this->paths);
+}

@@ -1,6 +1,8 @@
 #include "RequestHandler.hpp"
+#include "HttpResponse.hpp"
 #include <iostream>
 #include <string>
+#include <sys/_types/_size_t.h>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -10,6 +12,27 @@ RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeT
 }
 
 RequestHandler::~RequestHandler() { }
+
+void	RequestHandler::initStatusCodeMessages()
+{
+	statusCodeMessages[200] = "OK";
+	statusCodeMessages[201] = "Created";
+	statusCodeMessages[202] = "Accepted";
+	statusCodeMessages[204] = "No Content";
+	statusCodeMessages[301] = "Moved Permanently";
+	statusCodeMessages[302] = "Found";
+	statusCodeMessages[304] = "Not Modified";
+	statusCodeMessages[400] = "Bad Request";
+	statusCodeMessages[401] = "Unauthorized";
+	statusCodeMessages[403] = "Forbidden";
+	statusCodeMessages[404] = "Not Found";
+	statusCodeMessages[405] = "Method Not Allowed";
+	statusCodeMessages[413] = "Payload Too Large";
+	statusCodeMessages[500] = "Internal Server Error";
+	statusCodeMessages[501] = "Not Implemented";
+	statusCodeMessages[503] = "Service Unavailable";
+	statusCodeMessages[505] = "HTTP Version Not Supported";
+}
 
 
 std::string	RequestHandler::resolvePath(const std::string &uri)
@@ -90,15 +113,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 
 	if (!fileExistsAndAccessible(path))
 	{
-		// 403 Forbidden
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode("403");
-		response.setStatusMessage("Forbidden");
-		response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
-		response.setHeader("Content-Type", "text/html");
-		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "close");
+		return serveError(403);
 	}
 	else
 	{
@@ -143,6 +158,64 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 {
 	HttpResponse	response;
 
+
+	// if (serverConfig.tryFiles.isEnabled())
+	// {
+	// 	const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
+	// 	for (size_t i = 0; i < paths.size(); i++)
+	// 	{
+	// 		std::string path = serverConfig.root + paths[i];
+	// 		if (fileExists(path))
+	// 		{
+	// 			std::cout << "File exists" << std::endl;
+	// 			if (isDirectory(path))
+	// 			{
+	// 				std::cout << "File is a directory" << std::endl;
+	// 				for (size_t i = 0; i < serverConfig.index.size(); i++)
+	// 				{
+	// 					std::string indexPath = path + "/" + serverConfig.index[i];
+	// 					if (fileExists(indexPath))
+	// 					{
+	// 						std::cout << "Index file exists" << std::endl;
+	// 						return serveFile(indexPath);
+	// 					}
+	// 				}
+	// 				// handle autoindex directive
+	// 				if (serverConfig.autoindex == "off")
+	// 				{
+	// 					std::cout << "Autoindex is off -> 403" << std::endl;
+	// 					// // 403 Forbidden
+	// 					response.setVersion("HTTP/1.1");
+	// 					response.setStatusCode("403");
+	// 					response.setStatusMessage("Forbidden");
+	// 					response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
+	// 					response.setHeader("Content-Type", "text/html");
+	// 					response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	// 					response.setHeader("Server", "Nginx 2.0");
+	// 					response.setHeader("Connection", "close");
+	// 				}
+	// 				else
+	// 				{
+	// 					std::cout << "Autoindex is on -> 200" << std::endl;
+	// 					response.setVersion("HTTP/1.1");
+	// 					response.setStatusCode("200");
+	// 					response.setStatusMessage("OK");
+	// 					response.setBody(generateDirectoryListing(request.getUri(), path));
+	// 					response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	// 					response.setHeader("Content-Type", "text/html");
+	// 					response.setHeader("Server", "Nginx 2.0");
+	// 					response.setHeader("Connection", "keep-alive");
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				std::cout << "File is not a directory" << std::endl;
+	// 				return serveFile(path);
+	// 			}
+	// 		}
+	// 	}
+	// }
+
 	std::string	path = resolvePath(request.getUri());
 
 	std::cout << "path: " << path << std::endl;
@@ -166,16 +239,7 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 			// handle autoindex directive
 			if (serverConfig.autoindex == "off")
 			{
-				std::cout << "Autoindex is off -> 403" << std::endl;
-				// // 403 Forbidden
-				response.setVersion("HTTP/1.1");
-				response.setStatusCode("403");
-				response.setStatusMessage("Forbidden");
-				response.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
-				response.setHeader("Content-Type", "text/html");
-				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "close");
+				return serveError(403);
 			}
 			else
 			{
@@ -198,15 +262,28 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 	}
 	else
 	{
-		std::cout << "File does not exist" << std::endl;
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode("404");
-		response.setStatusMessage("Not Found");
-		response.setBody("<html><body><h1>404 Not Found</h1></body></html>");
-		response.setHeader("Content-Type", "text/html");
-		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "keep-alive");
+		response = serveError(404);
 	}
+	return (response);
+}
+
+HttpResponse	RequestHandler::serveError(int statusCode)
+{
+	HttpResponse	response;
+
+	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
+		statusCode = 500;
+
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode(std::to_string(statusCode));
+	response.setStatusMessage(statusCodeMessages[statusCode]);
+	response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	response.setHeader("Server", "Nginx 2.0");
+	if (statusCode == 404)
+		response.setHeader("Connection", "keep-alive");
+	else
+		response.setHeader("Connection", "close");
 	return (response);
 }
