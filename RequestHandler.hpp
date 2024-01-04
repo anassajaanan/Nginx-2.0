@@ -42,6 +42,9 @@ public:
 
 	// LocationConfig	*matchLocation(const std::string &uri);
 
+	bool			isRedirectStatusCode(int statusCode);
+	HttpResponse	serveReturnDirective(const LocationConfig *locationConfig, const Method &request);
+
 	HttpResponse	serveFile(const std::string& path);
 	HttpResponse	serveError(int statusCode);
 

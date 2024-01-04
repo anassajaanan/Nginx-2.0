@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include "HttpResponse.hpp"
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -17,7 +18,10 @@ void	RequestHandler::initStatusCodeMessages()
 	statusCodeMessages[204] = "No Content";
 	statusCodeMessages[301] = "Moved Permanently";
 	statusCodeMessages[302] = "Found";
+	statusCodeMessages[303] = "See Other";
 	statusCodeMessages[304] = "Not Modified";
+	statusCodeMessages[307] = "Temporary Redirect";
+	statusCodeMessages[308] = "Permanent Redirect";
 	statusCodeMessages[400] = "Bad Request";
 	statusCodeMessages[401] = "Unauthorized";
 	statusCodeMessages[403] = "Forbidden";
@@ -149,33 +153,136 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	return (response);
 }
 
+bool	RequestHandler::isRedirectStatusCode(int statusCode)
+{
+	if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 307 || statusCode == 308)
+		return (true);
+	return (false);
+}
+
+
+HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const Method &request)
+{
+	HttpResponse	response;
+
+	int statusCode = locationConfig->returnDirective.getStatusCode();
+	const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
+
+	if (isRedirectStatusCode(statusCode))
+	{
+		std::string httpScheme = "http://";
+		std::string locationHeader = responseTextOrUrl;
+
+		if (responseTextOrUrl[0] == '/')
+			locationHeader = httpScheme + request.getFromRequest("Host") + responseTextOrUrl;
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode(std::to_string(statusCode));
+		response.setStatusMessage(statusCodeMessages[statusCode]);
+		response.setHeader("Location", locationHeader);
+		response.setHeader("Content-Length", "0");
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
+	}
+	else
+	{
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode(std::to_string(statusCode));
+		response.setStatusMessage(statusCodeMessages[statusCode]);
+		response.setBody(responseTextOrUrl);
+		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+		response.setHeader("Content-Type", "text/plain");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
+	}
+	return (response);
+}
+
 
 
 HttpResponse	RequestHandler::handleRequest(const Method &request)
 {
-	HttpResponse	response;
-
-	// return serveError(200);
 
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 	if (locationConfig == NULL)
 	{
-		// std::cerr << "Location not found" << std::endl;
-		return serveError(404);
+		// Server Level Config should process the request
+		HttpResponse	response;
+
+		std::string	path = serverConfig.root + request.getUri();
+		if (!fileExists(path))
+			return serveError(404);
+		if (!isDirectory(path))
+			return serveFile(path);
+		else
+		{
+			
+			for (size_t i = 0; i < serverConfig.index.size(); i++)
+			{
+				std::string indexPath = path + "/" + serverConfig.index[i];
+				if (fileExists(indexPath))
+					return serveFile(indexPath);
+			}
+			if (serverConfig.autoindex == "off")
+				return serveError(403);
+			else
+			{
+				response.setVersion("HTTP/1.1");
+				response.setStatusCode("200");
+				response.setStatusMessage("OK");
+				response.setBody(generateDirectoryListing(request.getUri(), path));
+				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+				response.setHeader("Content-Type", "text/html");
+				response.setHeader("Server", "Nginx 2.0");
+				response.setHeader("Connection", "keep-alive");
+			}
+		}
+		return (response);
+
 	}
 	else
 	{
-		// std::cerr << "Location found" << std::endl;
-		// std::cerr << locationConfig->getPath() << std::endl;
-		return serveError(200);
+		HttpResponse	response;
+
+		if (locationConfig->returnDirective.isEnabled())
+			return serveReturnDirective(locationConfig, request);
+
+		std::string	path = locationConfig->root + request.getUri();
+		if (!fileExists(path))
+			return serveError(404);
+		if (!isDirectory(path))
+			return serveFile(path);
+		else
+		{
+			
+			for (size_t i = 0; i < locationConfig->index.size(); i++)
+			{
+				std::string indexPath = path + "/" + locationConfig->index[i];
+				if (fileExists(indexPath))
+					return serveFile(indexPath);
+			}
+			if (locationConfig->autoindex == "off")
+				return serveError(403);
+			else
+			{
+				response.setVersion("HTTP/1.1");
+				response.setStatusCode("200");
+				response.setStatusMessage("OK");
+				response.setBody(generateDirectoryListing(request.getUri(), path));
+				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+				response.setHeader("Content-Type", "text/html");
+				response.setHeader("Server", "Nginx 2.0");
+				response.setHeader("Connection", "keep-alive");
+			}
+		}
+		return (response);
 	}
 
-	std::string	path = resolvePath(request.getUri());
+	
 
-	std::cout << "path: " << path << std::endl;
+	
 
-	if (!fileExists(path))
-		return serveError(404);
+	
 
 	// if (serverConfig.tryFiles.isEnabled())
 	// {
@@ -205,39 +312,8 @@ HttpResponse	RequestHandler::handleRequest(const Method &request)
 	// 	}
 	// }
 
-	if (!isDirectory(path))
-			return serveFile(path);
-	else
-	{
-		std::cout << "File is a directory" << std::endl;
-		for (size_t i = 0; i < serverConfig.index.size(); i++)
-		{
-			std::string indexPath = path + "/" + serverConfig.index[i];
-			if (fileExists(indexPath))
-			{
-				std::cout << "Index file exists" << std::endl;
-				return serveFile(indexPath);
-			}
-		}
-		// handle autoindex directive
-		if (serverConfig.autoindex == "off")
-		{
-			return serveError(403);
-		}
-		else
-		{
-			std::cout << "Autoindex is on -> 200" << std::endl;
-			response.setVersion("HTTP/1.1");
-			response.setStatusCode("200");
-			response.setStatusMessage("OK");
-			response.setBody(generateDirectoryListing(request.getUri(), path));
-			response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-			response.setHeader("Content-Type", "text/html");
-			response.setHeader("Server", "Nginx 2.0");
-			response.setHeader("Connection", "keep-alive");
-		}
-	}
-	return (response);
+	
+	
 }
 
 HttpResponse	RequestHandler::serveError(int statusCode)

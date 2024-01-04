@@ -133,8 +133,8 @@ void	BaseConfig::setReturn(const std::vector<std::string> &returnValues)
 			throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"");
 	}
 	int codeInt = std::stoi(code);
-	if (codeInt < 300 || codeInt > 599)
-		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 300 and 599)");
+	if (codeInt < 100 || codeInt > 599)
+		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 100 and 599)");
 	this->returnDirective.setStatusCode(codeInt);
 }
 
