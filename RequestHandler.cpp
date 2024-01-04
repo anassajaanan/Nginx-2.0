@@ -1,11 +1,12 @@
 #include "RequestHandler.hpp"
 #include "HttpResponse.hpp"
+#include <iostream>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes)
 {
-
+	initStatusCodeMessages();
 }
 
 RequestHandler::~RequestHandler() { }
@@ -165,7 +166,6 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 {
 	HttpResponse	response;
 
-	initStatusCodeMessages();
 	int statusCode = locationConfig->returnDirective.getStatusCode();
 	const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
 
@@ -282,11 +282,6 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	}
 
 	
-
-	
-
-	
-
 	// if (serverConfig.tryFiles.isEnabled())
 	// {
 	// 	const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
@@ -314,28 +309,24 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	// 		}
 	// 	}
 	// }
-
-	
-	
 }
 
 HttpResponse	RequestHandler::serveError(int statusCode)
 {
 	HttpResponse	response;
 
-	initStatusCodeMessages();
-	// if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
-	// 	statusCode = 500;
-
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(statusCode));
-	response.setStatusMessage(statusCodeMessages[statusCode]);
-	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
-	{
-		response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
-		response.setHeader("Content-Type", "text/html");
-	}
 	response.setHeader("Content-Type", "text/plain");
+	if (statusCodeMessages.find(statusCode) != statusCodeMessages.end())
+	{
+		response.setStatusMessage(statusCodeMessages[statusCode]);
+		if (statusCode >= 400 && statusCode < 600)
+		{
+			response.setHeader("Content-Type", "text/html");
+			response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+		}
+	}
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
