@@ -324,10 +324,11 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	if (statusCodeMessages.find(statusCode) != statusCodeMessages.end())
 	{
 		response.setStatusMessage(statusCodeMessages[statusCode]);
-		if (statusCode >= 400 && statusCode < 600)
+		if (statusCode >= 400 && statusCode < 600) // Client Response Error or Server Response Error
 		{
 			response.setHeader("Content-Type", "text/html");
-			response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+			response.setBody("<html><body><h1>" + std::to_string(statusCode)
+				+ " " + statusCodeMessages[statusCode] + "</h1></body></html>");
 		}
 	}
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));

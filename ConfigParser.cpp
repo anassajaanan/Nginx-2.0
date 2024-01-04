@@ -62,6 +62,16 @@ void	ConfigParser::tokenizeConfigFile()
 				currentToken.clear();
 			}
 		}
+		else if (ch == '#')
+		{
+			if (!currentToken.empty())
+			{
+				configTokens.push_back(currentToken);
+				currentToken.clear();
+			}
+			while (it != configFileContent.end() && *it != '\n')
+				it++;
+		}
 		else
 			currentToken += ch;
 	}
