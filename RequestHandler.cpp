@@ -247,6 +247,9 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	{
 		HttpResponse	response;
 
+		// Location Level Config should process the request
+		
+		// check if return directive is enabled, if yes, return the response
 		if (locationConfig->returnDirective.isEnabled())
 			return serveReturnDirective(locationConfig, request);
 
