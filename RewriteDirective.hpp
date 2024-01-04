@@ -12,6 +12,7 @@ class RewriteDirective
 private:
 	std::string	pattern;
 	std::string	substitution;
+	bool		_isEnabled;
 
 public:
 	RewriteDirective();
@@ -20,6 +21,7 @@ public:
 
 	void		setPattern(const std::string &pattern);
 	void		setSubstitution(const std::string &substitution);
+	bool		isEnabled() const;
 
 };
 

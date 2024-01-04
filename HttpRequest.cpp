@@ -1,32 +1,20 @@
 #include "HttpRequest.hpp"
-#include <cctype>
-#include <cstddef>
-#include <cstring>
-#include <ostream>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <unistd.h>
-#include <utility>
 #include <vector>
-#include <algorithm>
 
-Method::Method(const std::string &requestString)
+HttpRequest::HttpRequest(const std::string &requestStr)
 {
-	if (requestString.empty())
+	if (requestStr.empty())
 		throw (std::runtime_error("Error While Getting The Request"));
-	std::cout << requestString << std::endl;
+	std::cout << requestStr << std::endl;
 	this->status = 200;
-	this->requestTokenizer(requestString);
+	this->requestTokenizer(requestStr);
 }
 
-void Method::requestTokenizer(const std::string &requestString)
+bool HttpRequest::requestTokenizer(const std::string &requestString)
 {
-	// std::stringstream	ss(requestString);
 	std::string			line;
 	std::string			tmp = requestString;
 	std::vector<std::string>	requestVec;
-	// std::cout << requestString << std::endl;
 	for (size_t i = 0; i < tmp.length(); i++)
 	{
 		line = tmp.substr(0, tmp.find("\r\n"));
@@ -36,81 +24,78 @@ void Method::requestTokenizer(const std::string &requestString)
 			break ;
 		}
 		if (line.empty())
-			throw (this->setStatus(400) , std::runtime_error("Get Error"));
+			return (this->setStatus(400), false);
 		requestVec.push_back(line);
 		tmp = tmp.substr(tmp.find("\r\n") + 2, tmp.length());
 		if (tmp.empty() || tmp == "\r\n")
 			break ;
 
 	}
-	// std::vector<std::string>::iterator it = requestVec.begin();
-	// for (;it != requestVec.end(); it++)
-	// 	std::cout << "{" << *it << "}" << std::endl;
-	validateRequesLine(requestVec[0]);
+	std::vector<std::string>::iterator it = requestVec.begin();
+	for (;it != requestVec.end(); it++)
+		std::cout << "{" << *it << "}" <<  std::endl;
+	if (!validateRequestLine(requestVec[0]))
+		return (false);
 	loadRequestContent(requestVec);
-	// std::cout << std::endl << std::endl;
-	// std::map<std::string, std::string>::iterator	t = requestContent.begin();
-	// for (;t != requestContent.end(); t++)
-	// 	std::cout << "{" << t->first << "}" << "==>" << t->second << std::endl;
-	// std::cout << "Method  ==> " << getRequestMethod() << std::endl;
-	// std::cout << "Path    ==> " << geturi() << std::endl;
-	// std::cout << "Host    ==> " << getHost() << std::endl;
-	// std::cout << "Version ==> " << getVersion() << std::endl;
-	// std::cout << "Accept  ==> " << getFromRequest("Acept") << std::endl;
+	return (true);
 }
 
-void	Method::validateRequesLine(const std::string &requestLine)
+bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 {
 	if (requestLine.empty())
-		throw (this->setStatus(400), std::runtime_error("Missing Method Type"));
+		throw (std::runtime_error("Missing HttpRequest Type"));
 	std::string					token;
 	std::stringstream			ss(requestLine);
-	std::vector<std::string>	possibleMethods;
+	std::vector<std::string>	possibleHttpRequests;
 	int							i = 0;
 
-	possibleMethods.push_back("GET");
-	possibleMethods.push_back("POST");
-	possibleMethods.push_back("DELETE");
+	possibleHttpRequests.push_back("GET");
+	possibleHttpRequests.push_back("POST");
+	possibleHttpRequests.push_back("DELETE");
 	while (std::getline(ss, token, ' '))
 	{
-		if (i == 0 && std::find(possibleMethods.begin(), possibleMethods.end(), token) == possibleMethods.end())
-			throw (this->setStatus(400), std::runtime_error("400 Bad Request")); //400 bad request
+		if (i == 0 && std::find(possibleHttpRequests.begin(), possibleHttpRequests.end(), token) == possibleHttpRequests.end())
+			return ( this->setStatus(400), false); //400 bad request
 		if (i == 0 && !token.empty())
-			this->setRequestMethod(token);
+			this->setMethod(token);
 		if (i == 1 && !token.empty())
 		{
-			this->validateUri(token);
+			if (!this->validateUri(token))
+				return (this->setStatus(400), false);
 			this->setUri(token);
 		}
 		if (i == 2 && !token.empty())
 		{
-			this->validateVersion(token);
+			if (!this->validateVersion(token))
+				return (false);
 			this->setVersion(token);
 		}
 		if (!token.empty())
 			i++;
 	}
 	if (i != 3)
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (this->setStatus(400), false);
+	return true;
 }
 
-void	Method::setStatus(const int statusNum)
+void	HttpRequest::setStatus(const int statusNum)
 {
 	this->status = statusNum;
 }
 
-int	Method::getStatus() const
+int	HttpRequest::getStatus() const
 {
 	return (this->status);
 }
 
-void	Method::validateUri(const std::string &str)
+bool	HttpRequest::validateUri(const std::string &str)
 {
 	if (str.empty() || str.find("/") == std::string::npos)
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (false);
+	return (true);
 }
 
-void	Method::checkArgsNumber(const std::string &arg)
+void	HttpRequest::checkArgsNumber(const std::string &arg)
 {
 	std::string		content;
 
@@ -119,11 +104,12 @@ void	Method::checkArgsNumber(const std::string &arg)
 	content = arg;
 }
 
-bool	Method::checkDuplicatedHost()
+bool	HttpRequest::checkDuplicatedHost()
 {
-	std::map<std::string, std::string>::iterator mapIt = this->requestContent.begin();
+	std::map<std::string, std::string>::iterator mapIt = this->headers.begin();
 	std::string	lowerKey;
-	for (;mapIt != this->requestContent.end(); mapIt++)
+	std::cout << "inside check" << std::endl;
+	for (;mapIt != this->headers.end(); mapIt++)
 	{
 		lowerKey.resize(mapIt->first.size());
 		std::transform(mapIt->first.begin(), mapIt->first.end(), lowerKey.begin(), ::tolower);
@@ -133,22 +119,22 @@ bool	Method::checkDuplicatedHost()
 	return true;
 }
 
-void	Method::searchForHost()
+bool	HttpRequest::searchForHost()
 {
-	std::map<std::string, std::string>::iterator mapIt = this->requestContent.begin();
+	std::map<std::string, std::string>::iterator mapIt = this->headers.begin();
 	std::string	lowerKey;
 
-	for (;mapIt != this->requestContent.end(); mapIt++)
+	for (;mapIt != this->headers.end(); mapIt++)
 	{
 		lowerKey.resize(mapIt->first.size());
 		std::transform(mapIt->first.begin(), mapIt->first.end(), lowerKey.begin(), ::tolower);
 		if (lowerKey == "host")
-			return ;
+			return (true);
 	}
-	throw (this->setStatus(400), std::runtime_error("400 bad Request"));
+	return (false);
 }
 
-void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
+bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 {
 	std::stringstream			ss;
 	std::vector<std::string>	splitedTokens;
@@ -157,7 +143,7 @@ void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
 	std::string					lowerString;
 
 	if (requestVec.empty())
-		throw (std::runtime_error("Invalid Get Contents"));
+		return (this->setStatus(400), false);
 	std::vector<std::string>::const_iterator	it = requestVec.begin() + 1;
 	for (; it != requestVec.end(); it++)
 	{
@@ -167,22 +153,33 @@ void	Method::loadRequestContent(const std::vector<std::string> &requestVec)
 		std::getline(ss, token, ':');
 		lowerString.resize(token.size());
 		std::transform(token.begin(), token.end(), lowerString.begin(), ::tolower);
-		std::cout << "token = " << token << std::endl;
+		// std::cout << "token = " << token << std::endl;
 		if (token.find(' ') != std::string::npos)
-			throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+			return ( this->setStatus(400), false);
 		if (lowerString  == "host")
-			validateHost(value);
+		{
+			if (!validateHost(value))
+				return (this->setStatus(400), false);
+		}
 		else
-			validateValue(value);
+		{
+			if (!validateValue(value))
+				return ( this->setStatus(400), false);
+		}
 		if (lowerString == "host" && !this->checkDuplicatedHost())
-			throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
-		this->requestContent.insert(std::pair<std::string, std::string>(token, value));
+		{
+			std::cout << "hererere" << std::endl;
+			return (this->setStatus(400), false);
+		}
+		this->headers.insert(std::pair<std::string, std::string>(token, value));
 	}
-	this->searchForHost();
-	this->setHost((this->requestContent.find("Host"))->second);
+	if (!this->searchForHost())
+		return (this->setStatus(400), false);
+	this->setHost((this->headers.find("Host"))->second);
+	return true;
 }
 
-void			Method::validateHost(std::string &hostName)
+bool			HttpRequest::validateHost(std::string &hostName)
 {
 	std::string		value;
 	std::string		tmp;
@@ -194,11 +191,11 @@ void			Method::validateHost(std::string &hostName)
 	if (hostName.empty())
 	{
 		hostName = "";
-		return;
+		return true;
 	}
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
 	if (value.empty())
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (false);
 	ss << value;
 	while (std::getline(ss, token, ' '))
 	{
@@ -206,11 +203,12 @@ void			Method::validateHost(std::string &hostName)
 			tokens.push_back(token);
 	}
 	if (tokens.size() != 1 || tokens[0][0] == ':')
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (false);
 	hostName = tokens[0];
+	return true;
 }
 
-void	Method::validateValue(std::string &hostName)
+bool	HttpRequest::validateValue(std::string &hostName)
 {
 	std::string		value;
 	std::string		tmp;
@@ -220,18 +218,19 @@ void	Method::validateValue(std::string &hostName)
 	if (hostName.empty())
 	{
 		hostName = "";
-		return;
+		return (true);
 	}
 	if (tmp.find(':') == std::string::npos && tmp.find(' ') != std::string::npos)
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (false);
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
 	if (value.empty() || value == hostName)
 		hostName = "";
 	else
 		hostName = value;
+	return true;
 }
 
-bool	Method::checkVersionNumber(const std::string &str)
+bool	HttpRequest::checkVersionNumber(const std::string &str)
 {
 	if (str.length() == 3 && std::isdigit(str[0]) && str[1] == '.' && std::isdigit(str[2]))
 	{
@@ -241,35 +240,35 @@ bool	Method::checkVersionNumber(const std::string &str)
 		if (version >= 1 && version <= 1.9)
 			return true;
 		else
-			throw (this->setStatus(505), std::runtime_error("505 HTTP Version Not Supported"));
+			return (this->setStatus(505), false);
 	}
 	return false;
 }
 
-void	Method::validateVersion(const std::string &version)
+bool	HttpRequest::validateVersion(const std::string &version)
 {
 	if (version.empty() || version.find("/") == std::string::npos || version.find(".") == std::string::npos)
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (this->setStatus(400), false);
 	if (std::count(version.begin(), version.end(), '.') != 1)
-		throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+		return (this->setStatus(400), false);
 	std::stringstream	ss(version);
 	std::string			token;
 	int					i = 0;
 	while (std::getline(ss, token, '/'))
 	{
 		if (i == 0 && token != "HTTP")
-			throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+			return (this->setStatus(400), false);
 		if (i == 1)
 		{
 			if (!this->checkVersionNumber(token))
-				throw (this->setStatus(400), std::runtime_error("400 Bad Request"));
+				return (this->setStatus(505), false);
 		}
 		i++;
-
 	}
+	return true;
 }
 
-std::vector<std::string> Method::splitByString(const std::string &str, const char *del)
+std::vector<std::string> HttpRequest::splitByString(const std::string &str, const char *del)
 {
 	std::vector<std::string>	tokens;
 	std::string					splitedString;
@@ -302,63 +301,59 @@ std::vector<std::string> Method::splitByString(const std::string &str, const cha
 	return (tokens);
 }
 
-void	Method::setHost(const std::string &hostName)
+void	HttpRequest::setHost(const std::string &hostName)
 {
 	this->host = hostName;
 }
 
-const std::string	&Method::getFromRequest(const std::string &key) const
+const std::string	&HttpRequest::getHeader(const std::string &key) const
 {
 	static std::string	s = "";
-	if (this->requestContent.find(key) != this->requestContent.end())
-		return (this->requestContent.find(key)->second);
+	if (this->headers.find(key) != this->headers.end())
+		return (this->headers.find(key)->second);
 	else
 		return (s);
 }
 
 
-void	Method::setVersion(const std::string &str)
+void	HttpRequest::setVersion(const std::string &str)
 {
 	this->version = str;
 }
 
-const std::string &Method::getVersion() const
+const std::string &HttpRequest::getVersion() const
 {
 	return (this->version);
 }
 
-const std::string	&Method::getHost() const
+const std::string	&HttpRequest::getHost() const
 {
 	return (this->host);
 }
 
-void	Method::setUri(const std::string &str)
+void	HttpRequest::setUri(const std::string &str)
 {
 	this->uri = str;
 }
 
-void	Method::setRequestMethod(const std::string &str)
+void	HttpRequest::setMethod(const std::string &str)
 {
-	this->requestMethod = str;
+	this->method = str;
 }
 
-const std::string	&Method::getRequestMethod() const
+const std::string	&HttpRequest::getMethod() const
 {
-	return (this->requestMethod);
+	return (this->method);
 }
 
-const std::string	&Method::getUri() const
+const std::string	&HttpRequest::getUri() const
 {
 	return (this->uri);
 }
 
-const std::map<std::string, std::string> &Method::getRequestContent() const
-{
-	return (this->requestContent);
-}
 
-Method::~Method()
+HttpRequest::~HttpRequest()
 {
-	write(2, "i went out Dumbass", 19);
-	std::cout << "i went out Dumbass" << std::endl;
+	// write(2, "i went out Dumbass", 19);
+	std::cout << "i went out" << std::endl;
 }
