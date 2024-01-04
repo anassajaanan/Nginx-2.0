@@ -1,12 +1,12 @@
 #include "RequestHandler.hpp"
 #include "HttpResponse.hpp"
-#include <string>
+#include <iostream>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes)
 {
-	this->initStatusCodeMessages();
+	initStatusCodeMessages();
 }
 
 RequestHandler::~RequestHandler() { }
@@ -167,7 +167,6 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 	HttpResponse	response;
 	// Method *request;
 
-	initStatusCodeMessages();
 	int statusCode = locationConfig->returnDirective.getStatusCode();
 	const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
 
@@ -210,19 +209,7 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 
 	std::cout << "status = " << request.getStatus() << std::endl;
 	if (request.getStatus() != 200)
-	{
-		HttpResponse	response;
-
-		// response.setVersion("HTTP/1.1");
-		// response.setStatusCode(std::to_string(request.getStatus()));
-		// response.setStatusMessage(this->statusCodeMessages[request.getStatus()]);
-		// response.setBody("<html><body><h1>" + response.getStatusCode() + " " + response.getStatusMessage() + "</h1></body></html>");
-		// response.setHeader("Content-Type", "text/html");
-		// response.setHeader("Server", "Nginx 2.0");
-		// response.setHeader("Connection", "keep-alive");
-		// response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 		return (serveError(request.getStatus()));
-	}
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 	if (locationConfig == NULL)
 	{
@@ -264,6 +251,9 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	{
 		HttpResponse	response;
 
+		// Location Level Config should process the request
+		
+		// check if return directive is enabled, if yes, return the response
 		if (locationConfig->returnDirective.isEnabled())
 			return serveReturnDirective(locationConfig, request);
 
@@ -299,11 +289,6 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	}
 
 	
-
-	
-
-	
-
 	// if (serverConfig.tryFiles.isEnabled())
 	// {
 	// 	const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
@@ -331,9 +316,6 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 	// 		}
 	// 	}
 	// }
-
-	
-	
 }
 
 HttpResponse	RequestHandler::serveError(int statusCode)
@@ -344,19 +326,21 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	initStatusCodeMessages();
 	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
 		statusCode = 500;
-
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(statusCode));
-	response.setStatusMessage(statusCodeMessages[statusCode]);
-	// if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
-	// {
-		response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
-		response.setHeader("Content-Type", "text/html");
-	// }
-	// response.setHeader("Content-Type", "text/plain");
+	response.setHeader("Content-Type", "text/plain");
+	if (statusCodeMessages.find(statusCode) != statusCodeMessages.end())
+	{
+		response.setStatusMessage(statusCodeMessages[statusCode]);
+		if (statusCode >= 400 && statusCode < 600) // Client Response Error or Server Response Error
+		{
+			response.setHeader("Content-Type", "text/html");
+			response.setBody("<html><body><h1>" + std::to_string(statusCode)
+				+ " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+		}
+	}
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
-	// std::cout << response.get
 	return (response);
 }

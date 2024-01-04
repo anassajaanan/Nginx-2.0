@@ -19,8 +19,6 @@ Sec-Fetch-Dest: document
 Sec-Fetch-Mode: navigate
 Sec-Fetch-Site: none
 Sec-Fetch-User: ?1
-Pragma: no-cache
-Cache-Control: no-cache
 
 
 token = Host
@@ -34,46 +32,6 @@ token = Sec-Fetch-Dest
 token = Sec-Fetch-Mode
 token = Sec-Fetch-Site
 token = Sec-Fetch-User
-token = Pragma
-token = Cache-Control
-received small file
-Waiting for events
-nev: 1
-Events received => EVFILT_WRITE 
-
-Handling client response
-Sending small file
-Waiting for events
-nev: 1
-Events received => EVFILT_READ 
-
-GET /favicon.ico HTTP/1.1
-Host: localhost:9000
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0
-Accept: image/avif,image/webp,*/*
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://localhost:9000/content/
-Sec-Fetch-Dest: image
-Sec-Fetch-Mode: no-cors
-Sec-Fetch-Site: same-origin
-Pragma: no-cache
-Cache-Control: no-cache
-
-
-token = Host
-token = User-Agent
-token = Accept
-token = Accept-Language
-token = Accept-Encoding
-token = Connection
-token = Referer
-token = Sec-Fetch-Dest
-token = Sec-Fetch-Mode
-token = Sec-Fetch-Site
-token = Pragma
-token = Cache-Control
 received small file
 Waiting for events
 nev: 1

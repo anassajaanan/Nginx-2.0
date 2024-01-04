@@ -31,9 +31,6 @@ bool HttpRequest::requestTokenizer(const std::string &requestString)
 			break ;
 
 	}
-	std::vector<std::string>::iterator it = requestVec.begin();
-	for (;it != requestVec.end(); it++)
-		std::cout << "{" << *it << "}" <<  std::endl;
 	if (!validateRequestLine(requestVec[0]))
 		return (false);
 	loadRequestContent(requestVec);
