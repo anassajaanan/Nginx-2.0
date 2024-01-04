@@ -16,44 +16,56 @@
 #include <vector>
 
 
-class Method
+class HttpRequest
 {
 
 private:
-		std::string							requestMethod;
+		std::string							method;
 		std::string							uri;
-		std::string							host;
 		std::string							version;
-		// int									status;
+		std::string							host;
+		std::map<std::string, std::string>	headers;
 		std::string							body;
-		std::map<std::string, std::string>	requestContent;
+		
+		// int									status;
+		
+		void				setMethod(const std::string &str);
 		void				setUri(const std::string &str);
 		void				setVersion(const std::string &str);
-		void				setRequestMethod(const std::string &str);
-		void				validateUri(const std::string &str);
-		void				validateHost(std::string &hostName);
-		void				validateValue(std::string &hostName);
-		void				checkArgsNumber(const std::string &arg);
-		void				searchForHost();
-		bool				checkVersionNumber(const std::string &str);
-		void				validateVersion(const std::string &version);
-		void				requestTokenizer(const std::string &requestString);
-		void				validateRequesLine(const std::string &requestLine);
-		void				loadRequestContent(const std::vector<std::string> &requestVec);
-		std::vector<std::string> splitByString(const std::string &str, const char *del);
-		bool				checkDuplicatedHost();
-		// void				setStatus(const int statusNum);
-	public:
-		Method(const std::string &content);
 		void				setHost(const std::string &hostName);
-		const std::string	&getHost() const;
-		// const int			getStatus() const;
-		const std::string	&getRequestMethod() const;
-		const std::string	&getVersion() const;
-		const std::string	&getUri() const;
-		const std::string	&getFromRequest(const std::string &key) const;
-		const std::map<std::string, std::string> &getRequestContent() const;
-		~Method();
+
+
+		void						validateUri(const std::string &str);
+		void						validateHost(std::string &hostName);
+		void						validateValue(std::string &hostName);
+		void						checkArgsNumber(const std::string &arg);
+		void						searchForHost();
+		bool						checkVersionNumber(const std::string &str);
+		void						validateVersion(const std::string &version);
+		void						requestTokenizer(const std::string &requestString);
+		void						validateRequestLine(const std::string &requestLine);
+		void						loadRequestContent(const std::vector<std::string> &requestVec);
+		std::vector<std::string>	splitByString(const std::string &str, const char *del);
+		bool						checkDuplicatedHost();
+
+		// void				setStatus(const int statusNum);
+public:
+	HttpRequest(const std::string &requestStr);
+	~HttpRequest();
+
+
+	const std::string	&getMethod() const;
+	const std::string	&getUri() const;
+	const std::string	&getVersion() const;
+	const std::string	&getHost() const;
+	const std::string	&getHeader(const std::string &key) const;
+
+
+	
+	
+	// const int			getStatus() const;
+
+
 };
 
 

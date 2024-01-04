@@ -5,7 +5,7 @@
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes)
 {
-	initStatusCodeMessages();
+
 }
 
 RequestHandler::~RequestHandler() { }
@@ -26,7 +26,7 @@ void	RequestHandler::initStatusCodeMessages()
 	statusCodeMessages[401] = "Unauthorized";
 	statusCodeMessages[403] = "Forbidden";
 	statusCodeMessages[404] = "Not Found";
-	statusCodeMessages[405] = "Method Not Allowed";
+	statusCodeMessages[405] = "HttpRequest Not Allowed";
 	statusCodeMessages[413] = "Payload Too Large";
 	statusCodeMessages[500] = "Internal Server Error";
 	statusCodeMessages[501] = "Not Implemented";
@@ -161,10 +161,11 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 }
 
 
-HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const Method &request)
+HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
 {
 	HttpResponse	response;
 
+	initStatusCodeMessages();
 	int statusCode = locationConfig->returnDirective.getStatusCode();
 	const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
 
@@ -174,7 +175,7 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 		std::string locationHeader = responseTextOrUrl;
 
 		if (responseTextOrUrl[0] == '/')
-			locationHeader = httpScheme + request.getFromRequest("Host") + responseTextOrUrl;
+			locationHeader = httpScheme + request.getHeader("Host") + responseTextOrUrl;
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode(std::to_string(statusCode));
 		response.setStatusMessage(statusCodeMessages[statusCode]);
@@ -186,6 +187,8 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 	}
 	else
 	{
+		if (responseTextOrUrl.empty())
+			return serveError(statusCode);
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode(std::to_string(statusCode));
 		response.setStatusMessage(statusCodeMessages[statusCode]);
@@ -200,7 +203,7 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 
 
 
-HttpResponse	RequestHandler::handleRequest(const Method &request)
+HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 {
 
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
@@ -320,21 +323,21 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 {
 	HttpResponse	response;
 
-	std::cout << "server Errrorrrrrrrrrrr" << std::endl;
-
-	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
-		statusCode = 500;
+	initStatusCodeMessages();
+	// if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
+	// 	statusCode = 500;
 
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(statusCode));
 	response.setStatusMessage(statusCodeMessages[statusCode]);
-	response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
-	response.setHeader("Content-Type", "text/html");
+	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
+	{
+		response.setBody("<html><body><h1>" + std::to_string(statusCode) + " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+		response.setHeader("Content-Type", "text/html");
+	}
+	response.setHeader("Content-Type", "text/plain");
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	response.setHeader("Server", "Nginx 2.0");
-	if (statusCode == 404)
-		response.setHeader("Connection", "keep-alive");
-	else
-		response.setHeader("Connection", "close");
+	response.setHeader("Connection", "keep-alive");
 	return (response);
 }

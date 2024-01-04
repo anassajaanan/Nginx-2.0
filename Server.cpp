@@ -106,7 +106,7 @@ void	Server::handleClientRequest(int clientSocket)
 	
 	RequestHandler handler(_config, _mimeTypes);
 
-	HttpResponse response = handler.handleRequest(Method(buffer));
+	HttpResponse response = handler.handleRequest(HttpRequest(buffer));
 
 	ResponseState *responseState;
 	if (response.getType() == SMALL_FILE)

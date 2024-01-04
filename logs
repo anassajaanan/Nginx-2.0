@@ -1,7 +1,4 @@
 Waiting for events
-nev: 0
-Events received => 
-Waiting for events
 nev: 1
 Events received => EVFILT_READ 
 
@@ -22,6 +19,8 @@ Sec-Fetch-Dest: document
 Sec-Fetch-Mode: navigate
 Sec-Fetch-Site: none
 Sec-Fetch-User: ?1
+Pragma: no-cache
+Cache-Control: no-cache
 
 
 token = Host
@@ -35,6 +34,8 @@ token = Sec-Fetch-Dest
 token = Sec-Fetch-Mode
 token = Sec-Fetch-Site
 token = Sec-Fetch-User
+token = Pragma
+token = Cache-Control
 received small file
 Waiting for events
 nev: 1
@@ -57,6 +58,8 @@ Referer: http://localhost:9000/content/
 Sec-Fetch-Dest: image
 Sec-Fetch-Mode: no-cors
 Sec-Fetch-Site: same-origin
+Pragma: no-cache
+Cache-Control: no-cache
 
 
 token = Host
@@ -69,7 +72,8 @@ token = Referer
 token = Sec-Fetch-Dest
 token = Sec-Fetch-Mode
 token = Sec-Fetch-Site
-server Errrorrrrrrrrrrr
+token = Pragma
+token = Cache-Control
 received small file
 Waiting for events
 nev: 1
@@ -77,9 +81,6 @@ Events received => EVFILT_WRITE
 
 Handling client response
 Sending small file
-Waiting for events
-nev: 0
-Events received => 
 Waiting for events
 Signal 2 received
 Server destructor
