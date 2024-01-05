@@ -161,7 +161,7 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 	return (false);
 }
 
-
+// Handle double quotes in the return directive
 HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
 {
 	HttpResponse	response;

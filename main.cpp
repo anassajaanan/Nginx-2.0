@@ -150,14 +150,6 @@ int main()
 		// std::cout << "Successfully parsed config file" << std::endl;
 		start(servers, serverConfigs, mimeTypeParser);
 
-
-		
-
-
-		
-		
-
-		
 		
 	}
 	catch (const std::exception &e)

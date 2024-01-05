@@ -62,6 +62,19 @@ void	ConfigParser::tokenizeConfigFile()
 				currentToken.clear();
 			}
 		}
+		else if (ch == '"' && currentToken.empty())
+		{
+			it++;
+			while (it != configFileContent.end() && *it != '"')
+			{
+				currentToken += *it;
+				it++;
+			}
+			if (it == configFileContent.end())
+				throw std::runtime_error("unexpected end of file, expecting \";\" or \"}\"");
+			configTokens.push_back(currentToken);
+			currentToken.clear();
+		}
 		else if (ch == '#')
 		{
 			if (!currentToken.empty())
