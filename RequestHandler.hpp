@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "BaseConfig.hpp"
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -43,9 +44,10 @@ public:
 	// LocationConfig	*matchLocation(const std::string &uri);
 
 	bool			isRedirectStatusCode(int statusCode);
-	HttpResponse	serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request);
+	HttpResponse	serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, const HttpRequest &request);
 
 	HttpResponse	serveFile(const std::string& path);
+	HttpResponse	serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path);
 	HttpResponse	serveError(int statusCode);
 
 	HttpResponse	handleRequest(const HttpRequest &request);

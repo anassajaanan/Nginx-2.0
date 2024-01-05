@@ -1,4 +1,7 @@
 #include "RequestHandler.hpp"
+#include "HttpResponse.hpp"
+#include <iostream>
+#include <string>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -140,14 +143,40 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 			response.filePath = path;
 			response.fileSize = fileSize;
 			response.setType(LARGE_FILE);
-
-
 			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
 			response.setHeader("Server", "Nginx 2.0");
 			response.setHeader("Connection", "keep-alive");
 			response.setHeader("Transfer-Encoding", "chunked");
 
 		}
+	}
+	return (response);
+}
+
+HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path)
+{
+	HttpResponse	response;
+
+	for (size_t i = 0; i < config->index.size(); i++)
+	{
+		std::string indexPath = path + "/" + config->index[i];
+		if (fileExists(indexPath))
+			return serveFile(indexPath);
+		if (config->index[i][0] == '/')
+			return serveError(404);
+	}
+	if (config->autoindex == "off")
+		return serveError(403);
+	else
+	{
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("200");
+		response.setStatusMessage("OK");
+		response.setBody(generateDirectoryListing(uri, path));
+		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
 	}
 	return (response);
 }
@@ -160,14 +189,10 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 }
 
 // Handle double quotes in the return directive
-HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
+// HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
+HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, const HttpRequest &request)
 {
 	HttpResponse	response;
-	// Method *request;
-
-	int statusCode = locationConfig->returnDirective.getStatusCode();
-	const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
-
 	if (isRedirectStatusCode(statusCode))
 	{
 		std::string httpScheme = "http://";
@@ -204,116 +229,53 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 
 HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 {
-
-	std::cout << "status = " << request.getStatus() << std::endl;
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
-	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
-	if (locationConfig == NULL)
+	
+	if (serverConfig.returnDirective.isEnabled())
 	{
-		// Server Level Config should process the request
-		HttpResponse	response;
-
-		std::string	path = serverConfig.root + request.getUri();
-		if (!fileExists(path))
-			return serveError(404);
-		if (!isDirectory(path))
-			return serveFile(path);
-		else
-		{
-			
-			for (size_t i = 0; i < serverConfig.index.size(); i++)
-			{
-				std::string indexPath = path + "/" + serverConfig.index[i];
-				if (fileExists(indexPath))
-					return serveFile(indexPath);
-			}
-			if (serverConfig.autoindex == "off")
-				return serveError(403);
-			else
-			{
-				response.setVersion("HTTP/1.1");
-				response.setStatusCode("200");
-				response.setStatusMessage("OK");
-				response.setBody(generateDirectoryListing(request.getUri(), path));
-				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-				response.setHeader("Content-Type", "text/html");
-				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "keep-alive");
-			}
-		}
-		return (response);
-
+		int statusCode = serverConfig.returnDirective.getStatusCode();
+		const std::string &responseTextOrUrl = serverConfig.returnDirective.getResponseTextOrUrl();
+		return serveReturnDirective(statusCode, responseTextOrUrl, request);
 	}
-	else
+
+
+	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
+	if (locationConfig)
 	{
-		HttpResponse	response;
 
 		// Location Level Config should process the request
 		
 		// check if return directive is enabled, if yes, return the response
 		if (locationConfig->returnDirective.isEnabled())
-			return serveReturnDirective(locationConfig, request);
+		{
+			int statusCode = locationConfig->returnDirective.getStatusCode();
+			const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
+			return serveReturnDirective(statusCode, responseTextOrUrl, request);
+		}
+
+		// handle try_files directive
 
 		std::string	path = locationConfig->root + request.getUri();
 		if (!fileExists(path))
 			return serveError(404);
-		if (!isDirectory(path))
-			return serveFile(path);
+		if (isDirectory(path))
+			return serveDirectory(locationConfig, request.getUri(), path);
 		else
-		{
-			
-			for (size_t i = 0; i < locationConfig->index.size(); i++)
-			{
-				std::string indexPath = path + "/" + locationConfig->index[i];
-				if (fileExists(indexPath))
-					return serveFile(indexPath);
-			}
-			if (locationConfig->autoindex == "off")
-				return serveError(403);
-			else
-			{
-				response.setVersion("HTTP/1.1");
-				response.setStatusCode("200");
-				response.setStatusMessage("OK");
-				response.setBody(generateDirectoryListing(request.getUri(), path));
-				response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-				response.setHeader("Content-Type", "text/html");
-				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "keep-alive");
-			}
-		}
-		return (response);
+			return serveFile(path);
 	}
+	else
+	{
+		// handle try_files directive
 
-	
-	// if (serverConfig.tryFiles.isEnabled())
-	// {
-	// 	const std::vector<std::string> &paths = serverConfig.tryFiles.getPaths();
-	// 	for (size_t i = 0; i < paths.size(); i++)
-	// 	{
-	// 		std::string path = serverConfig.root + paths[i];
-	// 		if (fileExists(path))
-	// 		{
-	// 			if (!isDirectory(path))
-	// 				return serveFile(path);
-	// 			else
-	// 			{
-	// 				if (paths[i].back() == '/')
-	// 				{
-	// 					// redirect to path
-	// 					// response.setVersion("HTTP/1.1");
-	// 					// response.setStatusCode("301");
-	// 					// response.setStatusMessage("Moved Permanently");
-	// 					// response.
-
-	// 				}
-					
-
-	// 			}
-	// 		}
-	// 	}
-	// }
+		std::string	path = serverConfig.root + request.getUri();
+		if (!fileExists(path))
+			return serveError(404);
+		if (isDirectory(path))
+			return serveDirectory(&serverConfig, request.getUri(), path);
+		else
+			return serveFile(path);
+	}
 }
 
 HttpResponse	RequestHandler::serveError(int statusCode)

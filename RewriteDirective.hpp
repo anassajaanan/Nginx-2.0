@@ -23,6 +23,11 @@ public:
 	void		setSubstitution(const std::string &substitution);
 	bool		isEnabled() const;
 
+
+	const std::string	&getPattern() const;
+	const std::string	&getSubstitution() const;
+	
+
 };
 
 

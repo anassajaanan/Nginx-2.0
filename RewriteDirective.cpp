@@ -27,3 +27,13 @@ bool	RewriteDirective::isEnabled() const
 {
 	return (_isEnabled);
 }
+
+const std::string	&RewriteDirective::getPattern() const
+{
+	return (pattern);
+}
+
+const std::string	&RewriteDirective::getSubstitution() const
+{
+	return (substitution);
+}
