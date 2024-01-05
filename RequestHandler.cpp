@@ -1,6 +1,4 @@
 #include "RequestHandler.hpp"
-#include "HttpResponse.hpp"
-#include <iostream>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -165,6 +163,7 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
 {
 	HttpResponse	response;
+	// Method *request;
 
 	int statusCode = locationConfig->returnDirective.getStatusCode();
 	const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
@@ -206,6 +205,9 @@ HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *location
 HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 {
 
+	std::cout << "status = " << request.getStatus() << std::endl;
+	if (request.getStatus() != 200)
+		return (serveError(request.getStatus()));
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 	if (locationConfig == NULL)
 	{
@@ -318,6 +320,10 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 {
 	HttpResponse	response;
 
+	std::cout << "enetered here" << std::endl;
+	initStatusCodeMessages();
+	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
+		statusCode = 500;
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(statusCode));
 	response.setHeader("Content-Type", "text/plain");

@@ -1,9 +1,4 @@
 #include "Server.hpp"
-#include "HttpResponse.hpp"
-#include <sstream>
-#include <sys/errno.h>
-#include <sys/event.h>
-#include <unistd.h>
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq)
 {

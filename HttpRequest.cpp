@@ -5,10 +5,11 @@ HttpRequest::HttpRequest(const std::string &requestStr)
 	if (requestStr.empty())
 		throw (std::runtime_error("Error While Getting The Request"));
 	std::cout << requestStr << std::endl;
+	this->status = 200;
 	this->requestTokenizer(requestStr);
 }
 
-void HttpRequest::requestTokenizer(const std::string &requestString)
+bool HttpRequest::requestTokenizer(const std::string &requestString)
 {
 	std::string			line;
 	std::string			tmp = requestString;
@@ -22,18 +23,20 @@ void HttpRequest::requestTokenizer(const std::string &requestString)
 			break ;
 		}
 		if (line.empty())
-			throw (std::runtime_error("Get Error"));
+			return (this->setStatus(400), false);
 		requestVec.push_back(line);
 		tmp = tmp.substr(tmp.find("\r\n") + 2, tmp.length());
 		if (tmp.empty() || tmp == "\r\n")
 			break ;
 
 	}
-	validateRequestLine(requestVec[0]);
+	if (!validateRequestLine(requestVec[0]))
+		return (false);
 	loadRequestContent(requestVec);
+	return (true);
 }
 
-void	HttpRequest::validateRequestLine(const std::string &requestLine)
+bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 {
 	if (requestLine.empty())
 		throw (std::runtime_error("Missing HttpRequest Type"));
@@ -48,30 +51,44 @@ void	HttpRequest::validateRequestLine(const std::string &requestLine)
 	while (std::getline(ss, token, ' '))
 	{
 		if (i == 0 && std::find(possibleHttpRequests.begin(), possibleHttpRequests.end(), token) == possibleHttpRequests.end())
-			throw (std::runtime_error(token + " Is Unkown HttpRequest")); //400 bad request
+			return ( this->setStatus(400), false); //400 bad request
 		if (i == 0 && !token.empty())
 			this->setMethod(token);
 		if (i == 1 && !token.empty())
 		{
-			this->validateUri(token);
+			if (!this->validateUri(token))
+				return (this->setStatus(400), false);
 			this->setUri(token);
 		}
 		if (i == 2 && !token.empty())
 		{
-			this->validateVersion(token);
+			if (!this->validateVersion(token))
+				return (false);
 			this->setVersion(token);
 		}
 		if (!token.empty())
 			i++;
 	}
 	if (i != 3)
-		throw (std::runtime_error("400 Bad Request"));
+		return (this->setStatus(400), false);
+	return true;
 }
 
-void	HttpRequest::validateUri(const std::string &str)
+void	HttpRequest::setStatus(const int statusNum)
+{
+	this->status = statusNum;
+}
+
+int	HttpRequest::getStatus() const
+{
+	return (this->status);
+}
+
+bool	HttpRequest::validateUri(const std::string &str)
 {
 	if (str.empty() || str.find("/") == std::string::npos)
-		throw (std::runtime_error("400 Bad Request"));
+		return (false);
+	return (true);
 }
 
 void	HttpRequest::checkArgsNumber(const std::string &arg)
@@ -87,6 +104,7 @@ bool	HttpRequest::checkDuplicatedHost()
 {
 	std::map<std::string, std::string>::iterator mapIt = this->headers.begin();
 	std::string	lowerKey;
+	std::cout << "inside check" << std::endl;
 	for (;mapIt != this->headers.end(); mapIt++)
 	{
 		lowerKey.resize(mapIt->first.size());
@@ -97,7 +115,7 @@ bool	HttpRequest::checkDuplicatedHost()
 	return true;
 }
 
-void	HttpRequest::searchForHost()
+bool	HttpRequest::searchForHost()
 {
 	std::map<std::string, std::string>::iterator mapIt = this->headers.begin();
 	std::string	lowerKey;
@@ -107,12 +125,12 @@ void	HttpRequest::searchForHost()
 		lowerKey.resize(mapIt->first.size());
 		std::transform(mapIt->first.begin(), mapIt->first.end(), lowerKey.begin(), ::tolower);
 		if (lowerKey == "host")
-			return ;
+			return (true);
 	}
-	throw (std::runtime_error("400 bad Request"));
+	return (false);
 }
 
-void	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
+bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 {
 	std::stringstream			ss;
 	std::vector<std::string>	splitedTokens;
@@ -121,7 +139,7 @@ void	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 	std::string					lowerString;
 
 	if (requestVec.empty())
-		throw (std::runtime_error("Invalid Get Contents"));
+		return (this->setStatus(400), false);
 	std::vector<std::string>::const_iterator	it = requestVec.begin() + 1;
 	for (; it != requestVec.end(); it++)
 	{
@@ -131,22 +149,33 @@ void	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 		std::getline(ss, token, ':');
 		lowerString.resize(token.size());
 		std::transform(token.begin(), token.end(), lowerString.begin(), ::tolower);
-		std::cout << "token = " << token << std::endl;
+		// std::cout << "token = " << token << std::endl;
 		if (token.find(' ') != std::string::npos)
-			throw (std::runtime_error("400 Bad Request"));
+			return ( this->setStatus(400), false);
 		if (lowerString  == "host")
-			validateHost(value);
+		{
+			if (!validateHost(value))
+				return (this->setStatus(400), false);
+		}
 		else
-			validateValue(value);
+		{
+			if (!validateValue(value))
+				return ( this->setStatus(400), false);
+		}
 		if (lowerString == "host" && !this->checkDuplicatedHost())
-			throw (std::runtime_error("400 Bad Request"));
+		{
+			std::cout << "hererere" << std::endl;
+			return (this->setStatus(400), false);
+		}
 		this->headers.insert(std::pair<std::string, std::string>(token, value));
 	}
-	this->searchForHost();
+	if (!this->searchForHost())
+		return (this->setStatus(400), false);
 	this->setHost((this->headers.find("Host"))->second);
+	return true;
 }
 
-void			HttpRequest::validateHost(std::string &hostName)
+bool			HttpRequest::validateHost(std::string &hostName)
 {
 	std::string		value;
 	std::string		tmp;
@@ -158,11 +187,11 @@ void			HttpRequest::validateHost(std::string &hostName)
 	if (hostName.empty())
 	{
 		hostName = "";
-		return;
+		return true;
 	}
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
 	if (value.empty())
-		throw (std::runtime_error("400 Bad Request"));
+		return (false);
 	ss << value;
 	while (std::getline(ss, token, ' '))
 	{
@@ -170,11 +199,12 @@ void			HttpRequest::validateHost(std::string &hostName)
 			tokens.push_back(token);
 	}
 	if (tokens.size() != 1 || tokens[0][0] == ':')
-		throw (std::runtime_error("400 Bad Request"));
+		return (false);
 	hostName = tokens[0];
+	return true;
 }
 
-void	HttpRequest::validateValue(std::string &hostName)
+bool	HttpRequest::validateValue(std::string &hostName)
 {
 	std::string		value;
 	std::string		tmp;
@@ -184,15 +214,16 @@ void	HttpRequest::validateValue(std::string &hostName)
 	if (hostName.empty())
 	{
 		hostName = "";
-		return;
+		return (true);
 	}
 	if (tmp.find(':') == std::string::npos && tmp.find(' ') != std::string::npos)
-		throw (std::runtime_error("400 Bad Request"));
+		return (false);
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
 	if (value.empty() || value == hostName)
 		hostName = "";
 	else
 		hostName = value;
+	return true;
 }
 
 bool	HttpRequest::checkVersionNumber(const std::string &str)
@@ -205,32 +236,32 @@ bool	HttpRequest::checkVersionNumber(const std::string &str)
 		if (version >= 1 && version <= 1.9)
 			return true;
 		else
-			throw (std::runtime_error("505 HTTP Version Not Supported"));
+			return (this->setStatus(505), false);
 	}
 	return false;
 }
 
-void	HttpRequest::validateVersion(const std::string &version)
+bool	HttpRequest::validateVersion(const std::string &version)
 {
 	if (version.empty() || version.find("/") == std::string::npos || version.find(".") == std::string::npos)
-		throw (std::runtime_error("400 Bad Request"));
+		return (this->setStatus(400), false);
 	if (std::count(version.begin(), version.end(), '.') != 1)
-		throw (std::runtime_error("400 Bad Request"));
+		return (this->setStatus(400), false);
 	std::stringstream	ss(version);
 	std::string			token;
 	int					i = 0;
 	while (std::getline(ss, token, '/'))
 	{
 		if (i == 0 && token != "HTTP")
-			throw (std::runtime_error("400 Bad Request"));
+			return (this->setStatus(400), false);
 		if (i == 1)
 		{
 			if (!this->checkVersionNumber(token))
-				throw (std::runtime_error("400 Bad Request"));
+				return (this->setStatus(505), false);
 		}
 		i++;
-
 	}
+	return true;
 }
 
 std::vector<std::string> HttpRequest::splitByString(const std::string &str, const char *del)
@@ -319,4 +350,6 @@ const std::string	&HttpRequest::getUri() const
 
 HttpRequest::~HttpRequest()
 {
+	// write(2, "i went out Dumbass", 19);
+	std::cout << "i went out" << std::endl;
 }

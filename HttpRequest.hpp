@@ -27,7 +27,7 @@ private:
 		std::map<std::string, std::string>	headers;
 		std::string							body;
 		
-		// int									status;
+		int									status;
 		
 		void				setMethod(const std::string &str);
 		void				setUri(const std::string &str);
@@ -35,20 +35,20 @@ private:
 		void				setHost(const std::string &hostName);
 
 
-		void						validateUri(const std::string &str);
-		void						validateHost(std::string &hostName);
-		void						validateValue(std::string &hostName);
+		bool						validateUri(const std::string &str);
+		bool						validateHost(std::string &hostName);
+		bool						validateValue(std::string &hostName);
 		void						checkArgsNumber(const std::string &arg);
-		void						searchForHost();
+		bool						searchForHost();
 		bool						checkVersionNumber(const std::string &str);
-		void						validateVersion(const std::string &version);
-		void						requestTokenizer(const std::string &requestString);
-		void						validateRequestLine(const std::string &requestLine);
-		void						loadRequestContent(const std::vector<std::string> &requestVec);
+		bool						validateVersion(const std::string &version);
+		bool						requestTokenizer(const std::string &requestString);
+		bool						validateRequestLine(const std::string &requestLine);
+		bool						loadRequestContent(const std::vector<std::string> &requestVec);
 		std::vector<std::string>	splitByString(const std::string &str, const char *del);
 		bool						checkDuplicatedHost();
 
-		// void				setStatus(const int statusNum);
+		void				setStatus(const int statusNum);
 public:
 	HttpRequest(const std::string &requestStr);
 	~HttpRequest();
@@ -63,7 +63,7 @@ public:
 
 	
 	
-	// const int			getStatus() const;
+	int			getStatus() const;
 
 
 };
