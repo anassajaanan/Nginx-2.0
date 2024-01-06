@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "HttpRequest.hpp"
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq)
 {
@@ -101,7 +102,9 @@ void	Server::handleClientRequest(int clientSocket)
 	
 	RequestHandler handler(_config, _mimeTypes);
 
-	HttpResponse response = handler.handleRequest(HttpRequest(buffer));
+	HttpRequest newRequest(buffer);
+
+	HttpResponse response = handler.handleRequest(newRequest);
 
 	ResponseState *responseState;
 	if (response.getType() == SMALL_FILE)

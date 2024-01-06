@@ -30,7 +30,6 @@ private:
 		int									status;
 		
 		void				setMethod(const std::string &str);
-		void				setUri(const std::string &str);
 		void				setVersion(const std::string &str);
 		void				setHost(const std::string &hostName);
 
@@ -56,6 +55,7 @@ public:
 
 	const std::string	&getMethod() const;
 	const std::string	&getUri() const;
+	void				setUri(const std::string &str);
 	const std::string	&getVersion() const;
 	const std::string	&getHost() const;
 	const std::string	&getHeader(const std::string &key) const;

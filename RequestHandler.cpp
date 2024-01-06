@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include <iostream>
 #include <string>
@@ -153,89 +154,47 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	return (response);
 }
 
-HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, const HttpRequest &request)
+HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::string &url)
 {
 	HttpResponse	response;
 
-	if (uri.back() != '/')
-	{
-		// redirect to the same uri with a trailing slash
-		std::string locationHeader = "http://" + request.getHeader("Host") + uri + "/";
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode("301");
-		response.setStatusMessage("Moved Permanently");
-		response.setHeader("Location", locationHeader);
-		response.setHeader("Content-Length", "0");
-		response.setHeader("Content-Type", "text/html");
-		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "keep-alive");
-		return (response);
-	}
+	std::string locationHeader = "http://" + request.getHeader("Host") + url;
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("301");
+	response.setStatusMessage("Moved Permanently");
+	response.setHeader("Location", locationHeader);
+	response.setHeader("Content-Length", "0");
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	return (response);
+}
 
-	size_t i;
-	for (i = 0; i < config->index.size() - 1; i++)
+HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request)
+{
+	if (uri.back() != '/')
+		return sendRedirect(request, uri + "/");
+	for (size_t i = 0; i < config->index.size(); i++)
 	{
+		if (i == config->index.size() - 1 && config->index[i][0] == '/')
+		{
+			request.setUri(config->index[i]);
+			return handleRequest(request);
+		}
 		std::string indexPath = path + "/" + config->index[i];
 		if (fileExists(indexPath))
 		{
 			if (isDirectory(indexPath))
-			{
-				if (indexPath.back() != '/')
-				{
-					// redirect to the same uri with a trailing slash
-					std::string locationHeader = "http://" + request.getHeader("Host") + uri + config->index[i] + "/";
-					response.setVersion("HTTP/1.1");
-					response.setStatusCode("301");
-					response.setStatusMessage("Moved Permanently");
-					response.setHeader("Location", locationHeader);
-					response.setHeader("Content-Length", "0");
-					response.setHeader("Content-Type", "text/html");
-					response.setHeader("Server", "Nginx 2.0");
-					response.setHeader("Connection", "keep-alive");
-					return (response);
-				}
-				else
-				{
-					// serve the index file
-					std::cerr << "Serving index file" << std::endl;
-					std::cerr << "if index file is a directory, serve directory listing" << std::endl;
-				}
-			}
+				return serveDirectory(config, uri + config->index[i], indexPath, request);
 			else 
-			{
 				return serveFile(indexPath);
-			}
-			
 		}
 	}
-	if (config->index[i][0] == '/')
-	{
-		std::string locationHeader = "http://" + request.getHeader("Host") + config->index[i];
-		
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode("301");
-		response.setStatusMessage("Moved Permanently");
-		response.setHeader("Location", locationHeader);
-		response.setHeader("Content-Length", "0");
-		response.setHeader("Content-Type", "text/html");
-		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "keep-alive");
-		return (response);
-	}
-	else {
-		std::string indexPath = path + "/" + config->index[i];
-		if (fileExists(indexPath))
-			return serveFile(indexPath);
-	}
-
 	if (config->autoindex == "off")
-	{
-		std::cerr << "Autoindex is off" << std::endl;
 		return serveError(403);
-	}
 	else
 	{
-		std::cerr << "Autoindex is on" << std::endl;
+		HttpResponse	response;
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
@@ -244,8 +203,8 @@ HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::strin
 		response.setHeader("Content-Type", "text/html");
 		response.setHeader("Server", "Nginx 2.0");
 		response.setHeader("Connection", "keep-alive");
+		return (response);
 	}
-	return (response);
 }
 
 bool	RequestHandler::isRedirectStatusCode(int statusCode)
@@ -256,8 +215,8 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 }
 
 // Handle double quotes in the return directive
-// HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
-HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, const HttpRequest &request)
+// HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, HttpRequest &request)
+HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, HttpRequest &request)
 {
 	HttpResponse	response;
 	if (isRedirectStatusCode(statusCode))
@@ -294,7 +253,7 @@ HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::str
 
 
 
-HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
+HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
