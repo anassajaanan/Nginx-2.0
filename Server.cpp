@@ -103,7 +103,6 @@ void	Server::handleClientRequest(int clientSocket)
 	RequestHandler handler(_config, _mimeTypes);
 
 	HttpRequest newRequest(buffer);
-
 	HttpResponse response = handler.handleRequest(newRequest);
 
 	ResponseState *responseState;

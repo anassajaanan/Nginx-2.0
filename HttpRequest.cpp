@@ -6,6 +6,7 @@ HttpRequest::HttpRequest(const std::string &requestStr)
 		throw (std::runtime_error("Error While Getting The Request"));
 	std::cout << requestStr << std::endl;
 	this->status = 200;
+	this->recursionDepth = 0;
 	this->requestTokenizer(requestStr);
 }
 
@@ -169,6 +170,7 @@ bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 		}
 		this->headers.insert(std::pair<std::string, std::string>(token, value));
 	}
+	
 	if (!this->searchForHost())
 		return (this->setStatus(400), false);
 	this->setHost((this->headers.find("Host"))->second);
@@ -352,4 +354,14 @@ HttpRequest::~HttpRequest()
 {
 	// write(2, "i went out Dumbass", 19);
 	std::cout << "i went out" << std::endl;
+}
+
+int	HttpRequest::getRecursionDepth() const
+{
+	return (this->recursionDepth);
+}
+
+void	HttpRequest::increaseRecursionDepth()
+{
+	recursionDepth++;
 }

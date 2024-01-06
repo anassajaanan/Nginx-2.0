@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include "BaseConfig.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include <iostream>
@@ -178,6 +179,9 @@ HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::strin
 	{
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
 		{
+			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+				return serveError(500);
+			request.increaseRecursionDepth();
 			request.setUri(config->index[i]);
 			return handleRequest(request);
 		}
@@ -265,11 +269,11 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return serveReturnDirective(statusCode, responseTextOrUrl, request);
 	}
 
-
+	BaseConfig		*config = NULL;
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 	if (locationConfig)
 	{
-
+		config = locationConfig;
 		// Location Level Config should process the request
 		
 		// check if return directive is enabled, if yes, return the response
@@ -279,29 +283,22 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 			const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
 			return serveReturnDirective(statusCode, responseTextOrUrl, request);
 		}
-
-		// handle try_files directive
-
-		std::string	path = locationConfig->root + request.getUri();
-		if (!fileExists(path))
-			return serveError(404);
-		if (isDirectory(path))
-			return serveDirectory(locationConfig, request.getUri(), path, request);
-		else
-			return serveFile(path);
 	}
 	else
 	{
-		// handle try_files directive
-
-		std::string	path = serverConfig.root + request.getUri();
-		if (!fileExists(path))
-			return serveError(404);
-		if (isDirectory(path))
-			return serveDirectory(&serverConfig, request.getUri(), path, request);
-		else
-			return serveFile(path);
+		config = &serverConfig;
 	}
+	
+	// handle try_files directive
+
+
+	std::string path = config->root + request.getUri();	
+	if (!fileExists(path))
+		return serveError(404);
+	if (isDirectory(path))
+		return serveDirectory(config, request.getUri(), path, request);
+	else
+		return serveFile(path);
 }
 
 HttpResponse	RequestHandler::serveError(int statusCode)
