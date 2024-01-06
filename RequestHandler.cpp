@@ -153,22 +153,89 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	return (response);
 }
 
-HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path)
+HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, const HttpRequest &request)
 {
 	HttpResponse	response;
 
-	for (size_t i = 0; i < config->index.size(); i++)
+	if (uri.back() != '/')
+	{
+		// redirect to the same uri with a trailing slash
+		std::string locationHeader = "http://" + request.getHeader("Host") + uri + "/";
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("301");
+		response.setStatusMessage("Moved Permanently");
+		response.setHeader("Location", locationHeader);
+		response.setHeader("Content-Length", "0");
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
+		return (response);
+	}
+
+	size_t i;
+	for (i = 0; i < config->index.size() - 1; i++)
 	{
 		std::string indexPath = path + "/" + config->index[i];
 		if (fileExists(indexPath))
-			return serveFile(indexPath);
-		if (config->index[i][0] == '/')
-			return serveError(404);
+		{
+			if (isDirectory(indexPath))
+			{
+				if (indexPath.back() != '/')
+				{
+					// redirect to the same uri with a trailing slash
+					std::string locationHeader = "http://" + request.getHeader("Host") + uri + config->index[i] + "/";
+					response.setVersion("HTTP/1.1");
+					response.setStatusCode("301");
+					response.setStatusMessage("Moved Permanently");
+					response.setHeader("Location", locationHeader);
+					response.setHeader("Content-Length", "0");
+					response.setHeader("Content-Type", "text/html");
+					response.setHeader("Server", "Nginx 2.0");
+					response.setHeader("Connection", "keep-alive");
+					return (response);
+				}
+				else
+				{
+					// serve the index file
+					std::cerr << "Serving index file" << std::endl;
+					std::cerr << "if index file is a directory, serve directory listing" << std::endl;
+				}
+			}
+			else 
+			{
+				return serveFile(indexPath);
+			}
+			
+		}
 	}
+	if (config->index[i][0] == '/')
+	{
+		std::string locationHeader = "http://" + request.getHeader("Host") + config->index[i];
+		
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("301");
+		response.setStatusMessage("Moved Permanently");
+		response.setHeader("Location", locationHeader);
+		response.setHeader("Content-Length", "0");
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
+		return (response);
+	}
+	else {
+		std::string indexPath = path + "/" + config->index[i];
+		if (fileExists(indexPath))
+			return serveFile(indexPath);
+	}
+
 	if (config->autoindex == "off")
+	{
+		std::cerr << "Autoindex is off" << std::endl;
 		return serveError(403);
+	}
 	else
 	{
+		std::cerr << "Autoindex is on" << std::endl;
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
@@ -260,7 +327,7 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 		if (!fileExists(path))
 			return serveError(404);
 		if (isDirectory(path))
-			return serveDirectory(locationConfig, request.getUri(), path);
+			return serveDirectory(locationConfig, request.getUri(), path, request);
 		else
 			return serveFile(path);
 	}
@@ -272,7 +339,7 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 		if (!fileExists(path))
 			return serveError(404);
 		if (isDirectory(path))
-			return serveDirectory(&serverConfig, request.getUri(), path);
+			return serveDirectory(&serverConfig, request.getUri(), path, request);
 		else
 			return serveFile(path);
 	}

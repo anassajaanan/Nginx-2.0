@@ -1,4 +1,6 @@
 #include "BaseConfig.hpp"
+#include <stdexcept>
+#include <sys/_types/_size_t.h>
 
 
 void	BaseConfig::setRoot(const std::string &rootValue)
@@ -9,6 +11,11 @@ void	BaseConfig::setRoot(const std::string &rootValue)
 
 void		BaseConfig::setIndex(const std::vector<std::string> &indexValues)
 {
+	for (size_t i = 0; i < indexValues.size() - 1; i++)
+	{
+		if (indexValues[i][0] == '/')
+			throw std::runtime_error("Only the last index in \"index\" directive should be an absolute path");
+	}
 	this->index = indexValues;
 }
 
