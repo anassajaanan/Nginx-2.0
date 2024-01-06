@@ -1,6 +1,7 @@
 #include "RequestHandler.hpp"
 #include "HttpResponse.hpp"
 #include <iostream>
+#include <sstream>
 #include <string>
 
 
@@ -253,9 +254,52 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 			const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
 			return serveReturnDirective(statusCode, responseTextOrUrl, request);
 		}
-
+		// std::cout << "herere" << std::endl;
 		// handle try_files directive
+		std::string				tryFilesPath = locationConfig->root + request.getUri();
+		std::vector<std::string> tryFilesParameters = locationConfig->tryFiles.getPaths();
+		std::vector<std::string>::iterator it = tryFilesParameters.begin();
+		while (it + 1 != locationConfig->tryFiles.getPaths().end())
+		{
+			if (*it == "$uri")
+			{
+				if (fileExists(tryFilesPath))
+					return (serveFile(tryFilesPath));
+			}
+			else if (*it == "$uri/")
+			{
+				if (isDirectory(tryFilesPath))
+					return (serveDirectory(locationConfig, request.getUri(), tryFilesPath));
+			}
+			// else
+			// if((*it).find_first_not_of("=") != std::string::npos)
+			// {
+				
+			// }
+			// else
+			// {
+			
+			// }
+			it++;
+		}
+		if((*it).find_first_not_of("=") != std::string::npos)
+		{
+			std::string tryFilesStatus = (*it).substr(1, (*it).length());
+			std::stringstream		ss(tryFilesStatus);
+			int						statusNum;
 
+			ss >> statusNum;
+			return (serveError(statusNum));
+		}
+		else
+		{
+			if (fileExists(locationConfig->root + (*it)))
+				serveFile(locationConfig->root + (*it));
+			else
+			 	serveError(404);
+		}
+		// locationConfig->tryFiles.setFallBackUri(locationConfig->root + *it)
+		// serverConfig.
 		std::string	path = locationConfig->root + request.getUri();
 		if (!fileExists(path))
 			return serveError(404);
