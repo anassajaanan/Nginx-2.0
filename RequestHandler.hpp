@@ -60,6 +60,10 @@ public:
 	HttpResponse	handleRequest(HttpRequest &request);
 	
 	HttpResponse	serveError(int statusCode);
+
+	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
+
+	HttpResponse	serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request);
 };
 
 

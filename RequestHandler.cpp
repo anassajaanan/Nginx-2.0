@@ -293,7 +293,92 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 			return handleReturnDirective(request, config);
 
 	if (config->tryFiles.isEnabled())
-		return handleTryFilesDirective(request, config);
+	{
+		std::string				tryFilesPath = config->root + request.getUri();
+		std::vector<std::string> tryFilesParameters = config->tryFiles.getPaths();
+		std::vector<std::string>::iterator it = tryFilesParameters.begin();
+		if (it == (config->tryFiles.getPaths()).end())
+			std::cout <<"Failed" << std::endl;
+		for (; it != tryFilesParameters.end(); it++)
+			std::cout << "{" << *it << "}" << std::endl;
+		it = tryFilesParameters.begin();
+		std::string				expandedUri;
+		if (it != (config->tryFiles.getPaths()).end())
+		{
+			std::cout << "len = " << tryFilesParameters.size() << std::endl;
+			int counter = 0;
+			while (counter < tryFilesParameters.size())
+			{
+				expandedUri = tryFilesParameters[counter];
+				replaceUri(expandedUri, "$uri", request.getUri());
+				tryFilesPath = config->root + expandedUri;
+				if (tryFilesPath.back() == '/' && tryFilesPath.back() - 1 == '/')
+					tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
+				if (tryFilesParameters[counter] == "$uri/") //remove extra slash
+				{
+					std::cout << "here  " << tryFilesPath << std::endl;
+					// std::cout << 
+					tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
+					std::cout << "after  " << tryFilesPath << std::endl;
+				}
+				std::cout << "saved = " << expandedUri << std::endl;
+				std::cout << "loop = " << tryFilesParameters[counter] << std::endl;
+				if (tryFilesParameters[counter] == "$uri")
+				{
+					std::cout << "path = " << tryFilesPath << std::endl;
+					if (!isDirectory(tryFilesPath) && fileExists(tryFilesPath))
+						return (serveFile(tryFilesPath));
+					std::cout << "after " << std::endl;
+				}
+				if (tryFilesParameters[counter] == "$uri/")
+				{
+					std::cout << "path dir = " << tryFilesPath << std::endl;
+					if (isDirectory(tryFilesPath))
+					{
+						// std::cout << "fdjk" << std::endl;
+						std::vector<std::string>::iterator	it = config->index.begin();
+						std::string							indexPath;
+
+						// for (;it != config->index.end(); it++)
+						// {
+						// 	indexPath = config->root + "/" + *it;
+						// 	std::cout << "index = " << indexPath << std::endl;
+						// 	if (!isDirectory(indexPath) && fileExists(indexPath))
+						// 		return (serveFile(indexPath));
+						// }
+						return (serveDirectoryTryFiles(config, request.getUri(), tryFilesPath, request));
+						// return (serveDirectory(config, request.getUri(), tryFilesPath, request));
+					}
+				}
+				// else
+				// if((tryFilesParameters[counter]).find_first_not_of("=") != std::string::npos)
+				// {
+					
+				// }
+				// else
+				// {
+				
+				// }
+				counter++;
+			}
+			if(config->tryFiles.getFallBackUri().empty())
+			{
+				std::cout << "error code" << std::endl;
+				return (serveError(config->tryFiles.getFallBackStatusCode()));
+			}
+			else
+			{
+				// if
+				// if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+				// 	return (serveError(505));
+				// request.incrementRecursionDepth();
+				// std::cout << "uri = " << config->root + "/" + config->tryFiles.getFallBackUri() << std::endl;
+				// request.setUri(config->root + "/" + config->tryFiles.getFallBackUri());
+				return (serveFile(config->root + "/" + config->tryFiles.getFallBackUri()));
+				// handleRequest(request);
+			}
+		}
+	}
 	
 
 	std::string	path = config->root + request.getUri();
@@ -334,3 +419,30 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	return (response);
 }
 
+void	RequestHandler::replaceUri(std::string &str, const std::string &replace, const std::string &to)
+{
+	size_t	i = 0;
+
+	i = str.find(replace, i);
+	while (i != std::string::npos)
+	{
+		str.replace(i, replace.length(), to);
+		i += replace.length();
+		i = str.find(replace, i);
+	}
+}
+
+HttpResponse	RequestHandler::serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request)
+{
+	std::vector<std::string>::iterator	it = config->index.begin();
+	std::string							indexPath;
+
+	for (;it != config->index.end(); it++)
+	{
+		indexPath = config->root + uri + *it;
+		std::cout << "index = " << indexPath << std::endl;
+		if (!isDirectory(indexPath) && fileExists(indexPath))
+			return (serveFile(indexPath));
+	}
+	return (serveError(403));
+}
