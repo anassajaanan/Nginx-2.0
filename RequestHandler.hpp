@@ -46,6 +46,10 @@ public:
 
 	bool			isRedirectStatusCode(int statusCode);
 
+	HttpResponse	serveDirectoryListing(const std::string &uri, const std::string &path);
+
+	HttpResponse	handleFallbackUri(HttpRequest &request, const std::string &fallback);
+
 	HttpResponse	handleReturnDirective(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);

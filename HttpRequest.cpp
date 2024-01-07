@@ -364,7 +364,7 @@ int	HttpRequest::getRecursionDepth() const
 	return (this->recursionDepth);
 }
 
-void	HttpRequest::increaseRecursionDepth()
+void	HttpRequest::incrementRecursionDepth()
 {
 	recursionDepth++;
 }

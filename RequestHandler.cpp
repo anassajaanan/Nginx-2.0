@@ -1,10 +1,6 @@
 #include "RequestHandler.hpp"
-#include "BaseConfig.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
-#include <cstddef>
-#include <iostream>
-#include <sys/_types/_size_t.h>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -118,9 +114,7 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	HttpResponse	response;
 
 	if (!fileExistsAndAccessible(path))
-	{
 		return serveError(403);
-	}
 	else
 	{
 		response.setVersion("HTTP/1.1");
@@ -171,6 +165,21 @@ HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::strin
 	return (response);
 }
 
+HttpResponse	RequestHandler::serveDirectoryListing(const std::string &uri, const std::string &path)
+{
+	HttpResponse	response;
+
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("200");
+	response.setStatusMessage("OK");
+	response.setBody(generateDirectoryListing(uri, path));
+	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	return (response);
+}
+
 HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *config)
 {
 	if (request.getUri().back() != '/')
@@ -178,13 +187,7 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 	for (size_t i = 0; i < config->index.size(); i++)
 	{
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
-		{
-			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-				return serveError(500);
-			request.increaseRecursionDepth();
-			request.setUri(config->index[i]);
-			return handleRequest(request);
-		}
+			return (handleFallbackUri(request, config->index[i]));
 		std::string indexPath = config->root + request.getUri() + "/" + config->index[i];
 		if (fileExists(indexPath))
 		{
@@ -200,19 +203,10 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 	if (config->autoindex == "off")
 		return serveError(403);
 	else
-	{
-		HttpResponse	response;
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode("200");
-		response.setStatusMessage("OK");
-		response.setBody(generateDirectoryListing(request.getUri(), config->root + request.getUri()));
-		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-		response.setHeader("Content-Type", "text/html");
-		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "keep-alive");
-		return (response);
-	}
+		return (serveDirectoryListing(request.getUri(), config->root + request.getUri()));
 }
+
+
 
 bool	RequestHandler::isRedirectStatusCode(int statusCode)
 {
@@ -281,13 +275,16 @@ HttpResponse	RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseC
 	if (config->tryFiles.getFallBackUri().empty())
 		return (serveError(config->tryFiles.getFallBackStatusCode()));
 	else
-	{
-		if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-			return (serveError(500));
-		request.increaseRecursionDepth();
-		request.setUri(config->tryFiles.getFallBackUri());
-		return (handleRequest(request));
-	}
+		return (handleFallbackUri(request, config->tryFiles.getFallBackUri()));
+}
+
+HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, const std::string &fallback)
+{
+	if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+		return (serveError(500));
+	request.incrementRecursionDepth();
+	request.setUri(fallback);
+	return (handleRequest(request));
 }
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)

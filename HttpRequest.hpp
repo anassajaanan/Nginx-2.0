@@ -65,7 +65,7 @@ public:
 	const std::string	&getHeader(const std::string &key) const;
 
 	int				getRecursionDepth() const;
-	void			increaseRecursionDepth();
+	void			incrementRecursionDepth();
 	
 	
 	int			getStatus() const;
