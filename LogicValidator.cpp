@@ -10,7 +10,6 @@ LogicValidator::LogicValidator()
 	possibleDirs["client_max_body_size"] = std::make_pair(OneArg, Independent); /*only one*/
 	possibleDirs["error_page"] = std::make_pair(TwoArgs, Independent); /*two or more*/
 	possibleDirs["try_files"] = std::make_pair(TwoOrMoreArgs, ParentNeeded); /*two or more*/
-	possibleDirs["rewrite"] = std::make_pair(TwoArgs, ParentNeeded); /* only 2*/
 	possibleDirs["index"] = std::make_pair(OneOrMoreArgs, Independent); /*one or more*/
 	possibleDirs["return"] = std::make_pair(OneOrTwoArgs, ParentNeeded); /*one or two*/
 }
@@ -51,11 +50,6 @@ void	LogicValidator::validateDirectiveParent(const std::string &key, const std::
 		{
 			if (parentName == "http")
 				throw (std::runtime_error("\"return\" directive is not allowed in this context"));
-		}
-		else if (key == "rewrite")
-		{
-			if (parentName == "http")
-				throw (std::runtime_error("\"rewrite\" directive is not allowed in this context"));
 		}
 }
 

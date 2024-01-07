@@ -144,9 +144,3 @@ void	BaseConfig::setReturn(const std::vector<std::string> &returnValues)
 		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 100 and 599)");
 	this->returnDirective.setStatusCode(codeInt);
 }
-
-void	BaseConfig::setRewrite(const std::vector<std::string> &rewriteValues)
-{
-	this->rewriteDirective.setPattern(rewriteValues[0]);
-	this->rewriteDirective.setSubstitution(rewriteValues[1]);
-}

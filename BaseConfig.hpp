@@ -9,7 +9,6 @@
 #include "DirectiveNode.hpp"
 #include "TryFilesDirective.hpp"
 #include "ReturnDirective.hpp"
-#include "RewriteDirective.hpp"
 
 #include <sstream>
 
@@ -32,7 +31,6 @@ public:
 	size_t									clientMaxBodySize;
 	TryFilesDirective						tryFiles;
 	ReturnDirective							returnDirective;
-	RewriteDirective						rewriteDirective;
 
 	void					setRoot(const std::string &rootValue);
 	void					setIndex(const std::vector<std::string> &indexValues);
@@ -41,7 +39,6 @@ public:
 	void					setClientMaxBodySize(const std::string &bodySize);
 	void					setTryFiles(const std::vector<std::string> &tryFilesValues);
 	void					setReturn(const std::vector<std::string> &returnValues);
-	void					setRewrite(const std::vector<std::string> &rewriteValues);
 
 };
 

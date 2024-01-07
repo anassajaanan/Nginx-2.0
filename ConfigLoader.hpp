@@ -28,7 +28,6 @@ private:
 
 public:
 	std::string						root;
-	// std::string						index;
 	std::vector<std::string>		index;
 	std::string						autoindex;
 	std::string						client_max_body_size;

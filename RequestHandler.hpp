@@ -47,15 +47,15 @@ public:
 
 	HttpResponse	handleFallbackUri(HttpRequest &request, const std::string &fallback);
 
-	HttpResponse	handleReturnDirective(HttpRequest &request, BaseConfig *config);
-
-	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);
-
-	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
+	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
 	HttpResponse	serveFile(const std::string& path);
 
-	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
+	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
+
+	HttpResponse	handleReturnDirective(HttpRequest &request, BaseConfig *config);
+
+	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleRequest(HttpRequest &request);
 	

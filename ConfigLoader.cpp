@@ -33,8 +33,6 @@ void ConfigLoader::processLocationNode(ContextNode* locationNode, LocationConfig
 				locationConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
 				locationConfig.setReturn(directive->getValues());
-			else if (directive->getKey() == "rewrite")
-				locationConfig.setRewrite(directive->getValues());
 		}
 	}
 }
@@ -66,8 +64,7 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 				serverConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
 				serverConfig.setReturn(directive->getValues());
-			else if (directive->getKey() == "rewrite")
-				serverConfig.setRewrite(directive->getValues());
+			
 		}
 		else
 		{
