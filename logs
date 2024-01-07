@@ -1,4 +1,7 @@
 Waiting for events
+nev: 0
+Events received => 
+Waiting for events
 nev: 1
 Events received => EVFILT_READ 
 
@@ -7,7 +10,7 @@ Waiting for events
 nev: 1
 Events received => EVFILT_READ 
 
-GET /content HTTP/1.1
+GET / HTTP/1.1
 User-Agent: PostmanRuntime/7.36.0
 Accept: */*
 Host: localhost:9000
@@ -28,12 +31,12 @@ Waiting for events
 nev: 1
 Events received => EVFILT_READ 
 
-GET /content/content/ HTTP/1.1
+GET /content/ HTTP/1.1
 User-Agent: PostmanRuntime/7.36.0
 Accept: */*
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
-Referer: http://localhost:9000/content
+Referer: http://localhost:9000/
 Host: localhost:9000
 
 
@@ -46,9 +49,6 @@ Events received => EVFILT_WRITE
 
 Handling client response
 Sending small file
-Waiting for events
-nev: 0
-Events received => 
 Waiting for events
 Signal 2 received
 Server destructor

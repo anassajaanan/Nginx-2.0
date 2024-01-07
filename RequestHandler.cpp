@@ -123,7 +123,6 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	}
 	else
 	{
-		// 200 OK
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
@@ -172,10 +171,10 @@ HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::strin
 	return (response);
 }
 
-HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request)
+HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *config)
 {
-	if (uri.back() != '/')
-		return sendRedirect(request, uri + "/");
+	if (request.getUri().back() != '/')
+		return sendRedirect(request, request.getUri() + "/");
 	for (size_t i = 0; i < config->index.size(); i++)
 	{
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
@@ -186,12 +185,15 @@ HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::strin
 			request.setUri(config->index[i]);
 			return handleRequest(request);
 		}
-		std::string indexPath = path + "/" + config->index[i];
+		std::string indexPath = config->root + request.getUri() + "/" + config->index[i];
 		if (fileExists(indexPath))
 		{
 			if (isDirectory(indexPath))
-				return serveDirectory(config, uri + config->index[i], indexPath, request);
-			else 
+			{
+				request.setUri(request.getUri() + config->index[i]);
+				return handleDirectory(request, config);
+			}
+			else
 				return serveFile(indexPath);
 		}
 	}
@@ -203,7 +205,7 @@ HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::strin
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
-		response.setBody(generateDirectoryListing(uri, path));
+		response.setBody(generateDirectoryListing(request.getUri(), config->root + request.getUri()));
 		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 		response.setHeader("Content-Type", "text/html");
 		response.setHeader("Server", "Nginx 2.0");
@@ -314,7 +316,7 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 	if (!fileExists(path))
 		return serveError(404);
 	if (isDirectory(path))
-		return serveDirectory(config, request.getUri(), path, request);
+		return handleDirectory(request, config);
 	else
 		return serveFile(path);
 }
