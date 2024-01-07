@@ -26,6 +26,9 @@ public:
 	bool					isEnabled() const;
 
 	const std::vector<std::string>	&getPaths() const;
+	const std::string				&getFallBackUri()const;
+	int								getFallBackStatusCode() const;
+
 };
 
 

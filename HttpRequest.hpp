@@ -15,6 +15,8 @@
 #include <stdexcept>
 #include <vector>
 
+#define MAX_RECURSION_DEPTH 10
+
 
 class HttpRequest
 {
@@ -28,9 +30,10 @@ private:
 		std::string							body;
 		
 		int									status;
+
+		int 								recursionDepth;
 		
 		void				setMethod(const std::string &str);
-		void				setUri(const std::string &str);
 		void				setVersion(const std::string &str);
 		void				setHost(const std::string &hostName);
 
@@ -56,11 +59,13 @@ public:
 
 	const std::string	&getMethod() const;
 	const std::string	&getUri() const;
+	void				setUri(const std::string &str);
 	const std::string	&getVersion() const;
 	const std::string	&getHost() const;
 	const std::string	&getHeader(const std::string &key) const;
 
-
+	int				getRecursionDepth() const;
+	void			increaseRecursionDepth();
 	
 	
 	int			getStatus() const;

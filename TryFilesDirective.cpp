@@ -30,6 +30,16 @@ bool	TryFilesDirective::isEnabled() const
 	return (this->_isEnabled);
 }
 
+const std::string	&TryFilesDirective::getFallBackUri()const
+{
+	return (this->fallBackUri);
+}
+
+int		TryFilesDirective::getFallBackStatusCode() const
+{
+	return (this->fallBackStatusCode);
+}
+
 const std::vector<std::string>	&TryFilesDirective::getPaths() const
 {
 	return (this->paths);

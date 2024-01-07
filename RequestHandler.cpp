@@ -1,8 +1,15 @@
 #include "RequestHandler.hpp"
+#include "BaseConfig.hpp"
+#include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include <algorithm>
+#include <cstddef>
 #include <iostream>
+#include <cstring>
 #include <sstream>
 #include <string>
+#include <variant>
+#include <vector>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -154,22 +161,50 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 	return (response);
 }
 
-HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path)
+HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::string &url)
 {
 	HttpResponse	response;
 
+	std::string locationHeader = "http://" + request.getHeader("Host") + url;
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("301");
+	response.setStatusMessage("Moved Permanently");
+	response.setHeader("Location", locationHeader);
+	response.setHeader("Content-Length", "0");
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	return (response);
+}
+
+HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request)
+{
+	if (uri.back() != '/')
+		return sendRedirect(request, uri + "/");
 	for (size_t i = 0; i < config->index.size(); i++)
 	{
+		if (i == config->index.size() - 1 && config->index[i][0] == '/')
+		{
+			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+				return serveError(500);
+			request.increaseRecursionDepth();
+			request.setUri(config->index[i]);
+			return handleRequest(request);
+		}
 		std::string indexPath = path + "/" + config->index[i];
 		if (fileExists(indexPath))
-			return serveFile(indexPath);
-		if (config->index[i][0] == '/')
-			return serveError(404);
+		{
+			if (isDirectory(indexPath))
+				return serveDirectory(config, uri + config->index[i], indexPath, request);
+			else 
+				return serveFile(indexPath);
+		}
 	}
 	if (config->autoindex == "off")
 		return serveError(403);
 	else
 	{
+		HttpResponse	response;
 		response.setVersion("HTTP/1.1");
 		response.setStatusCode("200");
 		response.setStatusMessage("OK");
@@ -178,8 +213,8 @@ HttpResponse	RequestHandler::serveDirectory(BaseConfig *config, const std::strin
 		response.setHeader("Content-Type", "text/html");
 		response.setHeader("Server", "Nginx 2.0");
 		response.setHeader("Connection", "keep-alive");
+		return (response);
 	}
-	return (response);
 }
 
 bool	RequestHandler::isRedirectStatusCode(int statusCode)
@@ -190,8 +225,8 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 }
 
 // Handle double quotes in the return directive
-// HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, const HttpRequest &request)
-HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, const HttpRequest &request)
+// HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, HttpRequest &request)
+HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, HttpRequest &request)
 {
 	HttpResponse	response;
 	if (isRedirectStatusCode(statusCode))
@@ -228,7 +263,7 @@ HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::str
 
 
 
-HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
+HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
@@ -240,11 +275,11 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 		return serveReturnDirective(statusCode, responseTextOrUrl, request);
 	}
 
-
+	BaseConfig		*config = NULL;
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 	if (locationConfig)
 	{
-
+		config = locationConfig;
 		// Location Level Config should process the request
 		
 		// check if return directive is enabled, if yes, return the response
@@ -254,25 +289,78 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 			const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
 			return serveReturnDirective(statusCode, responseTextOrUrl, request);
 		}
-		// std::cout << "herere" << std::endl;
-		// handle try_files directive
-		std::string				tryFilesPath = locationConfig->root + request.getUri();
-		std::vector<std::string> tryFilesParameters = locationConfig->tryFiles.getPaths();
-		std::vector<std::string>::iterator it = tryFilesParameters.begin();
-		while (it + 1 != locationConfig->tryFiles.getPaths().end())
+		
+	}
+	else
+	{
+		config = &serverConfig;
+	}
+	
+	// std::cout << "herere" << std::endl;
+	// handle try_files directive
+	std::string				tryFilesPath = config->root + request.getUri();
+	std::vector<std::string> tryFilesParameters = config->tryFiles.getPaths();
+	// std::cout << "here = " << tryFilesParameters[0] << std::endl;
+	std::vector<std::string>::iterator it = tryFilesParameters.begin();
+	if (it == (config->tryFiles.getPaths()).end())
+		std::cout <<"Failed" << std::endl;
+	for (; it != tryFilesParameters.end(); it++)
+		std::cout << "{" << *it << "}" << std::endl;
+	it = tryFilesParameters.begin();
+	std::string				expandedUri;
+	if (it != (config->tryFiles.getPaths()).end())
+	{
+		std::cout << "len = " << tryFilesParameters.size() << std::endl;
+		int counter = 0;
+		while (counter  < tryFilesParameters.size())
 		{
-			if (*it == "$uri")
+			// if (*it != tryFilesPath)
+			// std::cout << "try = " << *it << std::endl;
+			expandedUri = tryFilesParameters[counter];
+			replaceUri(expandedUri, "$uri", request.getUri());
+			// std::replace(expandedUri, expandedUri.end(), "$uri", request.getUri());
+			// if (std::strncmp((tryFilesParameters[counter]).c_str(), "$uri", 4) == 0)
+			// 	expandedUri = request.getUri();
+			// expandedUri
+			tryFilesPath = config->root + expandedUri;
+			if (tryFilesParameters[counter] == "$uri/") //remove extra slash
 			{
-				if (fileExists(tryFilesPath))
-					return (serveFile(tryFilesPath));
+				std::cout << "here  " << tryFilesPath << std::endl;
+				// std::cout << 
+				tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
+				std::cout << "after  " << tryFilesPath << std::endl;
 			}
-			else if (*it == "$uri/")
+			std::cout << "saved = " << expandedUri << std::endl;
+			std::cout << "loop = " << tryFilesParameters[counter] << std::endl;
+			if (tryFilesParameters[counter] == "$uri")
 			{
+				std::cout << "path = " << tryFilesPath << std::endl;
+				if (!isDirectory(tryFilesPath) && fileExists(tryFilesPath))
+					return (serveFile(tryFilesPath));
+				std::cout << "after " << std::endl;
+			}
+			if (tryFilesParameters[counter] == "$uri/")
+			{
+				std::cout << "path dir = " << tryFilesPath << std::endl;
 				if (isDirectory(tryFilesPath))
-					return (serveDirectory(locationConfig, request.getUri(), tryFilesPath));
+				{
+					std::cout << "fdjk" << std::endl;
+					std::vector<std::string>::iterator	it = config->index.begin();
+					std::string							indexPath;
+
+					for (;it != config->index.end(); it++)
+					{
+						indexPath = config->root + "/" + *it;
+						std::cout << "index = " << indexPath << std::endl;
+						if (!isDirectory(indexPath) && fileExists(indexPath))
+							return (serveFile(indexPath));
+					}
+					// return (serveDirectoryTryFiles(config, request.getUri(), tryFilesPath, request));
+					// return (serveDirectory(config, request.getUri(), tryFilesPath, request));
+				}
 			}
 			// else
-			// if((*it).find_first_not_of("=") != std::string::npos)
+			// if((tryFilesParameters[counter]).find_first_not_of("=") != std::string::npos)
 			// {
 				
 			// }
@@ -280,46 +368,27 @@ HttpResponse	RequestHandler::handleRequest(const HttpRequest &request)
 			// {
 			
 			// }
-			it++;
+			counter++;
 		}
-		if((*it).find_first_not_of("=") != std::string::npos)
-		{
-			std::string tryFilesStatus = (*it).substr(1, (*it).length());
-			std::stringstream		ss(tryFilesStatus);
-			int						statusNum;
-
-			ss >> statusNum;
-			return (serveError(statusNum));
-		}
+		if(config->tryFiles.getFallBackUri().empty())
+			return (serveError(config->tryFiles.getFallBackStatusCode()));
 		else
 		{
-			if (fileExists(locationConfig->root + (*it)))
-				serveFile(locationConfig->root + (*it));
-			else
-			 	serveError(404);
+			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+				return (serveError(505));
+			request.increaseRecursionDepth();
+			request.setUri(config->tryFiles.getFallBackUri());
+			handleRequest(request);
 		}
-		// locationConfig->tryFiles.setFallBackUri(locationConfig->root + *it)
-		// serverConfig.
-		std::string	path = locationConfig->root + request.getUri();
-		if (!fileExists(path))
-			return serveError(404);
-		if (isDirectory(path))
-			return serveDirectory(locationConfig, request.getUri(), path);
-		else
-			return serveFile(path);
 	}
+
+	std::string	path = config->root + request.getUri();
+	if (!fileExists(path))
+		return serveError(404);
+	if (isDirectory(path))
+		return serveDirectory(config, request.getUri(), path, request);
 	else
-	{
-		// handle try_files directive
-
-		std::string	path = serverConfig.root + request.getUri();
-		if (!fileExists(path))
-			return serveError(404);
-		if (isDirectory(path))
-			return serveDirectory(&serverConfig, request.getUri(), path);
-		else
-			return serveFile(path);
-	}
+		return serveFile(path);
 }
 
 HttpResponse	RequestHandler::serveError(int statusCode)
@@ -347,4 +416,32 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	return (response);
+}
+
+void	RequestHandler::replaceUri(std::string &str, const std::string &replace, const std::string &to)
+{
+	size_t	i = 0;
+
+	i = str.find(replace, i);
+	while (i != std::string::npos)
+	{
+		str.replace(i, replace.length(), to);
+		i += replace.length();
+		i = str.find(replace, i);
+	}
+}
+
+HttpResponse	RequestHandler::serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request)
+{
+	std::vector<std::string>::iterator	it = config->index.begin();
+	std::string							indexPath;
+
+	for (;it != config->index.end(); it++)
+	{
+		indexPath = config->root + "/" + *it;
+		std::cout << "index = " << indexPath << std::endl;
+		if (!isDirectory(indexPath) && fileExists(indexPath))
+			return (serveFile(indexPath));
+	}
+	return (serveError(403));
 }
