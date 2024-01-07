@@ -45,7 +45,11 @@ public:
 	
 
 	bool			isRedirectStatusCode(int statusCode);
-	HttpResponse	serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, HttpRequest &request);
+
+	HttpResponse	handleReturnDirective(HttpRequest &request, BaseConfig *config);
+
+	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);
+
 
 	HttpResponse	serveFile(const std::string& path);
 	HttpResponse	serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request);

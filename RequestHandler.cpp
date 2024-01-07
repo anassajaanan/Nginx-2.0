@@ -1,4 +1,6 @@
 #include "RequestHandler.hpp"
+#include "BaseConfig.hpp"
+#include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include <cstddef>
 #include <iostream>
@@ -217,11 +219,14 @@ bool	RequestHandler::isRedirectStatusCode(int statusCode)
 	return (false);
 }
 
-// Handle double quotes in the return directive
-// HttpResponse	RequestHandler::serveReturnDirective(const LocationConfig *locationConfig, HttpRequest &request)
-HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::string &responseTextOrUrl, HttpRequest &request)
+
+HttpResponse	RequestHandler::handleReturnDirective(HttpRequest &request, BaseConfig *config)
 {
 	HttpResponse	response;
+
+	int statusCode = config->returnDirective.getStatusCode();
+	const std::string &responseTextOrUrl = config->returnDirective.getResponseTextOrUrl();
+
 	if (isRedirectStatusCode(statusCode))
 	{
 		std::string httpScheme = "http://";
@@ -254,7 +259,34 @@ HttpResponse	RequestHandler::serveReturnDirective(int statusCode, const std::str
 	return (response);
 }
 
-
+HttpResponse	RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseConfig *config)
+{
+	std::vector<std::string> &tryFilesPaths = config->tryFiles.getPaths();
+	for (size_t i = 0; i < tryFilesPaths.size(); i++)
+	{
+		size_t pos = tryFilesPaths[i].find("$uri");
+		if (pos != std::string::npos)
+			tryFilesPaths[i].replace(pos, 4, request.getUri());
+		std::string	path = config->root + tryFilesPaths[i];
+		if (fileExists(path))
+		{
+			if (isDirectory(path) && path.back() == '/')
+				return sendRedirect(request, tryFilesPaths[i]);
+			else
+				return serveFile(path);
+		}
+	}
+	if (config->tryFiles.getFallBackUri().empty())
+		return (serveError(config->tryFiles.getFallBackStatusCode()));
+	else
+	{
+		if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+			return (serveError(500));
+		request.increaseRecursionDepth();
+		request.setUri(config->tryFiles.getFallBackUri());
+		return (handleRequest(request));
+	}
+}
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
@@ -262,71 +294,23 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return (serveError(request.getStatus()));
 	
 	if (serverConfig.returnDirective.isEnabled())
-	{
-		int statusCode = serverConfig.returnDirective.getStatusCode();
-		const std::string &responseTextOrUrl = serverConfig.returnDirective.getResponseTextOrUrl();
-		return serveReturnDirective(statusCode, responseTextOrUrl, request);
-	}
+		return handleReturnDirective(request, &serverConfig);
 
-	BaseConfig		*config = NULL;
+	BaseConfig		*config = &serverConfig;
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
-	if (locationConfig)
-	{
-		config = locationConfig;
-		// Location Level Config should process the request
-		
-		// check if return directive is enabled, if yes, return the response
-		if (locationConfig->returnDirective.isEnabled())
-		{
-			int statusCode = locationConfig->returnDirective.getStatusCode();
-			const std::string &responseTextOrUrl = locationConfig->returnDirective.getResponseTextOrUrl();
-			return serveReturnDirective(statusCode, responseTextOrUrl, request);
-		}
-		
-	}
-	else
-	{
-		config = &serverConfig;
-	}
 
+	if (locationConfig)
+		config = locationConfig;
+
+	if (config->returnDirective.isEnabled())
+			return handleReturnDirective(request, config);
 
 	if (config->tryFiles.isEnabled())
-	{
-		// std::string				tryFilesPath = config->root + request.getUri();
-		std::vector<std::string> &tryFilesPaths = config->tryFiles.getPaths();
-
-		
-		for (size_t i = 0; i < tryFilesPaths.size(); i++)
-		{
-
-			size_t pos = tryFilesPaths[i].find("$uri");
-			if (pos != std::string::npos)
-				tryFilesPaths[i].replace(pos, 4, request.getUri());
-
-			std::string	path = config->root + tryFilesPaths[i];
-
-			if (fileExists(path))
-			{
-				if (isDirectory(path) && path.back() == '/')
-					return sendRedirect(request, tryFilesPaths[i]);
-				else
-					return serveFile(path);
-			}
-		}
-		if (config->tryFiles.getFallBackUri().empty())
-			return (serveError(config->tryFiles.getFallBackStatusCode()));
-		else
-		{
-			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-				return (serveError(500));
-			request.increaseRecursionDepth();
-			request.setUri(config->tryFiles.getFallBackUri());
-			return (handleRequest(request));
-		}
-	}
+		return handleTryFilesDirective(request, config);
 	
 
 	std::string	path = config->root + request.getUri();
+
 	if (!fileExists(path))
 		return serveError(404);
 	if (isDirectory(path))
