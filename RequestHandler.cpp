@@ -1,13 +1,8 @@
 #include "RequestHandler.hpp"
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
-	: serverConfig(serverConfig), mimeTypes(mimeTypes)
-{
-	initStatusCodeMessages();
-}
+	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
 
 RequestHandler::~RequestHandler() { }
 
@@ -35,12 +30,6 @@ void	RequestHandler::initStatusCodeMessages()
 	statusCodeMessages[505] = "HTTP Version Not Supported";
 }
 
-
-std::string	RequestHandler::resolvePath(const std::string &uri)
-{
-	std::string path = serverConfig.root + uri;
-	return (path);
-}
 
 bool	RequestHandler::fileExists(const std::string &path)
 {
@@ -85,6 +74,14 @@ bool	RequestHandler::fileExistsAndAccessible(const std::string &path)
 	return (true);
 }
 
+bool	RequestHandler::isRedirectStatusCode(int statusCode)
+{
+	if (statusCode == 301 || statusCode == 302 || statusCode == 303
+		|| statusCode == 307 || statusCode == 308)
+		return (true);
+	return (false);
+}
+
 std::string	RequestHandler::generateDirectoryListing(const std::string &uri, const std::string &path)
 {
 	std::string htmlContent = "<html><head><title>Index of " + uri + "</title></head><body><h1>Index of " + uri + "</h1><hr><pre>";
@@ -108,6 +105,45 @@ std::string	RequestHandler::generateDirectoryListing(const std::string &uri, con
 	return (htmlContent);
 }
 
+HttpResponse	RequestHandler::serveDirectoryListing(const std::string &uri, const std::string &path)
+{
+	HttpResponse	response;
+
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("200");
+	response.setStatusMessage("OK");
+	response.setBody(generateDirectoryListing(uri, path));
+	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	return (response);
+}
+
+HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::string &url)
+{
+	HttpResponse	response;
+
+	std::string locationHeader = "http://" + request.getHeader("Host") + url;
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("301");
+	response.setStatusMessage("Moved Permanently");
+	response.setHeader("Location", locationHeader);
+	response.setHeader("Content-Length", "0");
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	return (response);
+}
+
+HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, const std::string &fallback)
+{
+	if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+		return (serveError(500));
+	request.incrementRecursionDepth();
+	request.setUri(fallback);
+	return (handleRequest(request));
+}
 
 HttpResponse	RequestHandler::serveFile(const std::string &path)
 {
@@ -143,40 +179,8 @@ HttpResponse	RequestHandler::serveFile(const std::string &path)
 			response.setHeader("Server", "Nginx 2.0");
 			response.setHeader("Connection", "keep-alive");
 			response.setHeader("Transfer-Encoding", "chunked");
-
 		}
 	}
-	return (response);
-}
-
-HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::string &url)
-{
-	HttpResponse	response;
-
-	std::string locationHeader = "http://" + request.getHeader("Host") + url;
-	response.setVersion("HTTP/1.1");
-	response.setStatusCode("301");
-	response.setStatusMessage("Moved Permanently");
-	response.setHeader("Location", locationHeader);
-	response.setHeader("Content-Length", "0");
-	response.setHeader("Content-Type", "text/html");
-	response.setHeader("Server", "Nginx 2.0");
-	response.setHeader("Connection", "keep-alive");
-	return (response);
-}
-
-HttpResponse	RequestHandler::serveDirectoryListing(const std::string &uri, const std::string &path)
-{
-	HttpResponse	response;
-
-	response.setVersion("HTTP/1.1");
-	response.setStatusCode("200");
-	response.setStatusMessage("OK");
-	response.setBody(generateDirectoryListing(uri, path));
-	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	response.setHeader("Content-Type", "text/html");
-	response.setHeader("Server", "Nginx 2.0");
-	response.setHeader("Connection", "keep-alive");
 	return (response);
 }
 
@@ -208,18 +212,11 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 
 
 
-bool	RequestHandler::isRedirectStatusCode(int statusCode)
-{
-	if (statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 307 || statusCode == 308)
-		return (true);
-	return (false);
-}
-
-
 HttpResponse	RequestHandler::handleReturnDirective(HttpRequest &request, BaseConfig *config)
 {
 	HttpResponse	response;
 
+	initStatusCodeMessages();
 	int statusCode = config->returnDirective.getStatusCode();
 	const std::string &responseTextOrUrl = config->returnDirective.getResponseTextOrUrl();
 
@@ -276,15 +273,6 @@ HttpResponse	RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseC
 		return (serveError(config->tryFiles.getFallBackStatusCode()));
 	else
 		return (handleFallbackUri(request, config->tryFiles.getFallBackUri()));
-}
-
-HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, const std::string &fallback)
-{
-	if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-		return (serveError(500));
-	request.incrementRecursionDepth();
-	request.setUri(fallback);
-	return (handleRequest(request));
 }
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)

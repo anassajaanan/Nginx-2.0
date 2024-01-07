@@ -21,30 +21,27 @@ class RequestHandler
 {
 
 private:
-	ServerConfig						&serverConfig;
+
+
 	MimeTypeParser						&mimeTypes;
+	ServerConfig						&serverConfig;
+
 	std::map<int, std::string>			statusCodeMessages;
 
-public:
-	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
-	~RequestHandler();
-
 	void			initStatusCodeMessages();
-
-	// facilitators
-	std::string		resolvePath(const std::string& uri);
 	bool			fileExists(const std::string& path);
 	bool			isDirectory(const std::string& path);
 	size_t			getFileSize(const std::string& path);
+	bool			fileExistsAndAccessible(const std::string &path);
+	bool			isRedirectStatusCode(int statusCode);
+
+public:
+
+	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
+	~RequestHandler();
+
 
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);
-
-	bool			fileExistsAndAccessible(const std::string &path);
-
-
-	
-
-	bool			isRedirectStatusCode(int statusCode);
 
 	HttpResponse	serveDirectoryListing(const std::string &uri, const std::string &path);
 
@@ -57,11 +54,12 @@ public:
 	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	serveFile(const std::string& path);
-	HttpResponse	serveError(int statusCode);
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
 	HttpResponse	handleRequest(HttpRequest &request);
+	
+	HttpResponse	serveError(int statusCode);
 };
 
 
