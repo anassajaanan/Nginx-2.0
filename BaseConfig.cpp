@@ -1,11 +1,11 @@
 #include "BaseConfig.hpp"
-#include <stdexcept>
-#include <sys/_types/_size_t.h>
 
 
 void	BaseConfig::setRoot(const std::string &rootValue)
 {
-	if (!rootValue.empty())
+	if (rootValue.back() == '/')
+		this->root = rootValue.substr(0, rootValue.size() - 1);
+	else
 		this->root = rootValue;
 }
 

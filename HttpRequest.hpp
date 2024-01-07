@@ -71,6 +71,9 @@ public:
 	int			getStatus() const;
 
 
+	void		normalizeUri();
+
+
 };
 
 

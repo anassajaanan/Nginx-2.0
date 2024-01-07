@@ -40,9 +40,7 @@ public:
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);
 
 	bool			fileExistsAndAccessible(const std::string &path);
-	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
 
-	// LocationConfig	*matchLocation(const std::string &uri);
 
 	
 
@@ -52,7 +50,6 @@ public:
 	HttpResponse	serveFile(const std::string& path);
 	HttpResponse	serveDirectory(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request);
 	HttpResponse	serveError(int statusCode);
-	HttpResponse	serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request);
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 

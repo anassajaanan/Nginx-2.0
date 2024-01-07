@@ -40,7 +40,7 @@ int		TryFilesDirective::getFallBackStatusCode() const
 	return (this->fallBackStatusCode);
 }
 
-const std::vector<std::string>	&TryFilesDirective::getPaths() const
+std::vector<std::string>	&TryFilesDirective::getPaths()
 {
 	return (this->paths);
 }

@@ -1,15 +1,8 @@
 #include "RequestHandler.hpp"
-#include "BaseConfig.hpp"
-#include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
-#include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include <cstring>
-#include <sstream>
-#include <string>
-#include <variant>
-#include <vector>
+#include <sys/_types/_size_t.h>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -295,92 +288,43 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 	{
 		config = &serverConfig;
 	}
-	
-	// std::cout << "herere" << std::endl;
-	// handle try_files directive
-	std::string				tryFilesPath = config->root + request.getUri();
-	std::vector<std::string> tryFilesParameters = config->tryFiles.getPaths();
-	// std::cout << "here = " << tryFilesParameters[0] << std::endl;
-	std::vector<std::string>::iterator it = tryFilesParameters.begin();
-	if (it == (config->tryFiles.getPaths()).end())
-		std::cout <<"Failed" << std::endl;
-	for (; it != tryFilesParameters.end(); it++)
-		std::cout << "{" << *it << "}" << std::endl;
-	it = tryFilesParameters.begin();
-	std::string				expandedUri;
-	if (it != (config->tryFiles.getPaths()).end())
-	{
-		std::cout << "len = " << tryFilesParameters.size() << std::endl;
-		int counter = 0;
-		while (counter  < tryFilesParameters.size())
-		{
-			// if (*it != tryFilesPath)
-			// std::cout << "try = " << *it << std::endl;
-			expandedUri = tryFilesParameters[counter];
-			replaceUri(expandedUri, "$uri", request.getUri());
-			// std::replace(expandedUri, expandedUri.end(), "$uri", request.getUri());
-			// if (std::strncmp((tryFilesParameters[counter]).c_str(), "$uri", 4) == 0)
-			// 	expandedUri = request.getUri();
-			// expandedUri
-			tryFilesPath = config->root + expandedUri;
-			if (tryFilesParameters[counter] == "$uri/") //remove extra slash
-			{
-				std::cout << "here  " << tryFilesPath << std::endl;
-				// std::cout << 
-				tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
-				std::cout << "after  " << tryFilesPath << std::endl;
-			}
-			std::cout << "saved = " << expandedUri << std::endl;
-			std::cout << "loop = " << tryFilesParameters[counter] << std::endl;
-			if (tryFilesParameters[counter] == "$uri")
-			{
-				std::cout << "path = " << tryFilesPath << std::endl;
-				if (!isDirectory(tryFilesPath) && fileExists(tryFilesPath))
-					return (serveFile(tryFilesPath));
-				std::cout << "after " << std::endl;
-			}
-			if (tryFilesParameters[counter] == "$uri/")
-			{
-				std::cout << "path dir = " << tryFilesPath << std::endl;
-				if (isDirectory(tryFilesPath))
-				{
-					std::cout << "fdjk" << std::endl;
-					std::vector<std::string>::iterator	it = config->index.begin();
-					std::string							indexPath;
 
-					for (;it != config->index.end(); it++)
-					{
-						indexPath = config->root + "/" + *it;
-						std::cout << "index = " << indexPath << std::endl;
-						if (!isDirectory(indexPath) && fileExists(indexPath))
-							return (serveFile(indexPath));
-					}
-					// return (serveDirectoryTryFiles(config, request.getUri(), tryFilesPath, request));
-					// return (serveDirectory(config, request.getUri(), tryFilesPath, request));
-				}
+
+	if (config->tryFiles.isEnabled())
+	{
+		// std::string				tryFilesPath = config->root + request.getUri();
+		std::vector<std::string> &tryFilesPaths = config->tryFiles.getPaths();
+
+		
+		for (size_t i = 0; i < tryFilesPaths.size(); i++)
+		{
+
+			size_t pos = tryFilesPaths[i].find("$uri");
+			if (pos != std::string::npos)
+				tryFilesPaths[i].replace(pos, 4, request.getUri());
+
+			std::string	path = config->root + tryFilesPaths[i];
+
+			if (fileExists(path))
+			{
+				if (isDirectory(path) && path.back() == '/')
+					return sendRedirect(request, tryFilesPaths[i]);
+				else
+					return serveFile(path);
 			}
-			// else
-			// if((tryFilesParameters[counter]).find_first_not_of("=") != std::string::npos)
-			// {
-				
-			// }
-			// else
-			// {
-			
-			// }
-			counter++;
 		}
-		if(config->tryFiles.getFallBackUri().empty())
+		if (config->tryFiles.getFallBackUri().empty())
 			return (serveError(config->tryFiles.getFallBackStatusCode()));
 		else
 		{
 			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-				return (serveError(505));
+				return (serveError(500));
 			request.increaseRecursionDepth();
 			request.setUri(config->tryFiles.getFallBackUri());
-			handleRequest(request);
+			return (handleRequest(request));
 		}
 	}
+	
 
 	std::string	path = config->root + request.getUri();
 	if (!fileExists(path))
@@ -395,7 +339,6 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 {
 	HttpResponse	response;
 
-	std::cout << "enetered here" << std::endl;
 	initStatusCodeMessages();
 	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
 		statusCode = 500;
@@ -415,33 +358,8 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
+	if (statusCode >= 500 && statusCode < 600 && statusCode != 503)
+		response.setHeader("Connection", "close");
 	return (response);
 }
 
-void	RequestHandler::replaceUri(std::string &str, const std::string &replace, const std::string &to)
-{
-	size_t	i = 0;
-
-	i = str.find(replace, i);
-	while (i != std::string::npos)
-	{
-		str.replace(i, replace.length(), to);
-		i += replace.length();
-		i = str.find(replace, i);
-	}
-}
-
-HttpResponse	RequestHandler::serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request)
-{
-	std::vector<std::string>::iterator	it = config->index.begin();
-	std::string							indexPath;
-
-	for (;it != config->index.end(); it++)
-	{
-		indexPath = config->root + "/" + *it;
-		std::cout << "index = " << indexPath << std::endl;
-		if (!isDirectory(indexPath) && fileExists(indexPath))
-			return (serveFile(indexPath));
-	}
-	return (serveError(403));
-}

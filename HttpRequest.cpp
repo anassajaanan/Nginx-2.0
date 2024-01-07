@@ -1,4 +1,6 @@
 #include "HttpRequest.hpp"
+#include <cstddef>
+#include <string>
 
 HttpRequest::HttpRequest(const std::string &requestStr)
 {
@@ -8,6 +10,7 @@ HttpRequest::HttpRequest(const std::string &requestStr)
 	this->status = 200;
 	this->recursionDepth = 0;
 	this->requestTokenizer(requestStr);
+	this->normalizeUri();
 }
 
 bool HttpRequest::requestTokenizer(const std::string &requestString)
@@ -364,4 +367,27 @@ int	HttpRequest::getRecursionDepth() const
 void	HttpRequest::increaseRecursionDepth()
 {
 	recursionDepth++;
+}
+
+void	HttpRequest::normalizeUri()
+{
+	std::string	normalizedUri;
+	bool	lastWasSlash = false;
+
+	for (size_t i = 0; i < uri.size(); i++)
+	{
+		if (uri[i] == '/')
+		{
+			if (!lastWasSlash)
+			{
+				normalizedUri += uri[i];
+				lastWasSlash = true;
+			}
+		}
+		else {
+			normalizedUri += uri[i];
+			lastWasSlash = false;
+		}
+	}
+	uri = normalizedUri;
 }
