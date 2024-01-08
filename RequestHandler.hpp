@@ -45,11 +45,11 @@ public:
 
 	HttpResponse	serveDirectoryListing(const std::string &uri, const std::string &path);
 
-	HttpResponse	handleFallbackUri(HttpRequest &request, const std::string &fallback);
+	HttpResponse	handleFallbackUri(HttpRequest &request, BaseConfig *config, const std::string &fallback);
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
-	HttpResponse	serveFile(const std::string& path);
+	HttpResponse	serveFile(BaseConfig *config, const std::string& path);
 
 	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
 
@@ -60,6 +60,7 @@ public:
 	HttpResponse	handleRequest(HttpRequest &request);
 	
 	HttpResponse	serveError(int statusCode);
+	HttpResponse	serveErrorPage(int statusCode, BaseConfig *config);
 
 	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
 
