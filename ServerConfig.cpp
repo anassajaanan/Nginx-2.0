@@ -13,10 +13,7 @@ ServerConfig::ServerConfig(const std::string &rootValue, const std::vector<std::
 	setAutoindex(autoindexValue);
 	setClientMaxBodySize(client_max_body_size);
 	for (size_t i = 0; i < errorPagesDirectives.size(); i++)
-	{
-		const std::vector<std::string> &values = errorPagesDirectives[i]->getValues();
-		setErrorPage(errorPagesDirectives[i]->getKey(), values[0]);
-	}
+		setErrorPage(errorPagesDirectives[i]->getValues(), "Http");
 }
 
 void	ServerConfig::setDefaultValues()

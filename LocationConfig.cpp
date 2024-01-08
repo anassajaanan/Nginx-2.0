@@ -10,6 +10,7 @@ LocationConfig::LocationConfig(const std::string &path, const ServerConfig &serv
 	this->index = serverConfig.index;
 	this->autoindex = serverConfig.autoindex;
 	this->errorPages = serverConfig.errorPages;
+	this->errorPagesContext = serverConfig.errorPagesContext;
 	this->clientMaxBodySize = serverConfig.clientMaxBodySize;
 }
 

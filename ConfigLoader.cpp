@@ -28,7 +28,7 @@ void ConfigLoader::processLocationNode(ContextNode* locationNode, LocationConfig
 			else if (directive->getKey() == "client_max_body_size")
 				locationConfig.setClientMaxBodySize(directive->getValues()[0]);
 			else if (directive->getKey() == "error_page")
-				locationConfig.setErrorPage(directive->getKey(), directive->getValues()[0]);
+				locationConfig.setErrorPage(directive->getValues(), "Location");
 			else if (directive->getKey() == "try_files")
 				locationConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
@@ -53,7 +53,7 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			else if (directive->getKey() == "client_max_body_size")
 				serverConfig.setClientMaxBodySize(directive->getValues()[0]);
 			else if (directive->getKey() == "error_page")
-				serverConfig.setErrorPage(directive->getKey(), directive->getValues()[0]);
+				serverConfig.setErrorPage(directive->getValues(), "Server");
 			else if (directive->getKey() == "root")
 				serverConfig.setRoot(directive->getValues()[0]);
 			else if (directive->getKey() == "index")
@@ -77,7 +77,6 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			}
 		}
 	}
-
 }
 
 void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConfig> &servers)
