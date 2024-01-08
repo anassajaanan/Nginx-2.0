@@ -36,6 +36,7 @@ public:
 	void					setIndex(const std::vector<std::string> &indexValues);
 	void					setAutoindex(const std::string &autoindexValue);
 	void					setErrorPage(const std::string &statusCode, const std::string &uri);
+	void					setErrorPage(const std::vector<std::string> &errorPageValues);
 	void					setClientMaxBodySize(const std::string &bodySize);
 	void					setTryFiles(const std::vector<std::string> &tryFilesValues);
 	void					setReturn(const std::vector<std::string> &returnValues);

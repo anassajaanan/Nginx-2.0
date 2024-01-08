@@ -1,0 +1,315 @@
+http {
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+		
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		try_files $uri $uri/ =413;
+
+	}
+}
+
+url: localhost:9999/content 
+
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www/content;
+
+		try_files $uri $uri/ =413;
+
+	}
+}
+
+localhost:9000/content
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		try_files index.html =413;
+
+	}
+}
+
+url: localhost:9000/
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		try_files /index.html =413;
+
+	}
+}
+
+url: localhost:9000/
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www/;
+
+		try_files /content/ =413;
+
+	}
+}
+
+url: localhost:9000/
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		try_files /content/index.html =413;
+
+	}
+}
+
+url: localhost:9000/
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		location /content {
+			try_files $uri $uri/ =413;
+		}
+
+	}
+}
+
+url: localhost:9000/
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		location /content {
+			try_files $uri $uri/ =413;
+		}
+
+	}
+}
+
+url: localhost:9000/content
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		location /content {
+			try_files /index2.html =413;
+		}
+
+	}
+}
+
+url: localhost:9000/content
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		location /content {
+			try_files /index22.html /anas =413;
+		}
+
+	}
+}
+
+url: localhost:9000/content
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		location /content {
+			try_files /index22.html /content/anas =413;
+		}
+
+		location /anas {
+			return 200 "Hello anas";
+		}
+
+	}
+}
+
+url: localhost:9000/content
+
+===================================================================================================
+
+http {
+
+
+
+	server
+	{
+		listen 127.0.0.1:9999;
+		server_name localhost;
+
+
+
+    	autoindex on;
+
+
+		root /goinfre/aajaanan/brew/var/www;
+
+		location /content {
+			try_files /index22.html /content/anas/anas.txt =413;
+		}
+
+		location /anas {
+			return 200 "Hello anas";
+		}
+
+	}
+}
+
+url: localhost:9000/content

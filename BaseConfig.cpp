@@ -48,6 +48,13 @@ void	BaseConfig::setErrorPage(const std::string &statusCode, const std::string &
 	errorPages[codeInt] = uri;
 }
 
+void	BaseConfig::setErrorPage(const std::vector<std::string> &errorPageValues)
+{
+	const std::string &fileOrUri = errorPageValues.back();
+	for (size_t i = 0; i < errorPageValues.size() - 1; i++)
+		setErrorPage(errorPageValues[i], fileOrUri);
+}
+
 void	BaseConfig::splitValueAndUnit(const std::string &bodySize, std::string &value, std::string &unit)
 {
 	size_t pos = bodySize.find_first_not_of("0123456789");
