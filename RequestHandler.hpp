@@ -49,7 +49,7 @@ public:
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
-	HttpResponse	serveFile(BaseConfig *config, const std::string& path);
+	HttpResponse	serveFile(HttpRequest &request, BaseConfig *config, const std::string& path);
 
 	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
 
@@ -60,7 +60,8 @@ public:
 	HttpResponse	handleRequest(HttpRequest &request);
 	
 	HttpResponse	serveError(int statusCode);
-	HttpResponse	serveErrorPage(int statusCode, BaseConfig *config);
+
+	HttpResponse	serveErrorPage(HttpRequest &request, BaseConfig *config, int statusCode);
 
 	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
 
