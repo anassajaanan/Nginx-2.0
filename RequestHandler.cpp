@@ -142,7 +142,7 @@ HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::strin
 HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, BaseConfig *config, const std::string &fallback)
 {
 	if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-		return (serveErrorPage(request, config, 500));
+		return (serveError(500));
 	request.incrementRecursionDepth();
 	request.setUri(fallback);
 	return (handleRequest(request));
@@ -415,6 +415,9 @@ HttpResponse	RequestHandler::serveErrorPage(HttpRequest &request, BaseConfig *co
 	else
 	{
 		// internal redirection
+		// config->errorPages.clear();
+		// config->errorPagesContext.clear();
+		
 		return (handleFallbackUri(request, config, errorPageFileOrUrl));
 	}
 }
