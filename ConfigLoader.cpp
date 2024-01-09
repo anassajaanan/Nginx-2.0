@@ -6,6 +6,7 @@ ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
 	this->root = DEFAULT_HTTP_ROOT_VALUE;
 	this->index.push_back(DEFAULT_HTTP_INDEX_VALUE);
 	this->autoindex = DEFAULT_HTTP_AUTOINDEX_VALUE;
+	this->keepalive_timeout = DEFAULT_HTTP_KEEPALIVE_TIMEOUT;
 	this->client_max_body_size = DEFAULT_HTTP_CLIENT_MAX_BODY_SIZE;
 	this->treeRoot = treeRoot;
 }
@@ -62,11 +63,12 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 				serverConfig.setIndex(directive->getValues());
 			else if (directive->getKey() == "autoindex")
 				serverConfig.setAutoindex(directive->getValues()[0]);
+			else if (directive->getKey() == "keepalive_timeout")
+				serverConfig.setKeepaliveTimeout(directive->getValues()[0]);
 			else if (directive->getKey() == "try_files")
 				serverConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
 				serverConfig.setReturn(directive->getValues());
-			
 		}
 		else
 		{
@@ -98,6 +100,8 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 				this->index = directive->getValues();
 			else if (directive->getKey() == "autoindex")
 				this->autoindex = directive->getValues()[0];
+			else if (directive->getKey() == "keepalive_timeout")
+				this->keepalive_timeout = directive->getValues()[0];
 			else if (directive->getKey() == "client_max_body_size")
 				this->client_max_body_size = directive->getValues()[0];
 			else if (directive->getKey() == "error_page")
@@ -108,7 +112,7 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 			ContextNode *serverNode = static_cast<ContextNode *>(httpChildren[i]);
 			if (serverNode->getName() == "server")
 			{
-				servers.push_back(ServerConfig(this->root, this->index, this->autoindex, this->client_max_body_size, this->errorPagesDirectives));
+				servers.push_back(ServerConfig(this->root, this->index, this->autoindex, this->keepalive_timeout, this->client_max_body_size, this->errorPagesDirectives));
 				ServerConfig &server = servers.back();
 				processServerNode(serverNode, server);
 			}

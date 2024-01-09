@@ -244,7 +244,7 @@ void	Server::checkForTimeouts()
 	std::map<int, ClientState *>::iterator it = _clients.begin();
 	while (it != _clients.end())
 	{
-		if (it->second->isTimedOut())
+		if (it->second->isTimedOut(this->_config.keepalive_timeout))
 		{
 			std::cerr << "Client timed out" << std::endl;
 			_kq.unregisterEvent(it->first, EVFILT_READ);
@@ -302,9 +302,9 @@ int		ClientState::getFd() const
 	return fd;
 }
 
-bool	ClientState::isTimedOut() const
+bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 {
-	std::chrono::seconds timeoutDuration(SERVER_TIMEOUT);
+	std::chrono::seconds timeoutDuration(keepalive_timeout);
 	std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
 	return (std::chrono::duration_cast<std::chrono::seconds>(now - lastRequestTime) > timeoutDuration);
 }

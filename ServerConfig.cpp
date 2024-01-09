@@ -1,16 +1,20 @@
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
+#include <stdexcept>
+#include <string>
+#include <sys/_types/_size_t.h>
 
 ServerConfig::ServerConfig() { }
 
 ServerConfig::ServerConfig(const std::string &rootValue, const std::vector<std::string> &indexValues,
-				const std::string &autoindexValue, const std::string &client_max_body_size,
+				const std::string &autoindexValue, const std::string &keepaliveValue, const std::string &client_max_body_size,
 				const std::vector<DirectiveNode *> &errorPagesDirectives)
 {
 	setDefaultValues();
 	setRoot(rootValue);
 	setIndex(indexValues);
 	setAutoindex(autoindexValue);
+	setKeepaliveTimeout(keepaliveValue);
 	setClientMaxBodySize(client_max_body_size);
 	for (size_t i = 0; i < errorPagesDirectives.size(); i++)
 		setErrorPage(errorPagesDirectives[i]->getValues(), "Http");
@@ -86,6 +90,26 @@ void	ServerConfig::setListen(const std::string &listenValue)
 void	ServerConfig::setServerName(const std::string &serverNameValue)
 {
 	this->serverName = serverNameValue;
+}
+
+void	ServerConfig::setKeepaliveTimeout(const std::string &keepaliveTimeoutValue)
+{
+	std::string	timeout = keepaliveTimeoutValue;
+	std::string unit;
+
+	size_t pos = keepaliveTimeoutValue.find_first_not_of("0123456789");
+	if (pos != std::string::npos)
+	{
+		if (pos == 0)
+			throw std::runtime_error("invalid value in \"keepalive_timeout\" directive: \"" + keepaliveTimeoutValue + "\"");
+		timeout = keepaliveTimeoutValue.substr(0, pos);
+		unit = keepaliveTimeoutValue.substr(pos);
+	}
+	if (!unit.empty() && unit != "s")
+		throw std::runtime_error("invalid unit in \"keepalive_timeout\" directive. It must be \"s\"");
+	this->keepalive_timeout = std::stoi(timeout);
+	if (this->keepalive_timeout < MIN_KEEPALIVE_TIMEOUT || this->keepalive_timeout > MAX_KEEPALIVE_TIMEOUT)
+		throw std::runtime_error("invalid value in \"keepalive_timeout\" directive: \"" + keepaliveTimeoutValue + "\", it must be between 5s and 300s");
 }
 
 void	ServerConfig::addLocation(const std::string &path, const LocationConfig &locationConfig)

@@ -16,6 +16,10 @@
 #define DEFAULT_SERVER_AUTOINDEX "off"
 #define DEFAULT_CLIENT_MAX_BODY_SIZE 1048576  // 1MB
 
+
+#define MIN_KEEPALIVE_TIMEOUT 5 // 5 seconds
+#define MAX_KEEPALIVE_TIMEOUT 300 // 5 minutes
+
 class LocationConfig;
 
 class ServerConfig : public BaseConfig
@@ -29,17 +33,19 @@ public:
 	int										port;
 	std::string								ipAddress;
 	std::string								serverName;
+	size_t									keepalive_timeout;
 	std::map<std::string, LocationConfig>	locations;
 
 	ServerConfig();
 	ServerConfig(const std::string &rootValue, const std::vector<std::string> &indexValues,
-				const std::string &autoindexValue, const std::string &client_max_body_size,
+				const std::string &autoindexValue, const std::string &keepaliveValue, const std::string &client_max_body_size,
 				const std::vector<DirectiveNode *> &errorPagesDirectives);
 
 	// setters
 	void					setDefaultValues();
 	void					setListen(const std::string &listenValue);
 	void					setServerName(const std::string &serverNameValue);
+	void					setKeepaliveTimeout(const std::string &keepaliveTimeoutValue);
 
 	void					addLocation(const std::string &path, const LocationConfig &locationConfig);
 
