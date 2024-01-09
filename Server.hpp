@@ -24,9 +24,6 @@
 
 #define SERVER_BACKLOG 30
 
-// #define SERVER_TIMEOUT 15
-
-// periodic timeout checking 
 #define SERVER_TIMEOUT_CHECK_INTERVAL 5 // 5 seconds
 
 

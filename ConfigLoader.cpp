@@ -1,4 +1,5 @@
 #include "ConfigLoader.hpp"
+#include "ConfigNode.hpp"
 
 
 ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
@@ -70,7 +71,10 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			else if (directive->getKey() == "return")
 				serverConfig.setReturn(directive->getValues());
 		}
-		else
+	}
+	for (size_t i = 0; i < serverChildren.size(); i++)
+	{
+		if (serverChildren[i]->getType() == Context)
 		{
 			ContextNode	*locationNode = static_cast<ContextNode *>(serverChildren[i]);
 			if (locationNode->getName() == "location")
@@ -107,7 +111,10 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 			else if (directive->getKey() == "error_page")
 				this->errorPagesDirectives.push_back(directive);
 		}
-		else
+	}
+	for (size_t i = 0; i < httpChildren.size(); i++)
+	{
+		if (httpChildren[i]->getType() == Context)
 		{
 			ContextNode *serverNode = static_cast<ContextNode *>(httpChildren[i]);
 			if (serverNode->getName() == "server")

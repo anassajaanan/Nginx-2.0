@@ -33,8 +33,8 @@ void	ConfigParser::readConfigFile()
 	{
 		if (line == "events { worker_connections  1024; }")
 			continue;
-		if (line == "		listen 127.0.0.1:9999;")
-			line = "		listen 127.0.0.1:9000;";
+		if (line == "		listen 9999;")
+			line = "		listen 9000;";
 		configFileContent += line + "\n";
 	}
 	file.close();
