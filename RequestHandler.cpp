@@ -1,7 +1,4 @@
 #include "RequestHandler.hpp"
-#include "BaseConfig.hpp"
-#include "HttpResponse.hpp"
-#include <string>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)

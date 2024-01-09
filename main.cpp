@@ -133,7 +133,8 @@ int main()
 		signal(SIGINT, signalHandler);
 		signal(SIGTERM, signalHandler);
 
-		ConfigParser parser("/goinfre/aajaanan/brew/etc/nginx/nginx.conf");
+		// ConfigParser parser("/goinfre/aajaanan/brew/etc/nginx/nginx.conf");
+		ConfigParser parser("./nginx.conf");
 		parser.parseConfigFile();
 
 		MimeTypeParser mimeTypeParser("mime.types");
