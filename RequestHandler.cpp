@@ -186,6 +186,7 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 
 HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *config)
 {
+	std::cout << "get uri = " << request.getUri() << std::endl;
 	if (request.getUri().back() != '/')
 		return sendRedirect(request, request.getUri() + "/");
 	for (size_t i = 0; i < config->index.size(); i++)
@@ -296,8 +297,9 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 	if (config->returnDirective.isEnabled())
 			return handleReturnDirective(request, config);
 
-	// if (config->tryFiles.isEnabled())
-	// {
+	if (config->tryFiles.isEnabled())
+	{
+		handleTryFilesDirective(request, config);
 		// std::string				tryFilesPath = config->root + request.getUri();
 		// std::vector<std::string> tryFilesParameters = config->tryFiles.getPaths();
 		// std::vector<std::string>::iterator it = tryFilesParameters.begin();
@@ -349,7 +351,7 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		// 		return (serveFile(config->root + "/" + config->tryFiles.getFallBackUri()));
 		// 	}
 		// }
-	// }
+	}
 	
 
 	std::string	path = config->root + request.getUri();
@@ -439,18 +441,18 @@ HttpResponse	RequestHandler::serveErrorPage(HttpRequest &request, BaseConfig *co
 // 	std::vector<std::string>::iterator	it = config->index.begin();
 // 	std::string							indexPath;
 
-// 	for (;it != config->index.end(); it++)
-// 	{
-// 		indexPath = config->root + uri + *it;
-// 		std::cout << "index = " << indexPath << std::endl;
-// 		if (!isDirectory(indexPath) && fileExists(indexPath))
-// 			return (serveFile(indexPath));
-// 	}
-// 	// if (autoindex is on serve it)
-// 	// 	return (autoindex);
-// 	std::cout << "issue" << std::endl;
-// 	return (serveError(403));
-// }
+	for (;it != config->index.end(); it++)
+	{
+		indexPath = config->root + uri + *it;
+		std::cout << "index = " << indexPath << std::endl;
+		if (!isDirectory(indexPath) && fileExists(indexPath))
+			return (serveFile(indexPath));
+	}
+	// if (autoindex is on serve it)
+	// 	return (autoindex);
+	std::cout << "issue" << std::endl;
+	return (serveError(403));
+}
 
 // HttpResponse RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseConfig *config)
 // {
