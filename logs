@@ -2,6 +2,141 @@ Waiting for events
 nev: 0
 Events received => 
 Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
+nev: 1
+Events received => EVFILT_READ 
+
+Accepting new connection
+Waiting for events
+nev: 1
+Events received => EVFILT_READ 
+
+GET / HTTP/1.1
+Host: localhost:9000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: none
+Sec-Fetch-User: ?1
+
+
+inside check
+received small file
+i went out
+Waiting for events
+nev: 1
+Events received => EVFILT_WRITE 
+
+Handling client response
+Sending small file
+Waiting for events
+nev: 1
+Events received => EVFILT_READ 
+
+GET /favicon.ico HTTP/1.1
+Host: localhost:9000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0
+Accept: image/avif,image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://localhost:9000/
+Sec-Fetch-Dest: image
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Site: same-origin
+
+
+inside check
+received small file
+i went out
+Waiting for events
+nev: 1
+Events received => EVFILT_WRITE 
+
+Handling client response
+Sending small file
+Waiting for events
+nev: 1
+Events received => EVFILT_READ 
+
+GET / HTTP/1.1
+Host: localhost:9000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: none
+Sec-Fetch-User: ?1
+
+
+inside check
+received small file
+i went out
+Waiting for events
+nev: 1
+Events received => EVFILT_WRITE 
+
+Handling client response
+Sending small file
+Waiting for events
+nev: 1
+Events received => EVFILT_READ 
+
+GET /favicon.ico HTTP/1.1
+Host: localhost:9000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/117.0
+Accept: image/avif,image/webp,*/*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Referer: http://localhost:9000/
+Sec-Fetch-Dest: image
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Site: same-origin
+
+
+inside check
+received small file
+i went out
+Waiting for events
+nev: 1
+Events received => EVFILT_WRITE 
+
+Handling client response
+Sending small file
+Waiting for events
+nev: 0
+Events received => 
+Waiting for events
 nev: 1
 Events received => EVFILT_READ 
 
@@ -13,6 +148,7 @@ Events received => EVFILT_READ
 GET / HTTP/1.1
 User-Agent: PostmanRuntime/7.36.0
 Accept: */*
+Cache-Control: no-cache
 Host: localhost:9000
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
@@ -31,24 +167,8 @@ Waiting for events
 nev: 1
 Events received => EVFILT_READ 
 
-GET /content/ HTTP/1.1
-User-Agent: PostmanRuntime/7.36.0
-Accept: */*
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive
-Referer: http://localhost:9000/
-Host: localhost:9000
-
-
-inside check
-received small file
-i went out
-Waiting for events
-nev: 1
-Events received => EVFILT_WRITE 
-
-Handling client response
-Sending small file
+Client disconnected
+Handling client disconnection
 Waiting for events
 Signal 2 received
 Server destructor

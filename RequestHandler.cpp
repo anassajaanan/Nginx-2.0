@@ -443,8 +443,7 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	HttpResponse	response;
 
 	initStatusCodeMessages();
-	if (statusCodeMessages.find(statusCode) == statusCodeMessages.end())
-		statusCode = 500;
+
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(statusCode));
 	response.setHeader("Content-Type", "text/plain");
