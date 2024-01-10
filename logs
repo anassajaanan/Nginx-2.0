@@ -18,7 +18,16 @@ Connection: keep-alive
 
 inside check
 get uri = /
-File size is small
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
+get uri = /index2.html/
 received small file
 i went out
 Waiting for events
@@ -27,6 +36,12 @@ Events received => EVFILT_WRITE
 
 Handling client response
 Sending small file
+Waiting for events
+nev: 1
+Events received => EVFILT_READ 
+
+Client disconnected
+Handling client disconnection
 Waiting for events
 Signal 2 received
 Server destructor

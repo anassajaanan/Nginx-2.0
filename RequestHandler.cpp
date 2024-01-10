@@ -208,13 +208,6 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
 			return (handleFallbackUri(request, config, config->index[i]));
 		std::string indexPath = config->root + request.getUri() + config->index[i];
-		// if (fileExists(indexPath))
-		// {
-		// 	if (isDirectory(indexPath))
-		// 		return (handleFallbackUri(request, config, request.getUri() + config->index[i]));
-		// 	else
-		// 		return serveFile(request, config, indexPath);
-		// }
 		if (pathExists(indexPath))
 		{
 			if (isDirectory(indexPath))
@@ -363,12 +356,13 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 	}
 	
 	std::string	path = config->root + request.getUri();
-	if (!fileExists(path))
-		return (serveErrorPage(request, config, 404));
-	if (isDirectory(path))
+	
+	if (path.back() == '/' || isDirectory(path))
 		return handleDirectory(request, config);
-	else
+	else if (fileExists(path))
 		return serveFile(request, config, path);
+	else
+		return (serveErrorPage(request, config, 404));
 }
 
 
