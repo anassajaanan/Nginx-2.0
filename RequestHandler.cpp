@@ -34,6 +34,20 @@ void	RequestHandler::initStatusCodeMessages()
 bool	RequestHandler::fileExists(const std::string &path)
 {
 	struct stat fileStat;
+
+	if (stat(path.c_str(), &fileStat) == 0)
+		return (true);
+	return (false);
+}
+
+bool	RequestHandler::pathExists(std::string path)
+{
+	struct stat fileStat;
+
+	size_t lastNonSlash = path.find_last_not_of('/');
+	if (lastNonSlash != std::string::npos)
+		path.erase(lastNonSlash + 1);
+
 	if (stat(path.c_str(), &fileStat) == 0)
 		return (true);
 	return (false);
@@ -194,12 +208,21 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
 			return (handleFallbackUri(request, config, config->index[i]));
 		std::string indexPath = config->root + request.getUri() + config->index[i];
-		if (fileExists(indexPath))
+		// if (fileExists(indexPath))
+		// {
+		// 	if (isDirectory(indexPath))
+		// 		return (handleFallbackUri(request, config, request.getUri() + config->index[i]));
+		// 	else
+		// 		return serveFile(request, config, indexPath);
+		// }
+		if (pathExists(indexPath))
 		{
 			if (isDirectory(indexPath))
 				return (handleFallbackUri(request, config, request.getUri() + config->index[i]));
-			else
+			else if (fileExists(indexPath))
 				return serveFile(request, config, indexPath);
+			else
+			 	return (serveErrorPage(request, config, 404));
 		}
 	}
 	if (config->autoindex == "off")
