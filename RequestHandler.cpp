@@ -200,9 +200,16 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 
 HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *config)
 {
-	std::cout << "get uri = " << request.getUri() << std::endl;
 	if (request.getUri().back() != '/')
 		return sendRedirect(request, request.getUri() + "/");
+
+	// handle single fallback uri
+	if (config->index.size() == 1 && config->index[0][0] == '/')
+		return (handleFallbackUri(request, config, config->index[0]));
+	
+	if (!isDirectory(config->root + request.getUri()))
+		return serveErrorPage(request, config, 404);
+
 	for (size_t i = 0; i < config->index.size(); i++)
 	{
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
@@ -215,9 +222,10 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 			else if (fileExists(indexPath))
 				return serveFile(request, config, indexPath);
 			else
-			 	return (serveErrorPage(request, config, 404));
+				return (serveErrorPage(request, config, 404));
 		}
 	}
+
 	if (config->autoindex == "off")
 		return serveErrorPage(request, config, 403);
 	else
