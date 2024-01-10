@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include "HttpResponse.hpp"
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -198,15 +199,24 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 	return (response);
 }
 
+HttpResponse	RequestHandler::handleAutoIndex(HttpRequest &request, BaseConfig *config)
+{
+	if (config->autoindex == "off")
+		return serveErrorPage(request, config, 403);
+	else
+	 	return (serveDirectoryListing(request.getUri(), config->root + request.getUri()));
+}
+
 HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *config)
 {
 	if (request.getUri().back() != '/')
 		return sendRedirect(request, request.getUri() + "/");
 
-	// handle single fallback uri
+	// Single fallback URI case
 	if (config->index.size() == 1 && config->index[0][0] == '/')
 		return (handleFallbackUri(request, config, config->index[0]));
 	
+	// Check if requested URI is a directory
 	if (!isDirectory(config->root + request.getUri()))
 		return serveErrorPage(request, config, 404);
 
@@ -226,10 +236,7 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 		}
 	}
 
-	if (config->autoindex == "off")
-		return serveErrorPage(request, config, 403);
-	else
-		return (serveDirectoryListing(request.getUri(), config->root + request.getUri()));
+	return (handleAutoIndex(request, config));
 }
 
 

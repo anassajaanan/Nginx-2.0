@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "BaseConfig.hpp"
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -40,6 +41,7 @@ public:
 	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
 	~RequestHandler();
 
+	HttpResponse	handleAutoIndex(HttpRequest &request, BaseConfig *config);
 
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);
 
