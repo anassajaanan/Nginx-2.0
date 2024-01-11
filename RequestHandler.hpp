@@ -65,6 +65,8 @@ public:
 
 	HttpResponse	serveErrorPage(HttpRequest &request, BaseConfig *config, int statusCode);
 
+	void			duplicateLocationSearch(std::string &path, std::string &location);
+
 	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
 
 	HttpResponse	serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request);

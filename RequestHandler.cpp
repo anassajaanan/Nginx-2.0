@@ -1,5 +1,7 @@
 #include "RequestHandler.hpp"
 #include "HttpResponse.hpp"
+#include <sstream>
+#include <string>
 
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -334,40 +336,31 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 				expandedUri = tryFilesParameters[counter];
 				replaceUri(expandedUri, "$uri", request.getUri());
 				tryFilesPath = config->root + expandedUri;
-				std::cout << "expan = " << expandedUri << std::endl;
-				if (tryFilesPath.back() == '/' && tryFilesPath.back() - 1 == '/')
-					tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
-				if (tryFilesParameters[counter] == "$uri/") //remove extra slash
+				if ((tryFilesPath.back() == '/' && tryFilesPath.back() - 1 == '/') || tryFilesParameters[counter] == "$uri/")
 					tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
 				if (fileExists(tryFilesPath) && !isDirectory(tryFilesPath))
 						return (serveFile(request, config, tryFilesPath));
 				else if (isDirectory(tryFilesPath))
 				{
-					if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-						break ;
-					request.incrementRecursionDepth();
-					request.setUri(expandedUri);
-					return (handleRequest(request));
+					if (tryFilesPath.back() == '/')
+						return sendRedirect(request, expandedUri);
+					if (request.getUri() == expandedUri)
+					{
+						if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
+							break ;
+						request.incrementRecursionDepth();
+						request.setUri(expandedUri);
+						return (handleRequest(request));
+					}
 				}
 				counter++;
 			}
 			if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH && isDirectory(tryFilesPath))
 				return (serveDirectoryTryFiles(config, request.getUri(), tryFilesPath, request));
 			if(config->tryFiles.getFallBackUri().empty())
-				// return (serveError(config->tryFiles.getFallBackStatusCode()));
 				return (serveErrorPage(request, config, config->tryFiles.getFallBackStatusCode()));
 			else
-			{
-				if (isDirectory(config->tryFiles.getFallBackUri()))
-				{
-					if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
-							return (serveError(500));
-					request.incrementRecursionDepth();
-					request.setUri(config->tryFiles.getFallBackUri());
-					 return (handleRequest(request));
-				}
-				return (serveFile(request, config, config->root + "/" + config->tryFiles.getFallBackUri()));
-			}
+				return (handleFallbackUri(request, config, config->tryFiles.getFallBackUri()));
 	}
 	
 	std::string	path = config->root + request.getUri();
@@ -380,7 +373,20 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return (serveErrorPage(request, config, 404));
 }
 
+void RequestHandler::duplicateLocationSearch(std::string &path, std::string &location)
+{
+	std::stringstream	ss;
+	std::string			directory;
 
+	if (path.empty())
+		return ;
+	while (std::getline(ss, directory, '/'))
+	{
+	}
+	if (directory == location)
+		path = path.substr(0, location.length());
+	// return true;
+}
 
 void	RequestHandler::replaceUri(std::string &str, const std::string &replace, const std::string &to)
 {
@@ -427,6 +433,7 @@ HttpResponse RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseC
 				expandedUri = tryFilesParameters[counter];
 				replaceUri(expandedUri, "$uri", request.getUri());
 				tryFilesPath = config->root + expandedUri;
+				std::cout << "config = " << config->root << std::endl;
 				if (tryFilesPath.back() == '/' && tryFilesPath.back() - 1 == '/')
 					tryFilesPath = tryFilesPath.substr(0, tryFilesPath.length() - 1);
 				if (tryFilesParameters[counter] == "$uri/") //remove extra slash
