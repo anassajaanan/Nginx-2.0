@@ -66,6 +66,7 @@ public:
 
 	int				getRecursionDepth() const;
 	void			incrementRecursionDepth();
+	void			setRecursionDepth(int depth);
 	
 	
 	int			getStatus() const;

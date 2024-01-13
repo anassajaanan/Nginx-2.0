@@ -369,6 +369,11 @@ void	HttpRequest::incrementRecursionDepth()
 	recursionDepth++;
 }
 
+void	HttpRequest::setRecursionDepth(int depth)
+{
+	this->recursionDepth = depth;
+}
+
 void	HttpRequest::normalizeUri()
 {
 	std::string	normalizedUri;

@@ -25,7 +25,6 @@ private:
 
 	MimeTypeParser						&mimeTypes;
 	ServerConfig						&serverConfig;
-
 	std::map<int, std::string>			statusCodeMessages;
 
 	void			initStatusCodeMessages();
@@ -35,15 +34,20 @@ private:
 	size_t			getFileSize(const std::string& path);
 	bool			fileExistsAndAccessible(const std::string &path);
 	bool			isRedirectStatusCode(int statusCode);
+	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
 
 public:
 
 	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
 	~RequestHandler();
 
-	HttpResponse	handleAutoIndex(HttpRequest &request, BaseConfig *config);
-
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);
+	
+	HttpResponse	serveError(int statusCode);
+
+	HttpResponse	handleErrorPage(HttpRequest &request, BaseConfig *config, int statusCode);
+
+	HttpResponse	handleAutoIndex(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	serveDirectoryListing(const std::string &uri, const std::string &path);
 
@@ -55,21 +59,16 @@ public:
 
 	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
 
+	HttpResponse	servePath(HttpRequest &request, BaseConfig *config);
+
 	HttpResponse	handleReturnDirective(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleRequest(HttpRequest &request);
-	
-	HttpResponse	serveError(int statusCode);
 
-	HttpResponse	serveErrorPage(HttpRequest &request, BaseConfig *config, int statusCode);
+	HttpResponse	handleGetRequest(HttpRequest &request);
 
-	void			duplicateLocationSearch(std::string &path, std::string &location);
-
-	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
-
-	HttpResponse	serveDirectoryTryFiles(BaseConfig *config, const std::string &uri, const std::string &path, HttpRequest &request);
 };
 
 
