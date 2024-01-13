@@ -25,7 +25,7 @@ void	RequestHandler::initStatusCodeMessages()
 	statusCodeMessages[401] = "Unauthorized";
 	statusCodeMessages[403] = "Forbidden";
 	statusCodeMessages[404] = "Not Found";
-	statusCodeMessages[405] = "HttpRequest Not Allowed";
+	statusCodeMessages[405] = "Method Not Allowed";
 	statusCodeMessages[413] = "Payload Too Large";
 	statusCodeMessages[500] = "Internal Server Error";
 	statusCodeMessages[501] = "Not Implemented";
@@ -410,7 +410,11 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 
 	if (locationConfig)
+	{
 		config = locationConfig;
+		if (locationConfig->isMethodAllowed(request.getMethod()) == false)
+			return (serveError(405));
+	}
 
 	if (config->returnDirective.isEnabled())
 			return handleReturnDirective(request, config);
