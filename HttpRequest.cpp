@@ -171,7 +171,7 @@ bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 			std::cout << "hererere" << std::endl;
 			return (this->setStatus(400), false);
 		}
-		this->headers.insert(std::pair<std::string, std::string>(token, value));
+		this->headers.insert(std::pair<std::string, std::string>(lowerString, value));
 	}
 	
 	if (!this->searchForHost())
