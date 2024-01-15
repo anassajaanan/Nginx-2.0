@@ -1,5 +1,7 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
+#include <sys/event.h>
+#include <unistd.h>
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq)
 {
@@ -90,36 +92,40 @@ void	Server::handleClientDisconnection(int clientSocket)
 
 void	Server::handleClientRequest(int clientSocket)
 {
-	char buffer[1024];
-	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+	char buffer[BUFFER_SIZE];
+	int bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
-		throw std::runtime_error("Error: recv failed");
-	buffer[bytesRead] = '\0';
+	{
+		// handle recv error
+		removeClient(clientSocket);
+		close(clientSocket);
+	}
 
-	// update client state
-	_clients[clientSocket]->updateLastRequestTime();
-	_clients[clientSocket]->incrementRequestCount();
+	if (bytesRead > 0)
+	{
+		ClientState *client = _clients[clientSocket];
+
+		client->updateLastRequestTime();
+		client->incrementRequestCount();
+
+
+	}
+}
+
+void	ClientState::processIncomingData(const char *buffer, int bytesRead)
+{
+	if (!areHeaderComplete)
+	{
+		requestHeaders.append(buffer, bytesRead);
+		if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
+			// handleHeaderSizeExceeded(fd);
+	}
+}
+
+void	Server::handleHeaderSizeExceeded(int clientSocket)
+{
+	removeClient(clientSocket);
 	
-	RequestHandler handler(_config, _mimeTypes);
-
-	HttpRequest newRequest(buffer);
-	HttpResponse response = handler.handleRequest(newRequest);
-
-	ResponseState *responseState;
-	if (response.getType() == SMALL_FILE)
-	{
-		std::cout << "received small file" << std::endl;
-		responseState = new ResponseState(response.buildResponse());
-	}
-	else 
-	{
-		std::cout << "received large file" << std::endl;
-		responseState = new ResponseState(response.buildResponseHeaders(), response.filePath, response.fileSize);
-	}
-	_responses[clientSocket] = responseState;
-
-	// register for write events
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
 void	Server::handleClientResponse(int clientSocket)
@@ -257,6 +263,14 @@ void	Server::checkForTimeouts()
 	}
 }
 
+void	Server::removeClient(int clientSocket)
+{
+	ClientState *clientState = _clients[clientSocket];
+	_kq.unregisterEvent(clientSocket, EVFILT_READ);
+	_clients.erase(clientSocket);
+	delete clientState;
+}
+
 
 void	Server::run()
 {
@@ -285,7 +299,8 @@ void	Server::stop()
 // #=================# ClientState #=================#
 
 ClientState::ClientState(int fd)
-	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0) { }
+	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0),
+	areHeaderComplete(false), isBodyComplete(false) { }
 
 void	ClientState::updateLastRequestTime()
 {

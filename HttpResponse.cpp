@@ -92,6 +92,22 @@ std::string HttpResponse::buildResponseHeaders() const
 	return this->getStatusLine() + "\r\n" + this->getHeadersAsString() + "\r\n";
 }
 
+
+void	HttpResponse::generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail)
+{
+	this->setVersion("HTTP/1.1");
+	this->setStatusCode(statusCode);
+	this->setStatusMessage(statusMessage);
+	this->setHeader("Content-Type", "text/html");
+	
+	std::string htmlBody = "<html><head><title>" + title + "</title></head>"
+                           "<body><center><h1>" + statusCode + " " + statusMessage + "</h1></center>"
+                           "<center>" + detail + "</center><hr><center>nginx 2.0</center></body></html>";
+	this->setBody(htmlBody);
+	this->setHeader("Content-Length", std::to_string(htmlBody.length()));
+	this->setHeader("Connection", "close");
+}
+
 // #======================# ResponseState #======================#
 
 ResponseState::ResponseState(const std::string &smallFileResponse)
