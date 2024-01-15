@@ -110,8 +110,8 @@ void	HttpResponse::generateStandardErrorResponse(const std::string &statusCode, 
 
 // #======================# ResponseState #======================#
 
-ResponseState::ResponseState(const std::string &smallFileResponse)
-	: type(SMALL_FILE), smallFileResponse(smallFileResponse) { }
+ResponseState::ResponseState(const std::string &smallFileResponse, bool closeConnection)
+	: type(SMALL_FILE), smallFileResponse(smallFileResponse), closeConnection(closeConnection) {}
 
 ResponseState::ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize)
 	: type(LARGE_FILE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0), isHeaderSent(false)

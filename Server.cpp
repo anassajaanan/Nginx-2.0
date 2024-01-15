@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 #include <sys/event.h>
 #include <unistd.h>
 
@@ -124,8 +125,12 @@ void	ClientState::processIncomingData(const char *buffer, int bytesRead)
 
 void	Server::handleHeaderSizeExceeded(int clientSocket)
 {
+	HttpResponse response;
+
+	response.generateStandardErrorResponse("400", "Bad Request", "400 Request Header Or Cookie Too Large", "Request Header Or Cookie Too Large");
+	ResponseState *responseState = new ResponseState(response.buildResponse());
 	removeClient(clientSocket);
-	
+
 }
 
 void	Server::handleClientResponse(int clientSocket)
