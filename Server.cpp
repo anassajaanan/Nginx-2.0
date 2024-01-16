@@ -113,7 +113,7 @@ void	Server::handleClientRequest(int clientSocket)
 		client->updateLastRequestTime();
 		client->incrementRequestCount();
 
-		std::cerr << "New Request comes: " << buffer << std::endl;
+		// std::cerr << "New Request comes: " << buffer << std::endl;
 
 		client->processIncomingData(*this, buffer, bytesRead);
 
@@ -193,6 +193,9 @@ void	ClientState::handlePostRequest(Server &server)
 		requestBodySize = std::stoll(request.getHeader("Content-Length"));
 		if (requestBodySize > server._config.clientMaxBodySize)
 		{
+			std::cerr << "Body of post request is grater than the client max body size" << std::endl;
+			std::cerr << "Body size: " << requestBodySize << std::endl;
+			std::cerr << "Client max body size: " << server._config.clientMaxBodySize << std::endl;
 			server.handleInvalidRequest(fd, 413);
 			return;
 		}

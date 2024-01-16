@@ -118,6 +118,7 @@ void	BaseConfig::setClientMaxBodySize(const std::string &bodySize)
 	// check for overflow
 	if (totalSize / multiplier != numericValue)
 		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
+	this->clientMaxBodySize = totalSize;
 }
 
 void	BaseConfig::processFallbackStatusCode(const std::string &statusCode)
