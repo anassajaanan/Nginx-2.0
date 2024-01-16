@@ -1,6 +1,4 @@
 #include "HttpRequest.hpp"
-#include <cstddef>
-#include <string>
 
 HttpRequest::HttpRequest(const std::string &requestStr)
 {
@@ -26,9 +24,8 @@ bool HttpRequest::requestTokenizer(const std::string &requestString)
 			requestVec.push_back(line);
 			break ;
 		}
-		if (line.empty())
-			return (this->setStatus(400), false);
-		requestVec.push_back(line);
+		if (!line.empty())
+			requestVec.push_back(line);
 		tmp = tmp.substr(tmp.find("\r\n") + 2, tmp.length());
 		if (tmp.empty() || tmp == "\r\n")
 			break ;
@@ -43,7 +40,7 @@ bool HttpRequest::requestTokenizer(const std::string &requestString)
 bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 {
 	if (requestLine.empty())
-		throw (std::runtime_error("Missing HttpRequest Type"));
+		return (this->setStatus(400), false);
 	std::string					token;
 	std::stringstream			ss(requestLine);
 	std::vector<std::string>	possibleHttpRequests;
@@ -108,7 +105,7 @@ bool	HttpRequest::checkDuplicatedHost()
 {
 	std::map<std::string, std::string>::iterator mapIt = this->headers.begin();
 	std::string	lowerKey;
-	std::cout << "inside check" << std::endl;
+	// std::cout << "inside check" << std::endl;
 	for (;mapIt != this->headers.end(); mapIt++)
 	{
 		lowerKey.resize(mapIt->first.size());
@@ -167,17 +164,29 @@ bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 				return ( this->setStatus(400), false);
 		}
 		if (lowerString == "host" && !this->checkDuplicatedHost())
-		{
-			std::cout << "hererere" << std::endl;
 			return (this->setStatus(400), false);
-		}
 		this->headers.insert(std::pair<std::string, std::string>(lowerString, value));
 	}
-	
 	if (!this->searchForHost())
 		return (this->setStatus(400), false);
-	this->setHost((this->headers.find("Host"))->second);
+	this->setHost((this->headers.find("host"))->second);
+	this->headers.insert(std::pair<std::string, std::string>("none", "none"));	
+	if (this->getMethod() == "POST")
+		if (!validatePostRequirements())
+			return (false);
 	return true;
+}
+
+bool		HttpRequest::validatePostRequirements()
+{
+	if (this->headers.find("content-length") == this->headers.end() && (this->headers.find("transfer-encoding") == this->headers.end() || this->headers.find("transfer-encoding")->second != "chunked"))
+		return (this->setStatus(411), false);
+	if (this->headers.find("content-length") != this->headers.end())
+	{
+		if (this->getHeader("content-length").find_first_not_of("0987654321") != std::string::npos)
+			return (this->setStatus(400), false);
+	}
+	return (true);
 }
 
 bool			HttpRequest::validateHost(std::string &hostName)
@@ -213,6 +222,7 @@ bool	HttpRequest::validateValue(std::string &hostName)
 {
 	std::string		value;
 	std::string		tmp;
+	int				index = 0;
 
 	value = hostName;
 	tmp = hostName;
@@ -224,6 +234,12 @@ bool	HttpRequest::validateValue(std::string &hostName)
 	if (tmp.find(':') == std::string::npos && tmp.find(' ') != std::string::npos)
 		return (false);
 	value = tmp.substr(tmp.find(':') + 1, tmp.length());
+	while (index < value.length() && value[index] == ' ')
+		index++;
+	value = value.substr(index, value.length());
+	if (value.empty())
+		return (false);
+	std::cout << "val = " << value  << " size = " << value.size() << std::endl;
 	if (value.empty() || value == hostName)
 		hostName = "";
 	else
@@ -309,11 +325,15 @@ void	HttpRequest::setHost(const std::string &hostName)
 
 const std::string	&HttpRequest::getHeader(const std::string &key) const
 {
-	static std::string	s = "";
+	std::string		lowerKey;
+
+	if (key.empty())
+		return (this->headers.find("none")->second);
+	lowerKey.resize(key.size());
+	std::transform(key.begin(), key.end(), lowerKey.begin(), ::tolower);
 	if (this->headers.find(key) != this->headers.end())
 		return (this->headers.find(key)->second);
-	else
-		return (s);
+	return (this->headers.find("none")->second);
 }
 
 
@@ -367,11 +387,6 @@ int	HttpRequest::getRecursionDepth() const
 void	HttpRequest::incrementRecursionDepth()
 {
 	recursionDepth++;
-}
-
-void	HttpRequest::setRecursionDepth(int depth)
-{
-	this->recursionDepth = depth;
 }
 
 void	HttpRequest::normalizeUri()

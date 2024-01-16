@@ -43,6 +43,7 @@ private:
 		bool						validateValue(std::string &hostName);
 		void						checkArgsNumber(const std::string &arg);
 		bool						searchForHost();
+		bool						validatePostRequirements();
 		bool						checkVersionNumber(const std::string &str);
 		bool						validateVersion(const std::string &version);
 		bool						requestTokenizer(const std::string &requestString);
