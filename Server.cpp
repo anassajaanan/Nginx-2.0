@@ -166,7 +166,8 @@ void	ClientState::parseHeaders(Server &server)
 
 void	ClientState::handleGetRequest(Server &server)
 {
-	if (!requestBody.empty() || request.getHeader("Content-Length") != "" || request.getHeader("Transfer-Encoding") == "chunked")
+
+	if (!requestBody.empty() || request.getHeader("Content-Length") != "none" || request.getHeader("Transfer-Encoding") == "chunked")
 		server.handleInvalidGetRequest(fd);
 	else
 		server.processGetRequest(fd, request);
@@ -186,6 +187,8 @@ void	ClientState::handlePostRequest(Server &server)
 	else
 	{
 		isChunked = false;
+		std::cerr << "this the value of Content-Length: " << request.getHeader("Content-Length") << std::endl;
+		std::cerr << "this the value of Content-Length: " << request.getHeader("content-length") << std::endl;
 		requestBodySize = std::stoll(request.getHeader("Content-Length"));
 		if (requestBodySize > server._config.clientMaxBodySize)
 		{

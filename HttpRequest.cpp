@@ -337,8 +337,8 @@ const std::string	&HttpRequest::getHeader(const std::string &key) const
 		return (this->headers.find("none")->second);
 	lowerKey.resize(key.size());
 	std::transform(key.begin(), key.end(), lowerKey.begin(), ::tolower);
-	if (this->headers.find(key) != this->headers.end())
-		return (this->headers.find(key)->second);
+	if (this->headers.find(lowerKey) != this->headers.end())
+		return (this->headers.find(lowerKey)->second);
 	return (this->headers.find("none")->second);
 }
 
