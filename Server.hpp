@@ -4,6 +4,7 @@
 #pragma once
 #include "HttpRequest.hpp"
 #include <string>
+#include <sys/_types/_size_t.h>
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -34,6 +35,8 @@
 
 // define max uri size as 4 KB
 #define MAX_URI_SIZE 4096 // 4 KB
+
+#define TEMP_FILE_DIRECTORY "/Users/aajaanan/goinfre/brew/var/uploads/"
 
 
 // class	ClientState
@@ -71,10 +74,11 @@ public:
 	ClientState(int fd);
 	~ClientState();
 
-	HttpRequest		*request;
+	HttpRequest		request;
 	std::string		requestHeaders;
 	std::string		requestBody;
 	std::ofstream	requestBodyFile;
+	size_t			requestBodySize;
 	std::string		requestBodyFilePath;
 	bool			areHeaderComplete;
 	bool			isBodyComplete;
@@ -91,7 +95,20 @@ public:
 
 	bool	headersCompleted(const char *buffer) const;
 
-	void 	processIncomingData(Server &server, const char *buffer, int bytesRead);
+	void	initializeBodyStorage(Server &server);
+
+	void	handleGetRequest(Server &server);
+	void	handlePostRequest(Server &server);
+
+	void	parseHeaders(Server &server);
+
+	void	processHeaders(Server &server, const char *buffer, size_t bytesRead);
+
+	void	processBody(Server &server, const char *buffer, size_t bytesRead);
+
+	void	processChunkedData(Server &server, const char *buffer, size_t bytesRead);
+
+	void 	processIncomingData(Server &server, const char *buffer, size_t bytesRead);
 };
 
 
@@ -130,10 +147,12 @@ public:
 	void	handleHeaderSizeExceeded(int clientSocket);
 	void	handleUriTooLarge(int clientSocket);
 	void	handleInvalidGetRequest(int clientSocket);
+	void	handleInvalidRequest(int clientSocket, int requestStatusCode);
+
 	void	processGetRequest(int clientSocket, HttpRequest &request);
+	void	processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection = false);
 
-	void	handleInvalidPostRequest(int clientSocket, int requestStatusCode);
-
+	
 
 	std::string	getStatusMessage(int statusCode);
 

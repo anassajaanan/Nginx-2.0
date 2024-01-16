@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "RequestHandler.hpp"
 #include <string>
 #include <sys/_types/_size_t.h>
 #include <sys/event.h>
@@ -96,7 +97,7 @@ void	Server::handleClientDisconnection(int clientSocket)
 void	Server::handleClientRequest(int clientSocket)
 {
 	char buffer[BUFFER_SIZE];
-	int bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
+	size_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
 	{
 		// handle recv error
@@ -112,59 +113,152 @@ void	Server::handleClientRequest(int clientSocket)
 		client->incrementRequestCount();
 
 
+		client->processIncomingData(*this, buffer, bytesRead);
+
 	}
 }
 
-void	ClientState::processIncomingData(Server &server, const char *buffer, int bytesRead)
+void	ClientState::processIncomingData(Server &server, const char *buffer, size_t bytesRead)
 {
 	if (!areHeaderComplete)
+		processHeaders(server, buffer, bytesRead);
+	else
+		processBody(server, buffer, bytesRead);
+}
+
+void	ClientState::processHeaders(Server &server, const char *buffer, size_t bytesRead)
+{
+	requestHeaders.append(buffer, bytesRead);
+	if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
 	{
-		requestHeaders.append(buffer, bytesRead);
-		if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
-		{
-			server.handleHeaderSizeExceeded(fd);
-			return;
-		}
-		if (headersCompleted(buffer))
-		{
-			areHeaderComplete = true;
-
-			// seperate headers and body
-			size_t endOfHeaders = requestHeaders.find("\r\n\r\n") + 4;
-			requestBody = requestHeaders.substr(endOfHeaders);
-			requestHeaders.resize(endOfHeaders);
-
-			this->request = new HttpRequest(requestHeaders);
-
-			if (request->getUri().size() > MAX_URI_SIZE)
-			{
-				server.handleUriTooLarge(fd);
-				return;
-			}
-
-			if (request->getMethod() == "GET")
-			{
-				if (!requestBody.empty() || request->getHeader("Content-Length") != "" || request->getHeader("Transfer-Encoding") == "chunked")
-				{
-					server.handleInvalidGetRequest(fd);
-					return;
-				}
-				server.processGetRequest(fd, *request);
-				return;
-			}
-
-			else if (request->getMethod() == "POST")
-			{
-				if (request->getStatus() != 200)
-				{
-					server.handleInvalidPostRequest(fd, request->getStatus());
-					return;
-				}
-			}
-		}
-
+		server.handleHeaderSizeExceeded(fd);
+		return;
+	}
+	if (headersCompleted(buffer))
+	{
+		areHeaderComplete = true;
+		parseHeaders(server);
 	}
 }
+
+void	ClientState::parseHeaders(Server &server)
+{
+	size_t endOfHeaders = requestHeaders.find("\r\n\r\n") + 4;
+	requestBody = requestHeaders.substr(endOfHeaders);
+	requestHeaders.resize(endOfHeaders);
+
+	this->request = HttpRequest(requestHeaders);
+
+	if (request.getUri().size() > MAX_URI_SIZE)
+	{
+		server.handleUriTooLarge(fd);
+		return;
+	}
+
+	if (request.getMethod() == "GET")
+		handleGetRequest(server);
+
+	else if (request.getMethod() == "POST")
+		handlePostRequest(server);
+	else
+		server.handleInvalidRequest(fd, 501);
+}
+
+void	ClientState::handleGetRequest(Server &server)
+{
+	if (!requestBody.empty() || request.getHeader("Content-Length") != "" || request.getHeader("Transfer-Encoding") == "chunked")
+		server.handleInvalidGetRequest(fd);
+	else
+		server.processGetRequest(fd, request);
+}
+
+
+
+void	ClientState::handlePostRequest(Server &server)
+{
+	if (request.getStatus() != 200)
+	{
+		server.handleInvalidRequest(fd, request.getStatus());
+		return;
+	}
+	if (request.getHeader("Transfer-Encoding") == "chunked")
+		isChunked = true;
+	else
+	{
+		isChunked = false;
+		requestBodySize = std::stoll(request.getHeader("Content-Length"));
+		if (requestBodySize > server._config.clientMaxBodySize)
+		{
+			server.handleInvalidRequest(fd, 413);
+			return;
+		}
+	}
+	initializeBodyStorage(server);
+	if (!requestBody.empty() && !isChunked)
+	{
+		requestBodyFile << requestBody;
+		requestBodyFile.flush();
+		requestBody.clear();
+	}
+}
+
+void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRead)
+{
+	if (!isChunked)
+	{
+		size_t remainingBodySize = requestBodySize - requestBodyFile.tellp();
+		if (bytesRead > remainingBodySize)
+		{
+			requestBodyFile.write(buffer, remainingBodySize);
+			requestBodyFile.close();
+			isBodyComplete = true;
+
+			server.removeClient(fd);
+			server.processPostRequest(fd, request, true);
+		}
+		else if (bytesRead == remainingBodySize)
+		{
+			requestBodyFile.write(buffer, bytesRead);
+			requestBodyFile.close();
+			isBodyComplete = true;
+			
+			server.processPostRequest(fd, request);
+		}
+		else
+			requestBodyFile.write(buffer, bytesRead);
+	}
+	else
+		processChunkedData(server, buffer, bytesRead);
+}
+
+
+void	ClientState::processChunkedData(Server &server, const char *buffer, size_t bytesRead)
+{
+	std::string chunk = buffer;
+	std::string chunkSizeHex = chunk.substr(0, chunk.find("\r\n"));
+	size_t chunkSize = std::stoll(chunkSizeHex, 0, 16);
+	if (chunkSize == 0)
+	{
+		isBodyComplete = true;
+		requestBodyFile.close();
+
+		server.removeClient(fd);
+		server.processPostRequest(fd, request, true);
+		return;
+	}
+	else 
+	{
+		chunk = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
+		requestBodyFile.write(chunk.c_str(), chunkSize);
+	}
+
+	if (requestBodyFile.tellp() > server._config.clientMaxBodySize)
+	{
+		server.handleInvalidRequest(fd, 413);
+		return;
+	}
+}
+
 
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
@@ -179,6 +273,19 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	else 
 		responseState = new ResponseState(response.buildResponseHeaders(), response.filePath, response.fileSize);
 	
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
+
+void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
+{
+	ResponseState *responseState;
+
+	RequestHandler handler(_config, _mimeTypes);
+	HttpResponse response = handler.handleRequest(request);
+
+	responseState = new ResponseState(response.buildResponseHeaders(), closeConnection);
+
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
@@ -217,8 +324,7 @@ void	Server::handleInvalidGetRequest(int clientSocket)
 }
 
 
-
-void	Server::handleInvalidPostRequest(int clientSocket, int requestStatusCode)
+void	Server::handleInvalidRequest(int clientSocket, int requestStatusCode)
 {
 	std::string statusCode = std::to_string(requestStatusCode);
 	std::string statusMessage = getStatusMessage(requestStatusCode);
@@ -422,6 +528,12 @@ ClientState::ClientState(int fd)
 	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0),
 	areHeaderComplete(false), isBodyComplete(false), request(NULL) { }
 
+ClientState::~ClientState()
+{
+	if (requestBodyFile.is_open())
+		requestBodyFile.close();
+}
+
 void	ClientState::updateLastRequestTime()
 {
 	lastRequestTime = std::chrono::steady_clock::now();
@@ -447,4 +559,16 @@ bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 bool	ClientState::headersCompleted(const char *buffer) const
 {
 	return (strstr(buffer, "\r\n\r\n") != NULL);
+}
+
+void	ClientState::initializeBodyStorage(Server &server)
+{
+	std::string filename = "post_body_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + "_" + std::to_string(fd) + ".tmp";
+	requestBodyFilePath = TEMP_FILE_DIRECTORY + filename;
+
+	requestBodyFile.open(requestBodyFilePath.c_str(), std::ios::out | std::ios::binary);
+	if (!requestBodyFile.is_open())
+	{
+		server.handleInvalidRequest(fd, 500);
+	}
 }
