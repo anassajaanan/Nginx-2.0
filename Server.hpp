@@ -109,6 +109,8 @@ public:
 	void	processChunkedData(Server &server, const char *buffer, size_t bytesRead);
 
 	void 	processIncomingData(Server &server, const char *buffer, size_t bytesRead);
+
+	void	resetClientState();
 };
 
 

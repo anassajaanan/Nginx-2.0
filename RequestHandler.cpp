@@ -447,7 +447,7 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		response.setHeader("Content-Length", std::to_string(body.length()));
 		response.setHeader("Content-Type", "text/html");
 		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "close");
+		response.setHeader("Connection", "keep-alive");
 		return (response);
 	}
 	else {

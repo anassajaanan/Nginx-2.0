@@ -285,7 +285,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
-
+	_clients[clientSocket]->resetClientState();
 	
 	if (response.getType() == SMALL_FILE)
 		responseState = new ResponseState(response.buildResponse());
@@ -294,6 +294,8 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+
+
 }
 
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
@@ -303,6 +305,7 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
+	_clients[clientSocket]->resetClientState();
 
 	responseState = new ResponseState(response.buildResponse(), closeConnection);
 
@@ -600,4 +603,17 @@ void	ClientState::initializeBodyStorage(Server &server)
 	{
 		server.handleInvalidRequest(fd, 500);
 	}
+}
+
+void	ClientState::resetClientState()
+{
+	requestHeaders.clear();
+	requestBody.clear();
+	if (requestBodyFile.is_open())
+		requestBodyFile.close();
+	requestBodySize = 0;
+	requestBodyFilePath.clear();
+	areHeaderComplete = false;
+	isBodyComplete = false;
+	isChunked = false;
 }
