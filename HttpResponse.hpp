@@ -54,7 +54,7 @@ class HttpResponse
 		std::string buildResponse() const; // for small files
 		std::string	buildResponseHeaders() const; // for large files
 
-		void	generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail);
+		void	generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail = "");
 
 };
 

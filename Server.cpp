@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include <sys/_types/_size_t.h>
 #include <sys/event.h>
 #include <unistd.h>
 
@@ -113,13 +114,36 @@ void	Server::handleClientRequest(int clientSocket)
 	}
 }
 
-void	ClientState::processIncomingData(const char *buffer, int bytesRead)
+void	ClientState::processIncomingData(Server &server, const char *buffer, int bytesRead)
 {
 	if (!areHeaderComplete)
 	{
 		requestHeaders.append(buffer, bytesRead);
 		if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
-			// handleHeaderSizeExceeded(fd);
+		{
+			server.handleHeaderSizeExceeded(fd);
+			return;
+		}
+		if (headersCompleted(buffer))
+		{
+			areHeaderComplete = true;
+
+			// seperate headers and body
+			size_t endOfHeaders = requestHeaders.find("\r\n\r\n") + 4;
+			requestBody = requestHeaders.substr(endOfHeaders);
+			requestHeaders.resize(endOfHeaders);
+
+			this->request = new HttpRequest(requestHeaders);
+
+			if (request->getUri().size() > MAX_URI_SIZE)
+			{
+				server.handleUriTooLarge(fd);
+				return;
+			}
+
+			
+		}
+
 	}
 }
 
@@ -127,10 +151,22 @@ void	Server::handleHeaderSizeExceeded(int clientSocket)
 {
 	HttpResponse response;
 
-	response.generateStandardErrorResponse("400", "Bad Request", "400 Request Header Or Cookie Too Large", "Request Header Or Cookie Too Large");
-	ResponseState *responseState = new ResponseState(response.buildResponse());
 	removeClient(clientSocket);
+	response.generateStandardErrorResponse("400", "Bad Request", "400 Request Header Or Cookie Too Large", "Request Header Or Cookie Too Large");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
 
+void	Server::handleUriTooLarge(int clientSocket)
+{
+	HttpResponse response;
+
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse("414", "Request-URI Too Large", "414 Request-URI Too Large");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
 void	Server::handleClientResponse(int clientSocket)
@@ -305,7 +341,7 @@ void	Server::stop()
 
 ClientState::ClientState(int fd)
 	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0),
-	areHeaderComplete(false), isBodyComplete(false) { }
+	areHeaderComplete(false), isBodyComplete(false), request(NULL) { }
 
 void	ClientState::updateLastRequestTime()
 {
@@ -327,4 +363,9 @@ bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 	std::chrono::seconds timeoutDuration(keepalive_timeout);
 	std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
 	return (std::chrono::duration_cast<std::chrono::seconds>(now - lastRequestTime) > timeoutDuration);
+}
+
+bool	ClientState::headersCompleted(const char *buffer) const
+{
+	return (strstr(buffer, "\r\n\r\n") != NULL);
 }

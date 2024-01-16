@@ -55,6 +55,8 @@
 
 // };	
 
+class Server;
+
 class ClientState
 {
 private:
@@ -70,6 +72,7 @@ public:
 
 	HttpRequest		*request;
 	std::string		requestHeaders;
+	std::string		requestBody;
 	std::ofstream	requestBodyFile;
 	std::string		requestBodyFilePath;
 	bool			areHeaderComplete;
@@ -85,8 +88,9 @@ public:
 	bool	isTimedOut(size_t keepalive_timeout) const;
 	int		getRequestCount() const;
 
+	bool	headersCompleted(const char *buffer) const;
 
-	void processIncomingData(const char *buffer, int bytesRead);
+	void 	processIncomingData(Server &server, const char *buffer, int bytesRead);
 };
 
 
@@ -123,6 +127,7 @@ public:
 
 	void	removeClient(int clientSocket);
 	void	handleHeaderSizeExceeded(int clientSocket);
+	void	handleUriTooLarge(int clientSocket);
 
 
 	void	run();
