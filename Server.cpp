@@ -196,11 +196,10 @@ void	ClientState::handlePostRequest(Server &server)
 		}
 	}
 	initializeBodyStorage(server);
-	if (!requestBody.empty() && !isChunked)
-		requestBodyFile << requestBody;
 	if (requestBody.size() == requestBodySize)
 	{
 		std::cerr << "Body of post request is completed from the first read" << std::endl;
+		requestBodyFile << requestBody;
 		requestBodyFile.close();
 		isBodyComplete = true;
 		server.processPostRequest(fd, request);
@@ -215,6 +214,7 @@ void	ClientState::handlePostRequest(Server &server)
 
 void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRead)
 {
+	std::cerr << "Processing body of post request" << std::endl;
 	if (!isChunked)
 	{
 		size_t remainingBodySize = requestBodySize - requestBodyFile.tellp();
