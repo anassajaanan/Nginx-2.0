@@ -1,5 +1,11 @@
 #include "HttpRequest.hpp"
 
+HttpRequest::HttpRequest()
+{
+	this->status = 200;
+	this->recursionDepth = 0;
+}
+
 HttpRequest::HttpRequest(const std::string &requestStr)
 {
 	if (requestStr.empty())

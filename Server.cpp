@@ -526,7 +526,7 @@ void	Server::stop()
 
 ClientState::ClientState(int fd)
 	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0),
-	areHeaderComplete(false), isBodyComplete(false), request(NULL) { }
+	areHeaderComplete(false), isBodyComplete(false) { }
 
 ClientState::~ClientState()
 {

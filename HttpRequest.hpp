@@ -54,6 +54,7 @@ private:
 
 		void				setStatus(const int statusNum);
 public:
+	HttpRequest();
 	HttpRequest(const std::string &requestStr);
 	~HttpRequest();
 
