@@ -186,10 +186,14 @@ void	ClientState::handlePostRequest(Server &server)
 		return;
 	}
 	if (request.getHeader("Transfer-Encoding") == "chunked")
-		isChunked = true;
+	{
+		// respond with 501
+		server.handleInvalidRequest(fd, 501);
+		return;
+	}
 	else
 	{
-		isChunked = false;
+		// isChunked = false;
 		requestBodySize = std::stoll(request.getHeader("Content-Length"));
 		if (requestBodySize > server._config.clientMaxBodySize)
 		{
@@ -201,110 +205,54 @@ void	ClientState::handlePostRequest(Server &server)
 		}
 	}
 	initializeBodyStorage(server);
-	if (!isChunked)
+	if (requestBody.size() == requestBodySize)
 	{
-		if (requestBody.size() == requestBodySize)
-		{
-			std::cerr << "Body of post request is completed from the first read" << std::endl;
-			requestBodyFile << requestBody;
-			requestBodyFile.close();
-			isBodyComplete = true;
-			server.processPostRequest(fd, request);
-		}
-		else if (requestBody.size() > requestBodySize)
-		{
-			std::cerr << "Body of post request is grater than the content length from the first read" << std::endl;
-			requestBodyFile.close();
-			server.handleInvalidRequest(fd, 400);
-		}
+		std::cerr << "Body of post request is completed from the first read" << std::endl;
+		requestBodyFile << requestBody;
+		requestBodyFile.close();
+		isBodyComplete = true;
+		server.processPostRequest(fd, request);
 	}
-	else
+	else if (requestBody.size() > requestBodySize)
 	{
-		std::cerr << "Processing chunked data of post request in the same read" << std::endl;
-		processChunkedData(server, requestBody.c_str(), requestBody.size());
+		std::cerr << "Body of post request is grater than the content length from the first read" << std::endl;
+		requestBodyFile.close();
+		server.handleInvalidRequest(fd, 400);
 	}
 }
 
 void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRead)
 {
 	std::cerr << "Processing body of post request" << std::endl;
-	if (!isChunked)
+	size_t remainingBodySize = requestBodySize - requestBodyFile.tellp();
+	if (bytesRead > remainingBodySize)
 	{
-		size_t remainingBodySize = requestBodySize - requestBodyFile.tellp();
-		if (bytesRead > remainingBodySize)
-		{
-			std::cerr << "Body of post request is grater than the content length" << std::endl;
-			requestBodyFile.write(buffer, remainingBodySize);
-			requestBodyFile.close();
-			isBodyComplete = true;
-
-			server.processPostRequest(fd, request, true);
-			server.removeClient(fd);
-		}
-		else if (bytesRead == remainingBodySize)
-		{
-			std::cerr << "Body of post request is completed" << std::endl;
-			requestBodyFile.write(buffer, bytesRead);
-			requestBodyFile.close();
-			isBodyComplete = true;
-			
-			server.processPostRequest(fd, request);
-		}
-		else
-		{
-			std::cerr << "Adding a new buffer to the body of post request" << std::endl;
-			requestBodyFile.write(buffer, bytesRead);
-		}
-	}
-	else
-		processChunkedData(server, buffer, bytesRead);
-}
-
-
-void	ClientState::processChunkedData(Server &server, const char *buffer, size_t bytesRead)
-{
-	std::string chunk(buffer, bytesRead);
-	std::cerr << "I receive this chunk: " << buffer << std::endl;
-	std::string chunkSizeHex = chunk.substr(0, chunk.find("\r\n"));
-	size_t chunkSize = std::stoll(chunkSizeHex, 0, 16);
-	if (chunkSize == 0)
-	{
-		std::cerr << "Zero length chunk is received of post request" << std::endl;
-		isBodyComplete = true;
+		std::cerr << "Body of post request is grater than the content length" << std::endl;
+		requestBodyFile.write(buffer, remainingBodySize);
 		requestBodyFile.close();
+		isBodyComplete = true;
 
-		
 		server.processPostRequest(fd, request, true);
 		server.removeClient(fd);
-		return;
 	}
-	else 
+	else if (bytesRead == remainingBodySize)
 	{
-		std::cerr << "A new chunk is received of post request" << std::endl;
-		// chunk = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
-		// requestBodyFile.write(chunk.c_str(), chunkSize);
-		std::string chunkBody = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
-		requestBodyFile.write(chunkBody.c_str(), chunkSize);
-		// update chunked data
-		chunk = chunk.substr(chunk.find("\r\n") + 2 + chunkSize + 2);
-	}
-
-	if (requestBodyFile.tellp() > server._config.clientMaxBodySize)
-	{
-		std::cerr << "Body of post request is grater than the client max body size" << std::endl;
-		server.handleInvalidRequest(fd, 413);
-		return;
-	}
-	if (chunk.size() > 0)
-	{
-		std::cerr << "There is a new chunk in the buffer of post request" << std::endl;
-		processChunkedData(server, chunk.c_str(), chunk.size());
+		std::cerr << "Body of post request is completed" << std::endl;
+		requestBodyFile.write(buffer, bytesRead);
+		requestBodyFile.close();
+		isBodyComplete = true;
+		
+		server.processPostRequest(fd, request);
 	}
 	else
 	{
-		std::cerr << "There is no new chunk in the buffer of post request" << std::endl;
+		std::cerr << "Adding a new buffer to the body of post request" << std::endl;
+		requestBodyFile.write(buffer, bytesRead);
 	}
 }
+
+
+
 
 
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
@@ -645,5 +593,4 @@ void	ClientState::resetClientState()
 	requestBodyFilePath.clear();
 	areHeaderComplete = false;
 	isBodyComplete = false;
-	isChunked = false;
 }

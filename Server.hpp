@@ -82,7 +82,7 @@ public:
 	std::string		requestBodyFilePath;
 	bool			areHeaderComplete;
 	bool			isBodyComplete;
-	bool			isChunked;
+	// bool			isChunked;
 
 
 
@@ -106,7 +106,6 @@ public:
 
 	void	processBody(Server &server, const char *buffer, size_t bytesRead);
 
-	void	processChunkedData(Server &server, const char *buffer, size_t bytesRead);
 
 	void 	processIncomingData(Server &server, const char *buffer, size_t bytesRead);
 
