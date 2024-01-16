@@ -2,6 +2,7 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "RequestHandler.hpp"
+#include <iostream>
 #include <string>
 #include <sys/_types/_size_t.h>
 #include <sys/event.h>
@@ -187,8 +188,6 @@ void	ClientState::handlePostRequest(Server &server)
 	else
 	{
 		isChunked = false;
-		std::cerr << "this the value of Content-Length: " << request.getHeader("Content-Length") << std::endl;
-		std::cerr << "this the value of Content-Length: " << request.getHeader("content-length") << std::endl;
 		requestBodySize = std::stoll(request.getHeader("Content-Length"));
 		if (requestBodySize > server._config.clientMaxBodySize)
 		{
@@ -198,10 +197,19 @@ void	ClientState::handlePostRequest(Server &server)
 	}
 	initializeBodyStorage(server);
 	if (!requestBody.empty() && !isChunked)
-	{
 		requestBodyFile << requestBody;
-		requestBodyFile.flush();
-		requestBody.clear();
+	if (requestBody.size() == requestBodySize)
+	{
+		std::cerr << "Body of post request is completed from the first read" << std::endl;
+		requestBodyFile.close();
+		isBodyComplete = true;
+		server.processPostRequest(fd, request);
+	}
+	else if (requestBody.size() > requestBodySize)
+	{
+		std::cerr << "Body of post request is grater than the content length from the first read" << std::endl;
+		requestBodyFile.close();
+		server.handleInvalidRequest(fd, 400);
 	}
 }
 
@@ -212,6 +220,7 @@ void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRe
 		size_t remainingBodySize = requestBodySize - requestBodyFile.tellp();
 		if (bytesRead > remainingBodySize)
 		{
+			std::cerr << "Body of post request is grater than the content length" << std::endl;
 			requestBodyFile.write(buffer, remainingBodySize);
 			requestBodyFile.close();
 			isBodyComplete = true;
@@ -221,6 +230,7 @@ void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRe
 		}
 		else if (bytesRead == remainingBodySize)
 		{
+			std::cerr << "Body of post request is completed" << std::endl;
 			requestBodyFile.write(buffer, bytesRead);
 			requestBodyFile.close();
 			isBodyComplete = true;
@@ -228,7 +238,10 @@ void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRe
 			server.processPostRequest(fd, request);
 		}
 		else
+		{
+			std::cerr << "Adding a new buffer to the body of post request" << std::endl;
 			requestBodyFile.write(buffer, bytesRead);
+		}
 	}
 	else
 		processChunkedData(server, buffer, bytesRead);
@@ -242,6 +255,7 @@ void	ClientState::processChunkedData(Server &server, const char *buffer, size_t 
 	size_t chunkSize = std::stoll(chunkSizeHex, 0, 16);
 	if (chunkSize == 0)
 	{
+		std::cerr << "Zero length chunk is received of post request" << std::endl;
 		isBodyComplete = true;
 		requestBodyFile.close();
 
@@ -251,12 +265,14 @@ void	ClientState::processChunkedData(Server &server, const char *buffer, size_t 
 	}
 	else 
 	{
+		std::cerr << "A new chunk is received of post request" << std::endl;
 		chunk = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
 		requestBodyFile.write(chunk.c_str(), chunkSize);
 	}
 
 	if (requestBodyFile.tellp() > server._config.clientMaxBodySize)
 	{
+		std::cerr << "Body of post request is grater than the client max body size" << std::endl;
 		server.handleInvalidRequest(fd, 413);
 		return;
 	}
@@ -274,7 +290,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	if (response.getType() == SMALL_FILE)
 		responseState = new ResponseState(response.buildResponse());
 	else 
-		responseState = new ResponseState(response.buildResponseHeaders(), response.filePath, response.fileSize);
+		responseState = new ResponseState(response.buildResponse(), response.filePath, response.fileSize);
 	
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
@@ -282,15 +298,18 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
+	std::cerr << "Processing post request" << std::endl;
 	ResponseState *responseState;
 
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
 
-	responseState = new ResponseState(response.buildResponseHeaders(), closeConnection);
+	responseState = new ResponseState(response.buildResponse(), closeConnection);
 
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+
+	std::cerr << "Post Request is processed" << std::endl;
 }
 
 void	Server::handleHeaderSizeExceeded(int clientSocket)
@@ -354,13 +373,20 @@ void	Server::handleClientResponse(int clientSocket)
 	{
 		std::cout << "Sending small file" << std::endl;
 		const std::string &response = responseState->getSmallFileResponse();
+
 		int bytesSent = send(clientSocket, response.c_str(), response.length(), 0);
 		if (bytesSent < 0)
 			throw std::runtime_error("Error: send failed");
 		if (bytesSent == (int)response.length())
 		{
+			std::cerr << "Small file sent completely" << std::endl;
 			_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
 			_responses.erase(clientSocket);
+			if (responseState->closeConnection)
+			{
+				std::cerr << "Closing connection after sending small response" << std::endl;
+				close(clientSocket);
+			}
 			delete responseState;
 		}
 	}

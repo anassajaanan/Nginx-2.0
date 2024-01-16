@@ -3,6 +3,7 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include <cstddef>
+#include <string>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
@@ -430,11 +431,30 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
+	
+	std::cerr << "RequestHandler is handling a request of type: " << request.getMethod() << std::endl;
+	if (request.getMethod() == "GET")
+		return (handleGetRequest(request));
+	else if (request.getMethod() == "POST")
+	{
+		HttpResponse response;
 
-	// if (request.getMethod() == "GET")
-	// 	return (handleGetRequest(request));
-	// else if (request.getMethod() == "POST")
-	// 	return (handlePostRequest(request))
-	return (handleGetRequest(request));
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode("200");
+		response.setStatusMessage("OK");
+		std::string body = "<h2>Your Post request was successful received and handled</h2>";
+		response.setBody(body);
+		response.setHeader("Content-Length", std::to_string(body.length()));
+		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "close");
+		return (response);
+	}
+	else {
+		return (serveError(405));
+	}
+
+
+	// return (handleGetRequest(request));
 }
 
