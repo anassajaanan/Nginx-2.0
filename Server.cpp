@@ -113,8 +113,10 @@ void	Server::handleClientRequest(int clientSocket)
 		client->updateLastRequestTime();
 		client->incrementRequestCount();
 
+		std::cerr << "New Request comes: " << buffer << std::endl;
 
 		client->processIncomingData(*this, buffer, bytesRead);
+
 
 	}
 }
@@ -196,19 +198,27 @@ void	ClientState::handlePostRequest(Server &server)
 		}
 	}
 	initializeBodyStorage(server);
-	if (requestBody.size() == requestBodySize)
+	if (!isChunked)
 	{
-		std::cerr << "Body of post request is completed from the first read" << std::endl;
-		requestBodyFile << requestBody;
-		requestBodyFile.close();
-		isBodyComplete = true;
-		server.processPostRequest(fd, request);
+		if (requestBody.size() == requestBodySize)
+		{
+			std::cerr << "Body of post request is completed from the first read" << std::endl;
+			requestBodyFile << requestBody;
+			requestBodyFile.close();
+			isBodyComplete = true;
+			server.processPostRequest(fd, request);
+		}
+		else if (requestBody.size() > requestBodySize)
+		{
+			std::cerr << "Body of post request is grater than the content length from the first read" << std::endl;
+			requestBodyFile.close();
+			server.handleInvalidRequest(fd, 400);
+		}
 	}
-	else if (requestBody.size() > requestBodySize)
+	else
 	{
-		std::cerr << "Body of post request is grater than the content length from the first read" << std::endl;
-		requestBodyFile.close();
-		server.handleInvalidRequest(fd, 400);
+		std::cerr << "Processing chunked data of post request in the same read" << std::endl;
+		processChunkedData(server, requestBody.c_str(), requestBody.size());
 	}
 }
 
@@ -225,8 +235,8 @@ void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRe
 			requestBodyFile.close();
 			isBodyComplete = true;
 
-			server.removeClient(fd);
 			server.processPostRequest(fd, request, true);
+			server.removeClient(fd);
 		}
 		else if (bytesRead == remainingBodySize)
 		{
@@ -250,7 +260,8 @@ void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRe
 
 void	ClientState::processChunkedData(Server &server, const char *buffer, size_t bytesRead)
 {
-	std::string chunk = buffer;
+	std::string chunk(buffer, bytesRead);
+	std::cerr << "I receive this chunk: " << buffer << std::endl;
 	std::string chunkSizeHex = chunk.substr(0, chunk.find("\r\n"));
 	size_t chunkSize = std::stoll(chunkSizeHex, 0, 16);
 	if (chunkSize == 0)
@@ -259,15 +270,20 @@ void	ClientState::processChunkedData(Server &server, const char *buffer, size_t 
 		isBodyComplete = true;
 		requestBodyFile.close();
 
-		server.removeClient(fd);
+		
 		server.processPostRequest(fd, request, true);
+		server.removeClient(fd);
 		return;
 	}
 	else 
 	{
 		std::cerr << "A new chunk is received of post request" << std::endl;
-		chunk = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
-		requestBodyFile.write(chunk.c_str(), chunkSize);
+		// chunk = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
+		// requestBodyFile.write(chunk.c_str(), chunkSize);
+		std::string chunkBody = chunk.substr(chunk.find("\r\n") + 2, chunkSize);
+		requestBodyFile.write(chunkBody.c_str(), chunkSize);
+		// update chunked data
+		chunk = chunk.substr(chunk.find("\r\n") + 2 + chunkSize + 2);
 	}
 
 	if (requestBodyFile.tellp() > server._config.clientMaxBodySize)
@@ -275,6 +291,15 @@ void	ClientState::processChunkedData(Server &server, const char *buffer, size_t 
 		std::cerr << "Body of post request is grater than the client max body size" << std::endl;
 		server.handleInvalidRequest(fd, 413);
 		return;
+	}
+	if (chunk.size() > 0)
+	{
+		std::cerr << "There is a new chunk in the buffer of post request" << std::endl;
+		processChunkedData(server, chunk.c_str(), chunk.size());
+	}
+	else
+	{
+		std::cerr << "There is no new chunk in the buffer of post request" << std::endl;
 	}
 }
 
@@ -305,7 +330,9 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
+
 	_clients[clientSocket]->resetClientState();
+	
 
 	responseState = new ResponseState(response.buildResponse(), closeConnection);
 
