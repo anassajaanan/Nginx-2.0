@@ -3,6 +3,7 @@
 
 #pragma once
 #include "HttpRequest.hpp"
+#include <string>
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -128,7 +129,13 @@ public:
 	void	removeClient(int clientSocket);
 	void	handleHeaderSizeExceeded(int clientSocket);
 	void	handleUriTooLarge(int clientSocket);
+	void	handleInvalidGetRequest(int clientSocket);
+	void	processGetRequest(int clientSocket, HttpRequest &request);
 
+	void	handleInvalidPostRequest(int clientSocket, int requestStatusCode);
+
+
+	std::string	getStatusMessage(int statusCode);
 
 	void	run();
 	void	stop();

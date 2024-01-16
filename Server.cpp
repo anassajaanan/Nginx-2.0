@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include <string>
 #include <sys/_types/_size_t.h>
 #include <sys/event.h>
 #include <unistd.h>
@@ -141,10 +142,45 @@ void	ClientState::processIncomingData(Server &server, const char *buffer, int by
 				return;
 			}
 
-			
+			if (request->getMethod() == "GET")
+			{
+				if (!requestBody.empty() || request->getHeader("Content-Length") != "" || request->getHeader("Transfer-Encoding") == "chunked")
+				{
+					server.handleInvalidGetRequest(fd);
+					return;
+				}
+				server.processGetRequest(fd, *request);
+				return;
+			}
+
+			else if (request->getMethod() == "POST")
+			{
+				if (request->getStatus() != 200)
+				{
+					server.handleInvalidPostRequest(fd, request->getStatus());
+					return;
+				}
+			}
 		}
 
 	}
+}
+
+void	Server::processGetRequest(int clientSocket, HttpRequest &request)
+{
+	ResponseState *responseState;
+
+	RequestHandler handler(_config, _mimeTypes);
+	HttpResponse response = handler.handleRequest(request);
+
+	
+	if (response.getType() == SMALL_FILE)
+		responseState = new ResponseState(response.buildResponse());
+	else 
+		responseState = new ResponseState(response.buildResponseHeaders(), response.filePath, response.fileSize);
+	
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
 void	Server::handleHeaderSizeExceeded(int clientSocket)
@@ -164,6 +200,32 @@ void	Server::handleUriTooLarge(int clientSocket)
 
 	removeClient(clientSocket);
 	response.generateStandardErrorResponse("414", "Request-URI Too Large", "414 Request-URI Too Large");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
+
+void	Server::handleInvalidGetRequest(int clientSocket)
+{
+	HttpResponse response;
+
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse("400", "Bad Request", "400 Invalid GET Request (with body indicators)", "Invalid GET Request (with body indicators)");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
+
+
+
+void	Server::handleInvalidPostRequest(int clientSocket, int requestStatusCode)
+{
+	std::string statusCode = std::to_string(requestStatusCode);
+	std::string statusMessage = getStatusMessage(requestStatusCode);
+
+	HttpResponse response;
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse(statusCode, statusMessage, statusCode + " " + statusMessage);
 	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
@@ -310,6 +372,23 @@ void	Server::removeClient(int clientSocket)
 	_kq.unregisterEvent(clientSocket, EVFILT_READ);
 	_clients.erase(clientSocket);
 	delete clientState;
+}
+
+std::string	Server::getStatusMessage(int statusCode)
+{
+	std::map<int, std::string>			statusCodeMessages;
+
+	statusCodeMessages[400] = "Bad Request";
+	statusCodeMessages[411] = "Length Required";
+	statusCodeMessages[413] = "Request Entity Too Large";
+	statusCodeMessages[414] = "Request-URI Too Large";
+	statusCodeMessages[500] = "Internal Server Error";
+	statusCodeMessages[501] = "Not Implemented";
+	statusCodeMessages[505] = "HTTP Version Not Supported";
+
+	if (statusCodeMessages.count(statusCode) == 0)
+		return "";
+	return statusCodeMessages[statusCode];
 }
 
 

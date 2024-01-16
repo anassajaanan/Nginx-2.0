@@ -63,7 +63,7 @@ class ResponseState
 
 public:
 
-	ResponseState(const std::string &smallFileResponse, bool closeConnection); // small file
+	ResponseState(const std::string &smallFileResponse, bool closeConnection = false); // small file
 	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large file
 
 	ResponseType		getType() const;
