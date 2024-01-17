@@ -151,8 +151,14 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 		if (statusCode >= 400 && statusCode < 600) // Client Response Error or Server Response Error
 		{
 			response.setHeader("Content-Type", "text/html");
-			response.setBody("<html><body><h1>" + std::to_string(statusCode)
-				+ " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+			// response.setBody("<html><body><h1>" + std::to_string(statusCode)
+			// 	+ " " + statusCodeMessages[statusCode] + "</h1></body></html>");
+			std::string code = std::to_string(statusCode);
+			std::string message = code + " " + statusCodeMessages[statusCode];
+			std::string htmlBody = "<html><head><title>" + message + "</title></head>"
+                           "<body><center><h1>" + message + "</h1></center>"
+                           "<hr><center>nginx 2.0</center></body></html>";
+			response.setBody(htmlBody);
 		}
 	}
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
@@ -404,6 +410,7 @@ HttpResponse RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseC
 
 HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 {
+	
 	if (serverConfig.returnDirective.isEnabled())
 		return handleReturnDirective(request, &serverConfig);
 
