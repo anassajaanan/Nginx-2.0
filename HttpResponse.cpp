@@ -1,7 +1,7 @@
 #include "HttpResponse.hpp"
 
 
-HttpResponse::HttpResponse(): type(SMALL_FILE) { }
+HttpResponse::HttpResponse(): type(SMALL_RESPONSE) { }
 
 
 void	HttpResponse::setType(ResponseType type)

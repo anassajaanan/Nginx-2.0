@@ -10,7 +10,7 @@
 
 #define CHUNK_SIZE  4096 // 4KB
 
-enum	ResponseType { SMALL_FILE, LARGE_FILE };
+enum	ResponseType { SMALL_RESPONSE, LARGE_RESPONSE };
 
 class HttpResponse
 {

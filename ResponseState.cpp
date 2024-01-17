@@ -1,10 +1,10 @@
 #include "ResponseState.hpp"
 
 ResponseState::ResponseState(const std::string &smallResponse, bool closeConnection)
-	: type(SMALL_FILE), smallResponse(smallResponse), closeConnection(closeConnection) {}
+	: type(SMALL_RESPONSE), smallResponse(smallResponse), closeConnection(closeConnection) {}
 
 ResponseState::ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize)
-	: type(LARGE_FILE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0), isHeaderSent(false)
+	: type(LARGE_RESPONSE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0), isHeaderSent(false)
 {
 	fileStream.open(filePath, std::ifstream::binary);
 }
@@ -26,7 +26,7 @@ const std::string &ResponseState::getHeaders() const
 
 std::string ResponseState::getNextChunk()
 {
-	if (type == LARGE_FILE && fileStream.is_open())
+	if (type == LARGE_RESPONSE && fileStream.is_open())
 	{
 		char buffer[CHUNK_SIZE];
 
@@ -41,7 +41,7 @@ std::string ResponseState::getNextChunk()
 
 bool ResponseState::isFinished() const
 {
-	if (type == LARGE_FILE)
+	if (type == LARGE_RESPONSE)
 		return (fileStream.eof() || bytesSent >= fileSize);
 	else
 		return true;

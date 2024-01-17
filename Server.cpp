@@ -123,7 +123,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	HttpResponse response = handler.handleRequest(request);
 	_clients[clientSocket]->resetClientState();
 	
-	if (response.getType() == SMALL_FILE)
+	if (response.getType() == SMALL_RESPONSE)
 		responseState = new ResponseState(response.buildResponse());
 	else 
 		responseState = new ResponseState(response.buildResponse(), response.filePath, response.fileSize);
@@ -210,7 +210,7 @@ void	Server::handleClientResponse(int clientSocket)
 	std::cout << "Handling client response" << std::endl;
 	ResponseState *responseState = _responses[clientSocket];
 
-	if (responseState->getType() == SMALL_FILE)
+	if (responseState->getType() == SMALL_RESPONSE)
 	{
 		std::cout << "Sending small file" << std::endl;
 		const std::string &response = responseState->getSmallResponse();
@@ -231,7 +231,7 @@ void	Server::handleClientResponse(int clientSocket)
 			delete responseState;
 		}
 	}
-	else if (responseState->getType() == LARGE_FILE)
+	else if (responseState->getType() == LARGE_RESPONSE)
 	{
 		// send headers first, then send file in chunks
 		if (!responseState->isHeaderSent)

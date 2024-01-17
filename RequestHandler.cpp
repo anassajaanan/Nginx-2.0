@@ -267,7 +267,7 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 			// send large file in chunks
 			response.filePath = path;
 			response.fileSize = fileSize;
-			response.setType(LARGE_FILE);
+			response.setType(LARGE_RESPONSE);
 			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
 			response.setHeader("Server", "Nginx 2.0");
 			response.setHeader("Connection", "keep-alive");

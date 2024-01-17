@@ -34,7 +34,7 @@ void	ConfigParser::readConfigFile()
 		if (line == "events { worker_connections  1024; }")
 			continue;
 		if (line == "		listen 9999;")
-			line = "		listen 9001;";
+			line = "		listen 9000;";
 		configFileContent += line + "\n";
 	}
 	file.close();
