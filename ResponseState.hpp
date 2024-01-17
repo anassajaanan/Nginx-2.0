@@ -12,12 +12,12 @@ class ResponseState
 
 public:
 
-	ResponseState(const std::string &smallFileResponse, bool closeConnection = false); // small file
-	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large file
+	ResponseState(const std::string &smallResponse, bool closeConnection = false); // small response
+	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large response
 
 	ResponseType		getType() const;
 
-	const std::string	&getSmallFileResponse() const;
+	const std::string	&getSmallResponse() const;
 	const std::string	&getHeaders() const;
 
 	std::string			getNextChunk();
@@ -29,7 +29,7 @@ public:
 
 private:
 	ResponseType	type;
-	std::string		smallFileResponse;
+	std::string		smallResponse;
 	std::string		headers;
 	std::string		filePath;
 	std::ifstream	fileStream;

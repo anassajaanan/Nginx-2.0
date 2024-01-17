@@ -213,7 +213,7 @@ void	Server::handleClientResponse(int clientSocket)
 	if (responseState->getType() == SMALL_FILE)
 	{
 		std::cout << "Sending small file" << std::endl;
-		const std::string &response = responseState->getSmallFileResponse();
+		const std::string &response = responseState->getSmallResponse();
 
 		int bytesSent = send(clientSocket, response.c_str(), response.length(), 0);
 		if (bytesSent < 0)

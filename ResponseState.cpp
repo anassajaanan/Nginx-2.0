@@ -1,7 +1,7 @@
 #include "ResponseState.hpp"
 
-ResponseState::ResponseState(const std::string &smallFileResponse, bool closeConnection)
-	: type(SMALL_FILE), smallFileResponse(smallFileResponse), closeConnection(closeConnection) {}
+ResponseState::ResponseState(const std::string &smallResponse, bool closeConnection)
+	: type(SMALL_FILE), smallResponse(smallResponse), closeConnection(closeConnection) {}
 
 ResponseState::ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize)
 	: type(LARGE_FILE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0), isHeaderSent(false)
@@ -14,9 +14,9 @@ ResponseType ResponseState::getType() const
 	return type;
 }
 
-const std::string &ResponseState::getSmallFileResponse() const
+const std::string &ResponseState::getSmallResponse() const
 {
-	return (smallFileResponse);
+	return (smallResponse);
 }
 
 const std::string &ResponseState::getHeaders() const
