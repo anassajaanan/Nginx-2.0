@@ -112,8 +112,8 @@ void	ClientState::handlePostRequest(Server &server)
 			server.handleInvalidRequest(fd, 413);
 			return;
 		}
+		initializeBodyStorage(server);
 	}
-	initializeBodyStorage(server);
 }
 
 void	ClientState::initializeBodyStorage(Server &server)

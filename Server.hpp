@@ -36,7 +36,7 @@
 // define max uri size as 4 KB
 #define MAX_URI_SIZE 4096 // 4 KB
 
-#define TEMP_FILE_DIRECTORY "/Users/aajaanan/goinfre/brew/var/upload/"
+#define TEMP_FILE_DIRECTORY "/Users/aajaanan/goinfre/brew/var/uploads/"
 
 
 

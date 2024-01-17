@@ -18,6 +18,7 @@ Server::~Server()
 	{
 		_kq.unregisterEvent(it->first, EVFILT_READ);
 		close(it->first);
+		delete it->second;
 		it++;
 	}
 	_clients.clear();
@@ -390,6 +391,7 @@ void	Server::stop()
 	{
 		_kq.unregisterEvent(it->first, EVFILT_READ);
 		close(it->first);
+		delete it->second;
 		it++;
 	}
 	_clients.clear();
