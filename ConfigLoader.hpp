@@ -2,7 +2,6 @@
 
 
 #pragma once
-#include <string>
 #ifndef CONFIGLOADER_HPP
 # define CONFIGLOADER_HPP
 
@@ -40,11 +39,6 @@ public:
 
 	void	loadServers(std::vector<ServerConfig> &servers);
 };
-
-
-
-
-
 
 
 #endif /* CONFIGLOADER_HPP */

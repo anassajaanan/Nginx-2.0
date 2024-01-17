@@ -205,9 +205,11 @@ void	Server::handleClientResponse(int clientSocket)
 	if (_responses.count(clientSocket) == 0)
 	{
 		std::cerr << "Error: no response state found for client socket " << clientSocket << std::endl;
+		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
 		return;
 	}
 	std::cout << "Handling client response" << std::endl;
+
 	ResponseState *responseState = _responses[clientSocket];
 
 	if (responseState->getType() == SMALL_RESPONSE)

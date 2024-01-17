@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <sys/event.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -48,7 +49,7 @@ public:
 	Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq);
 	~Server();
 
-	ServerConfig						&_config;
+	ServerConfig					&_config;
 	MimeTypeParser						&_mimeTypes;
 	KqueueManager						&_kq;
 	int									_socket;
