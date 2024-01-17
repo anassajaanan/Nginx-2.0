@@ -1,7 +1,6 @@
 
 
 #pragma once
-#include <sys/_types/_size_t.h>
 #ifndef HTTPRESPONSE_HPP
 #define HTTPRESPONSE_HPP
 
@@ -9,7 +8,7 @@
 #include <string>
 #include <map>
 
-#define CHUNK_SIZE 3 * 1024 // 8 KB
+#define CHUNK_SIZE  4096 // 4KB
 
 enum	ResponseType { SMALL_FILE, LARGE_FILE };
 
@@ -57,51 +56,5 @@ class HttpResponse
 		void	generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail = "");
 
 };
-
-class ResponseState
-{
-
-public:
-
-	ResponseState(const std::string &smallFileResponse, bool closeConnection = false); // small file
-	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large file
-
-	ResponseType		getType() const;
-
-	const std::string	&getSmallFileResponse() const;
-	const std::string	&getHeaders() const;
-
-	std::string			getNextChunk();
-
-	bool				isFinished() const;
-
-	bool				isHeaderSent;
-	bool				closeConnection;
-
-private:
-	ResponseType	type;
-	std::string		smallFileResponse;
-	std::string		headers;
-	std::string		filePath;
-	std::ifstream	fileStream;
-	size_t			fileSize;
-	size_t			bytesSent;
-	
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif /* HTTPRESPONSE_HPP */

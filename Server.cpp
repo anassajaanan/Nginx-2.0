@@ -115,11 +115,6 @@ void	Server::handleClientRequest(int clientSocket)
 	}
 }
 
-
-
-
-
-
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	ResponseState *responseState;

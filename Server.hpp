@@ -2,9 +2,6 @@
 
 
 #pragma once
-#include "HttpRequest.hpp"
-#include <string>
-#include <sys/_types/_size_t.h>
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -12,6 +9,7 @@
 #include "KqueueManager.hpp"
 #include "MimeTypeParser.hpp"
 #include "RequestHandler.hpp"
+#include "ResponseState.hpp"
 
 
 #include <fcntl.h>
@@ -37,7 +35,6 @@
 #define MAX_URI_SIZE 4096 // 4 KB
 
 #define TEMP_FILE_DIRECTORY "/Users/aajaanan/goinfre/brew/var/uploads/"
-
 
 
 class ClientState;
@@ -90,7 +87,6 @@ public:
 	void	stop();
 
 };
-
 
 
 #endif /* SERVER_HPP */
