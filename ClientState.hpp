@@ -12,23 +12,22 @@ class ClientState
 private:
 
 	int													fd;
-	std::chrono::time_point<std::chrono::steady_clock>	lastRequestTime;
 	int													requestCount;
+	std::chrono::time_point<std::chrono::steady_clock>	lastRequestTime;
+
+	HttpRequest											request;
+	std::string											requestHeaders;
+	std::string											requestBody;
+	std::ofstream										requestBodyFile;
+	size_t												requestBodySize;
+	std::string											requestBodyFilePath;
+	bool												areHeaderComplete;
+	bool												isBodyComplete;
 	
 public:
 
 	ClientState(int fd);
 	~ClientState();
-
-	HttpRequest		request;
-	std::string		requestHeaders;
-	std::string		requestBody;
-	std::ofstream	requestBodyFile;
-	size_t			requestBodySize;
-	std::string		requestBodyFilePath;
-	bool			areHeaderComplete;
-	bool			isBodyComplete;
-
 
 	void	resetClientState();
 	void	updateLastRequestTime();
