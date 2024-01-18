@@ -50,9 +50,8 @@ void	KqueueManager::unregisterEvent(int fd, int16_t filter)
 int	KqueueManager::waitForEvents()
 {
 	struct timespec timeout;
-	timeout.tv_sec = 10;
+	timeout.tv_sec = 5;
 	timeout.tv_nsec = 0;
-
 
 	int nev = kevent(this->kq, NULL, 0, this->events, MAX_EVENTS, &timeout);
 	return (nev);

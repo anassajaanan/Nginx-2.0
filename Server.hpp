@@ -25,9 +25,6 @@
 
 #define SERVER_BACKLOG 30
 
-#define SERVER_TIMEOUT_CHECK_INTERVAL 5 // 5 seconds
-
-
 #define BUFFER_SIZE 4096 // 4 KB
 
 #define MAX_REQUEST_HEADERS_SIZE 16384 // 16 KB
@@ -49,12 +46,11 @@ public:
 	Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq);
 	~Server();
 
-	ServerConfig					&_config;
+	ServerConfig						&_config;
 	MimeTypeParser						&_mimeTypes;
 	KqueueManager						&_kq;
 	int									_socket;
 	struct sockaddr_in					_serverAddr;
-	int									_running;
 	std::map<int, ClientState *>		_clients;
 	std::map<int, ResponseState *>		_responses;
 
@@ -85,7 +81,6 @@ public:
 	std::string	getStatusMessage(int statusCode);
 
 	void	run();
-	void	stop();
 
 };
 

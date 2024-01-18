@@ -10,6 +10,8 @@
 #include "MimeTypeParser.hpp"
 #include "KqueueManager.hpp"
 
+#define SERVER_TIMEOUT_CHECK_INTERVAL 5 // 5 seconds
+
 class ServerManager
 {
 private:
@@ -27,8 +29,12 @@ public:
 	
 
 	void	initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypes);
+	void 	checkTimeouts();
+	void	processReadEvent(const struct kevent &event);
+	void	processWriteEvent(const struct kevent &event);
 
 	void	start();
+	void	stop();
 
 };
 

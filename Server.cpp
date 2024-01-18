@@ -1,7 +1,7 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
 
-Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq)
+Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
 {
 	// std::cout << "Server constructor" << std::endl;
 	_serverAddr.sin_family = AF_INET;
@@ -12,18 +12,33 @@ Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &k
 
 Server::~Server()
 {
-	std::cout << "Server destructor" << std::endl;
-	std::map<int, ClientState *>::iterator it = _clients.begin();
-	while (it != _clients.end())
-	{
-		_kq.unregisterEvent(it->first, EVFILT_READ);
-		close(it->first);
-		delete it->second;
-		it++;
-	}
-	_clients.clear();
 	_kq.unregisterEvent(_socket, EVFILT_READ);
 	close(_socket);
+
+	std::map<int, ClientState *>::iterator client = _clients.begin();
+	while (client != _clients.end())
+	{
+		_kq.unregisterEvent(client->first, EVFILT_READ);
+		delete client->second;
+		close(client->first);
+		client++;
+	}
+	_clients.clear();
+
+	std::map<int, ResponseState *>::iterator response = _responses.begin();
+	while (response != _responses.end())
+	{
+		_kq.unregisterEvent(response->first, EVFILT_WRITE);
+		delete response->second;
+		response++;
+	}
+	_responses.clear();
+
+	if (_socket != -1)
+	{
+		_kq.unregisterEvent(_socket, EVFILT_READ);
+		close(_socket);
+	}
 }
 
 void	Server::createServerSocket()
@@ -377,19 +392,4 @@ void	Server::run()
 	setSocketToNonBlocking();
 	bindAndListen();
 	_kq.registerEvent(_socket, EVFILT_READ);
-	_running = true;
-}
-
-void	Server::stop()
-{
-	this->_running = false;
-	std::map<int, ClientState *>::iterator it = _clients.begin();
-	while (it != _clients.end())
-	{
-		_kq.unregisterEvent(it->first, EVFILT_READ);
-		close(it->first);
-		delete it->second;
-		it++;
-	}
-	_clients.clear();
 }

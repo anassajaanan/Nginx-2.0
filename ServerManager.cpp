@@ -20,90 +20,100 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 	}
 }
 
+void	ServerManager::checkTimeouts()
+{
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	if (std::chrono::duration_cast<std::chrono::seconds>(now - lastTimeoutCheck) > std::chrono::seconds(SERVER_TIMEOUT_CHECK_INTERVAL))
+	{
+		for (size_t i = 0; i < servers.size(); i++)
+			servers[i]->checkForTimeouts();
+		lastTimeoutCheck = now;
+	}
+}
+
+void	ServerManager::processReadEvent(const struct kevent &event)
+{
+	for (size_t i = 0; i < servers.size(); i++)
+	{
+		if (event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0)
+		{
+			if (event.ident == servers[i]->_socket)
+				servers[i]->acceptNewConnection();
+			else
+			{
+				if (event.flags & EV_EOF)
+				{
+					std::cout << "Client disconnected" << std::endl;
+					servers[i]->handleClientDisconnection(event.ident);
+				}
+				else
+					servers[i]->handleClientRequest(event.ident);
+			}
+		}
+	}
+}
+
+void	ServerManager::processWriteEvent(const struct kevent &event)
+{
+	for (size_t i = 0; i < servers.size(); i++)
+	{
+		if (servers[i]->_responses.count(event.ident) > 0)
+		{
+			servers[i]->handleClientResponse(event.ident);
+			break;
+		}
+	}
+}
+
 void	ServerManager::start()
 {
 	this->lastTimeoutCheck = std::chrono::steady_clock::now();
 
 	while (running)
 	{
-		std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-		if (std::chrono::duration_cast<std::chrono::seconds>(now - lastTimeoutCheck) > std::chrono::seconds(SERVER_TIMEOUT_CHECK_INTERVAL))
-		{
-			for (size_t i = 0; i < servers.size(); i++)
-				servers[i]->checkForTimeouts();
-			lastTimeoutCheck = now;
-		}
-
+		checkTimeouts();
 
 		std::cout << "Waiting for events" << std::endl;
+
 		int nev = kqueue.waitForEvents();
 		if (!running)
 			break;
-		std::cout << "nev: " << nev << std::endl;
+
+
 		if (nev < 0)
-			throw std::runtime_error("Error in kqueue");
-		std::cout << "Events received => ";
+		{
+			std::cerr << "Error in kqueue: " << strerror(errno) << std::endl;
+			continue;
+		}
+		else if (nev == 0)
+		{
+			std::cout << "No events" << std::endl;
+			continue;
+		}
+		
+
 		for (int ev = 0; ev < nev; ev++)
 		{
 			if (kqueue.events[ev].filter == EVFILT_READ)
-				std::cout << "EVFILT_READ " << std::endl;
-			else if (kqueue.events[ev].filter == EVFILT_WRITE)
-				std::cout << "EVFILT_WRITE " << std::endl;
-			else if (kqueue.events[ev].filter == EVFILT_EXCEPT)
-				std::cout << "EVFILT_EXCEPT " << std::endl;
-			else
-				std::cout << "Unknown filter " << kqueue.events[ev].filter << std::endl;
+				processReadEvent(kqueue.events[ev]);
 		}
-		std::cout << std::endl;
-		for (int ev = 0; ev < nev; ev++)
-		{
-			if (kqueue.events[ev].filter == EVFILT_READ)
-			{
-				for (size_t i = 0; i < servers.size(); i++)
-				{
-					if (kqueue.events[ev].ident == servers[i]->_socket || servers[i]->_clients.count(kqueue.events[ev].ident) > 0)
-					{
-						if (kqueue.events[ev].ident == servers[i]->_socket)
-							servers[i]->acceptNewConnection();
-						else
-						{
-							if (kqueue.events[ev].flags & EV_EOF)
-							{
-								std::cout << "Client disconnected" << std::endl;
-								servers[i]->handleClientDisconnection(kqueue.events[ev].ident);
-							}
-							else
-								servers[i]->handleClientRequest(kqueue.events[ev].ident);
-						}
-						break;
-					}
-				}
-			}
-		}
+
 		for (int ev = 0; ev < nev; ev++)
 		{
 			if (kqueue.events[ev].filter == EVFILT_WRITE)
-			{
-				for (size_t i = 0; i < servers.size(); i++)
-				{
-					if (servers[i]->_responses.count(kqueue.events[ev].ident) > 0)
-					{
-						servers[i]->handleClientResponse(kqueue.events[ev].ident);
-						break;
-					}
-				}
-			}
-			else if (kqueue.events[ev].filter == EVFILT_EXCEPT)
-			{
-				std::cout << "Exception" << std::endl;
-			}
+				processWriteEvent(kqueue.events[ev]);
 		}
 	}
 
+	std::cout << "ServerManager stopped" << std::endl;
+	stop();
+	
+}
 
+void	ServerManager::stop()
+{
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		servers[i]->stop();
 		delete servers[i];
 	}
 }
