@@ -90,8 +90,9 @@ void	Server::acceptNewConnection()
 
 void	Server::handleClientDisconnection(int clientSocket)
 {
-	std::cout << "Handling client disconnection" << std::endl;
-	_kq.unregisterEvent(clientSocket, EVFILT_READ);\
+	Logger::log(Logger::INFO, "Handling disconnection of client with socket fd " + std::to_string(clientSocket), "Server::handleClientDisconnection");
+
+	_kq.unregisterEvent(clientSocket, EVFILT_READ);
 	ClientState *clientState = _clients[clientSocket];
 	_clients.erase(clientSocket);
 	delete clientState;
@@ -111,7 +112,7 @@ void	Server::handleClientRequest(int clientSocket)
 	size_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
 	{
-		// handle recv error
+		Logger::log(Logger::ERROR, "Error receiving data from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
 		removeClient(clientSocket);
 		close(clientSocket);
 	}
@@ -124,6 +125,7 @@ void	Server::handleClientRequest(int clientSocket)
 		client->incrementRequestCount();
 
 		// std::cerr << "New Request comes: " << buffer << std::endl;
+		Logger::log(Logger::DEBUG, "Received new request from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
 
 		client->processIncomingData(*this, buffer, bytesRead);
 
@@ -363,6 +365,14 @@ void	Server::checkForTimeouts()
 
 void	Server::removeClient(int clientSocket)
 {
+	if (_clients.find(clientSocket) == _clients.end())
+	{
+        Logger::log(Logger::WARN, "Attempted to remove non-existent client with socket fd " + std::to_string(clientSocket), "Server::removeClient");
+        return;
+    }
+
+	Logger::log(Logger::INFO, "Removing client with socket fd " + std::to_string(clientSocket), "Server::removeClient");
+
 	ClientState *clientState = _clients[clientSocket];
 	_kq.unregisterEvent(clientSocket, EVFILT_READ);
 	_clients.erase(clientSocket);

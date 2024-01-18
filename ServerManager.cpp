@@ -43,10 +43,7 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 			else
 			{
 				if (event.flags & EV_EOF)
-				{
-					std::cout << "Client disconnected" << std::endl;
 					servers[i]->handleClientDisconnection(event.ident);
-				}
 				else
 					servers[i]->handleClientRequest(event.ident);
 			}
