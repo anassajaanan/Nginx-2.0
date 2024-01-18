@@ -43,24 +43,49 @@ void	Server::createServerSocket()
 {
 	this->_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->_socket < 0)
-		throw std::runtime_error("Error: socket creation failed");
+	{
+		Logger::log(Logger::ERROR, "Failed to create server socket: " + std::string(strerror(errno)), "Server::createServerSocket");
+		this->_socket = -1;
+	}
+	else
+		Logger::log(Logger::INFO, "Server socket created successfully", "Server::createServerSocket");
 }
 
 void	Server::setSocketOptions()
 {
+	if (_socket == -1)
+		return;
+
 	int opt = 1;
 	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
-		throw std::runtime_error("Error: setsockopt failed");
+	{
+		Logger::log(Logger::ERROR, "Failed to set socket options: " + std::string(strerror(errno)), "Server::setSocketOptions");
+		_socket = -1;
+	}
+	else
+		Logger::log(Logger::INFO, "Socket options set successfully", "Server::setSocketOptions");
 }
 
 
 void	Server::setSocketToNonBlocking()
 {
+	if (_socket == -1)
+		return;
+
 	int flags = fcntl(this->_socket, F_GETFL, 0);
 	if (flags < 0)
-		throw std::runtime_error("Error: fcntl failed");
+	{
+		Logger::log(Logger::ERROR, "fcntl(F_GETFL) failed: " + std::string(strerror(errno)), "Server::setSocketToNonBlocking");
+        _socket = -1;
+		return;
+	}
 	if (fcntl(this->_socket, F_SETFL, flags | O_NONBLOCK) < 0)
-		throw std::runtime_error("Error: fcntl failed");
+	{
+		Logger::log(Logger::ERROR, "fcntl(F_SETFL) failed: " + std::string(strerror(errno)), "Server::setSocketToNonBlocking");
+		_socket = -1;
+	}
+	else
+		Logger::log(Logger::INFO, "Socket set to non-blocking mode successfully", "Server::setSocketToNonBlocking");
 }
 
 void	Server::bindAndListen()
@@ -124,11 +149,9 @@ void	Server::handleClientRequest(int clientSocket)
 		client->updateLastRequestTime();
 		client->incrementRequestCount();
 
-		// std::cerr << "New Request comes: " << buffer << std::endl;
 		Logger::log(Logger::DEBUG, "Received new request from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
 
 		client->processIncomingData(*this, buffer, bytesRead);
-
 
 	}
 }
