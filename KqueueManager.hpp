@@ -5,6 +5,8 @@
 #ifndef KQUEUE_MANAGER_HPP
 # define KQUEUE_MANAGER_HPP
 
+#include "Logger.hpp"
+
 #include <unistd.h>
 #include <iostream>
 #include <stdexcept>

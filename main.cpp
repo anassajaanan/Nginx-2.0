@@ -2,6 +2,7 @@
 #include "ConfigParser.hpp"
 #include "ConfigLoader.hpp"
 #include "ServerManager.hpp"
+#include "Logger.hpp"
 
 
 
@@ -40,6 +41,7 @@ int main()
 
 		ServerManager serverManager(serverConfigs, mimeTypeParser);
 
+		Logger::log(Logger::DEBUG, "Starting server manager", "main");
 		serverManager.start();
 
 	}

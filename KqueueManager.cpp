@@ -1,7 +1,4 @@
 #include "KqueueManager.hpp"
-#include <sys/_types/_int16_t.h>
-#include <sys/_types/_intptr_t.h>
-#include <sys/event.h>
 
 KqueueManager::KqueueManager()
 {
@@ -30,21 +27,21 @@ void	KqueueManager::registerEvent(int fd, int16_t filter)
 void	KqueueManager::unregisterEvent(int fd, int16_t filter)
 {
 	struct kevent	event;
+
+	std::string		filterType = "UNKNOWN";
+	
+	if (filter == EVFILT_READ)
+		filterType = "EVFILT_READ";
+	else if (filter == EVFILT_WRITE)
+		filterType = "EVFILT_WRITE";
+
+
 	EV_SET(&event, fd, filter, EV_DELETE, 0, 0, NULL);
+
 	if (kevent(this->kq, &event, 1, NULL, 0, NULL) < 0)
-	{
-		// throw std::runtime_error("failed to unregister the event");
-		std::cerr << "failed to unregister the event ";
-		if (filter == EVFILT_READ)
-			std::cerr << "EVFILT_READ";
-		else if (filter == EVFILT_WRITE)
-			std::cerr << "EVFILT_WRITE";
-		else if (filter == EVFILT_EXCEPT)
-			std::cerr << "EVFILT_EXCEPT";
-		else
-			std::cerr << "Unknown filter " << filter;
-		std::cerr << std::endl;
-	}
+		Logger::log(Logger::ERROR, "Failed to unregister the event for fd " + std::to_string(fd) + ": " + filterType, "KqueueManager::unregisterEvent");
+	else
+		Logger::log(Logger::DEBUG, "Unregistered the event for fd " + std::to_string(fd) + ": " + filterType, "KqueueManager::unregisterEvent");
 }
 
 int	KqueueManager::waitForEvents()

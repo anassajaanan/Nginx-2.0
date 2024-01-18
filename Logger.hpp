@@ -42,11 +42,13 @@ private:
 };
 
 
-
-
-
-
-
+/*
+DEBUG: Detailed information, typically of interest only when diagnosing problems.
+INFO: Confirmation that things are working as expected.
+WARN: An indication that something unexpected happened, or indicative of some problem in the near future (e.g., 'disk space low'). The software is still working as expected.
+ERROR: Due to a more serious problem, the software has not been able to perform some function.
+FATAL: A very severe error event that will presumably lead the application to abort.
+*/
 
 
 #endif /* LOGGER_HPP */

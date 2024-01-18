@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
+#include "Logger.hpp"
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
 {
@@ -12,9 +13,6 @@ Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &k
 
 Server::~Server()
 {
-	_kq.unregisterEvent(_socket, EVFILT_READ);
-	close(_socket);
-
 	std::map<int, ClientState *>::iterator client = _clients.begin();
 	while (client != _clients.end())
 	{
@@ -348,7 +346,8 @@ void	Server::checkForTimeouts()
 	{
 		if (it->second->isTimedOut(this->_config.keepalive_timeout))
 		{
-			std::cerr << "Client timed out" << std::endl;
+			Logger::log(Logger::INFO, "Client with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForTimeouts");
+			
 			_kq.unregisterEvent(it->first, EVFILT_READ);
 			close(it->first);
 			delete it->second;
