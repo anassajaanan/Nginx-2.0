@@ -16,11 +16,18 @@ KqueueManager::~KqueueManager()
 void	KqueueManager::registerEvent(int fd, int16_t filter)
 {
 	struct kevent	newEvent;
+
+	std::string		filterType = "UNKNOWN";
+	if (filter == EVFILT_READ)
+		filterType = "EVFILT_READ";
+	else if (filter == EVFILT_WRITE)
+		filterType = "EVFILT_WRITE";
+
 	EV_SET(&newEvent, fd, filter, EV_ADD, 0, 0, NULL);
 	if (kevent(this->kq, &newEvent, 1, NULL, 0, NULL) < 0)
-	{
-		throw std::runtime_error("Failed to register a new event");
-	}
+		Logger::log(Logger::ERROR, "Failed to register a new event for fd " + std::to_string(fd) + ": " + filterType, "KqueueManager::registerEvent");
+	else
+		Logger::log(Logger::DEBUG, "Registered a new event for fd " + std::to_string(fd) + ": " + filterType, "KqueueManager::registerEvent");
 }
 
 

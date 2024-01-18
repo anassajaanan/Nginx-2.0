@@ -74,12 +74,15 @@ void	Server::bindAndListen()
 
 void	Server::acceptNewConnection()
 {
-	std::cout << "Accepting new connection" << std::endl;
 	struct sockaddr_in	clientAddr;
 	socklen_t			clientAddrLen = sizeof(clientAddr);
 	int clientSocket = accept(this->_socket, (struct sockaddr *)&clientAddr, &clientAddrLen);
 	if (clientSocket < 0)
-		throw std::runtime_error("Error: accept failed");
+	{
+		Logger::log(Logger::ERROR, "Error accepting new connection: " + std::string(strerror(errno)), "Server::acceptNewConnection");
+		return;
+	}
+	Logger::log(Logger::INFO, "Accepted new connection on socket fd " + std::to_string(clientSocket), "Server::acceptNewConnection");
 	ClientState *clientState = new ClientState(clientSocket);
 	_clients[clientSocket] = clientState;
 	_kq.registerEvent(clientSocket, EVFILT_READ);
@@ -347,7 +350,7 @@ void	Server::checkForTimeouts()
 		if (it->second->isTimedOut(this->_config.keepalive_timeout))
 		{
 			Logger::log(Logger::INFO, "Client with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForTimeouts");
-			
+
 			_kq.unregisterEvent(it->first, EVFILT_READ);
 			close(it->first);
 			delete it->second;

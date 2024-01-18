@@ -1,4 +1,5 @@
 #include "ServerManager.hpp"
+#include "Logger.hpp"
 
 
 int	ServerManager::running = 1;
@@ -73,7 +74,7 @@ void	ServerManager::start()
 	{
 		checkTimeouts();
 
-		std::cout << "Waiting for events" << std::endl;
+		Logger::log(Logger::DEBUG, "Waiting for events", "EventLoop");
 
 		int nev = kqueue.waitForEvents();
 		if (!running)
@@ -82,12 +83,12 @@ void	ServerManager::start()
 
 		if (nev < 0)
 		{
-			std::cerr << "Error in kqueue: " << strerror(errno) << std::endl;
+			Logger::log(Logger::ERROR, "Error in kqueue: " + std::string(strerror(errno)), "EventLoop");
 			continue;
 		}
 		else if (nev == 0)
 		{
-			std::cout << "No events" << std::endl;
+			Logger::log(Logger::DEBUG, "No events to process at this time", "EventLoop");
 			continue;
 		}
 		
