@@ -1,5 +1,6 @@
 #include "ServerManager.hpp"
 #include "Logger.hpp"
+#include <string>
 
 
 int	ServerManager::running = 1;
@@ -17,7 +18,14 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 	{
 		Server *server = new Server(serverConfigs[i], mimeTypes, kqueue);
 		server->run();
-		// check the stat of socket [-1] then delete
+		if (server->_socket == -1)
+		{
+			Logger::log(Logger::ERROR, "Failed to create server", "ServerManager::initializeServers");
+			delete server;
+			continue;
+		}
+		Logger::log(Logger::INFO, "Server is created and it is listening on port: " + std::to_string(server->_config.port), "ServerManager::initializeServers");
+		kqueue.registerEvent(server->_socket, EVFILT_READ);
 		servers.push_back(server);
 	}
 }

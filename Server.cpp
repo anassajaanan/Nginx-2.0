@@ -439,5 +439,4 @@ void	Server::run()
 	setSocketOptions();
 	setSocketToNonBlocking();
 	bindAndListen();
-	_kq.registerEvent(_socket, EVFILT_READ);
 }
