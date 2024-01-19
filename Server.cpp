@@ -163,9 +163,7 @@ void	Server::handleClientRequest(int clientSocket)
 		client->incrementRequestCount();
 
 		Logger::log(Logger::DEBUG, "Received new request from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
-
 		client->processIncomingData(*this, buffer, bytesRead);
-
 	}
 }
 
@@ -193,25 +191,25 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
-	std::cerr << "Processing post request" << std::endl;
-	ResponseState *responseState;
+	Logger::log(Logger::INFO, "Processing POST request for client with socket fd " + std::to_string(clientSocket), "Server::processPostRequest");
 
+	ResponseState *responseState;
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
-
 	_clients[clientSocket]->resetClientState();
 	
-
 	responseState = new ResponseState(response.buildResponse(), closeConnection);
 
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 
-	std::cerr << "Post Request is processed" << std::endl;
+	Logger::log(Logger::DEBUG, "POST request processed and response ready for client with socket fd " + std::to_string(clientSocket), "Server::processPostRequest");
 }
 
 void	Server::handleHeaderSizeExceeded(int clientSocket)
 {
+	Logger::log(Logger::WARN, "Request headers size exceeded the maximum limit for fd " + std::to_string(clientSocket), "Server::handleHeaderSizeExceeded");
+
 	HttpResponse response;
 
 	removeClient(clientSocket);
@@ -223,6 +221,8 @@ void	Server::handleHeaderSizeExceeded(int clientSocket)
 
 void	Server::handleUriTooLarge(int clientSocket)
 {
+	Logger::log(Logger::WARN, "URI size exceeded the maximum limit for fd " + std::to_string(clientSocket), "Server::handleUriTooLarge");
+	
 	HttpResponse response;
 
 	removeClient(clientSocket);
@@ -234,6 +234,8 @@ void	Server::handleUriTooLarge(int clientSocket)
 
 void	Server::handleInvalidGetRequest(int clientSocket)
 {
+	Logger::log(Logger::WARN, "GET request with body received for fd " + std::to_string(clientSocket), "Server::handleInvalidGetRequest");
+	
 	HttpResponse response;
 
 	removeClient(clientSocket);

@@ -45,7 +45,6 @@ void	ClientState::processHeaders(Server &server, const char *buffer, size_t byte
 	requestHeaders.append(buffer, bytesRead);
 	if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
 	{
-		Logger::log(Logger::WARN, "Request headers size exceeded the maximum limit for fd " + std::to_string(fd), "ClientState::processHeaders");
 		server.handleHeaderSizeExceeded(fd);
 		return;
 	}
@@ -70,7 +69,6 @@ void	ClientState::parseHeaders(Server &server)
 
 	if (request.getUri().size() > MAX_URI_SIZE)
 	{
-		Logger::log(Logger::WARN, "URI size exceeded the maximum limit for fd " + std::to_string(fd), "ClientState::parseHeaders");
 		server.handleUriTooLarge(fd);
 		return;
 	}
@@ -96,12 +94,9 @@ void	ClientState::parseHeaders(Server &server)
 void	ClientState::handleGetRequest(Server &server)
 {
 
+	// Log the situation where a GET request contains a body, which is unusual
 	if (!requestBody.empty() || request.getHeader("Content-Length") != "none" || request.getHeader("Transfer-Encoding") == "chunked")
-	{
-		// Log the situation where a GET request contains a body, which is unusual
-		Logger::log(Logger::WARN, "GET request with body received for fd " + std::to_string(fd), "ClientState::handleGetRequest");
 		server.handleInvalidGetRequest(fd);
-	}
 	else
 		server.processGetRequest(fd, request);
 }
