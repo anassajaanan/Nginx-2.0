@@ -166,30 +166,29 @@ void	ClientState::initializeBodyStorage(Server &server)
 
 void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRead)
 {
-	std::cerr << "Processing body of post request" << std::endl;
+	Logger::log(Logger::DEBUG, "Processing body of POST request for client with socket fd " + std::to_string(fd), "ClientState::processBody");
+
 	size_t remainingBodySize = requestBodySize - requestBodyFile.tellp();
 	if (bytesRead > remainingBodySize)
 	{
-		std::cerr << "Body of post request is grater than the content length" << std::endl;
+		Logger::log(Logger::WARN, "POST request body exceeds declared content length for client with socket fd " + std::to_string(fd), "ClientState::processBody");
 		requestBodyFile.write(buffer, remainingBodySize);
 		requestBodyFile.close();
 		isBodyComplete = true;
-
 		server.processPostRequest(fd, request, true);
 		server.removeClient(fd);
 	}
 	else if (bytesRead == remainingBodySize)
 	{
-		std::cerr << "Body of post request is completed" << std::endl;
+		 Logger::log(Logger::DEBUG, "POST request body is complete for client with socket fd " + std::to_string(fd), "ClientState::processBody");
 		requestBodyFile.write(buffer, bytesRead);
 		requestBodyFile.close();
 		isBodyComplete = true;
-		
 		server.processPostRequest(fd, request);
 	}
 	else
 	{
-		std::cerr << "Adding a new buffer to the body of post request" << std::endl;
+		Logger::log(Logger::DEBUG, "Appending to POST request body for client with socket fd " + std::to_string(fd), "ClientState::processBody");
 		requestBodyFile.write(buffer, bytesRead);
 	}
 }
