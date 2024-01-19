@@ -45,14 +45,18 @@ void	ClientState::processHeaders(Server &server, const char *buffer, size_t byte
 	requestHeaders.append(buffer, bytesRead);
 	if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
 	{
+		Logger::log(Logger::WARN, "Request headers size exceeded the maximum limit for fd " + std::to_string(fd), "ClientState::processHeaders");
 		server.handleHeaderSizeExceeded(fd);
 		return;
 	}
 	if (headersCompleted(buffer))
 	{
 		areHeaderComplete = true;
+		Logger::log(Logger::DEBUG, "Headers completed for fd " + std::to_string(fd), "ClientState::processHeaders");
 		parseHeaders(server);
 	}
+	else
+		Logger::log(Logger::DEBUG, "Received partial headers for fd " + std::to_string(fd), "ClientState::processHeaders");
 }
 
 void	ClientState::parseHeaders(Server &server)
