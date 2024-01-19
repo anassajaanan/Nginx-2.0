@@ -90,10 +90,23 @@ void	Server::setSocketToNonBlocking()
 
 void	Server::bindAndListen()
 {
+	if (_socket == -1)
+		return;
+
 	if (bind(this->_socket, (struct sockaddr *)&this->_serverAddr, sizeof(this->_serverAddr)) < 0)
-		throw std::runtime_error("Error: bind failed");
+	{
+		Logger::log(Logger::ERROR, "Failed to bind socket: " + std::string(strerror(errno)), "Server::bindAndListen");
+		_socket = -1;
+		return;
+	}
+	Logger::log(Logger::INFO, "Socket bound successfully", "Server::bindAndListen");
 	if (listen(this->_socket, SERVER_BACKLOG) < 0)
-		throw std::runtime_error("Error: listen failed");
+	{
+		Logger::log(Logger::ERROR, "Failed to listen on socket: " + std::string(strerror(errno)), "Server::bindAndListen");
+		_socket = -1;
+	}
+	else
+		Logger::log(Logger::INFO, "Server is now listening on socket", "Server::bindAndListen");
 }
 
 

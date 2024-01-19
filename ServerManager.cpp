@@ -17,6 +17,7 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 	{
 		Server *server = new Server(serverConfigs[i], mimeTypes, kqueue);
 		server->run();
+		// check the stat of socket [-1] then delete
 		servers.push_back(server);
 	}
 }
