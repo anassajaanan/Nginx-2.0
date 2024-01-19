@@ -66,20 +66,31 @@ void	ClientState::parseHeaders(Server &server)
 	requestHeaders.resize(endOfHeaders);
 
 	this->request = HttpRequest(requestHeaders);
+	Logger::log(Logger::DEBUG, "Parsed HTTP headers for fd " + std::to_string(fd), "ClientState::parseHeaders");
 
 	if (request.getUri().size() > MAX_URI_SIZE)
 	{
+		Logger::log(Logger::WARN, "URI size exceeded the maximum limit for fd " + std::to_string(fd), "ClientState::parseHeaders");
 		server.handleUriTooLarge(fd);
 		return;
 	}
 
 	if (request.getMethod() == "GET")
+	{
+		Logger::log(Logger::INFO, "Handling GET request for fd " + std::to_string(fd), "ClientState::parseHeaders");
 		handleGetRequest(server);
+	}
 
 	else if (request.getMethod() == "POST")
+	{
+		Logger::log(Logger::INFO, "Handling POST request for fd " + std::to_string(fd), "ClientState::parseHeaders");
 		handlePostRequest(server);
+	}
 	else
+	{
+		Logger::log(Logger::WARN, "Unsupported HTTP method for fd " + std::to_string(fd), "ClientState::parseHeaders");
 		server.handleInvalidRequest(fd, 501, "Method not implemented");
+	}
 }
 
 void	ClientState::handleGetRequest(Server &server)
