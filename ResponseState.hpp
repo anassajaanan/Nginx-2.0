@@ -26,6 +26,7 @@ public:
 
 	bool				isHeaderSent;
 	bool				closeConnection;
+	size_t				bytesSent;
 
 private:
 	ResponseType	type;
@@ -34,7 +35,7 @@ private:
 	std::string		filePath;
 	std::ifstream	fileStream;
 	size_t			fileSize;
-	size_t			bytesSent;
+	
 	
 };
 

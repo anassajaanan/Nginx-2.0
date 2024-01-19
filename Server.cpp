@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
 #include "Logger.hpp"
+#include <sys/_types/_size_t.h>
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
 {
@@ -259,39 +260,81 @@ void	Server::handleInvalidRequest(int clientSocket, int requestStatusCode, const
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
-void	Server::handleClientResponse(int clientSocket)
+// void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
+// {
+// 	Logger::log(Logger::DEBUG, "Sending small response to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
+
+// 	const std::string &response = responseState->getSmallResponse();
+
+// 	int bytesSent = send(clientSocket, response.c_str(), response.length(), 0);
+// 	if (bytesSent < 0)
+// 		Logger::log(Logger::ERROR, "Failed to send small response to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendSmallResponse");
+// 	if (bytesSent == (int)response.length())
+// 	{
+// 		Logger::log(Logger::DEBUG, "Small response sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
+// 		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+// 		_responses.erase(clientSocket);
+		// if (responseState->closeConnection)
+		// {
+		// 	Logger::log(Logger::INFO, "Closing connection after sending small response to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
+        //     close(clientSocket);
+		// }
+		// delete responseState;
+// 	}
+// 	else
+// 	{
+// 		// handle partial send
+// 	}
+// }
+
+void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 {
-	if (_responses.count(clientSocket) == 0)
+	Logger::log(Logger::DEBUG, "Sending small response to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
+
+	const std::string &response = responseState->getSmallResponse();
+	size_t totalLength = response.length();
+	size_t remainingLength = totalLength - responseState->bytesSent;
+	const char *responsePtr = response.c_str() + responseState->bytesSent;
+
+	size_t bytesSent = send(clientSocket, responsePtr, remainingLength, 0);
+
+	if (bytesSent < 0)
+		Logger::log(Logger::ERROR, "Failed to send small response to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendSmallResponse");
+	else
 	{
-		std::cerr << "Error: no response state found for client socket " << clientSocket << std::endl;
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
-		return;
-	}
-	std::cout << "Handling client response" << std::endl;
-
-	ResponseState *responseState = _responses[clientSocket];
-
-	if (responseState->getType() == SMALL_RESPONSE)
-	{
-		std::cout << "Sending small file" << std::endl;
-		const std::string &response = responseState->getSmallResponse();
-
-		int bytesSent = send(clientSocket, response.c_str(), response.length(), 0);
-		if (bytesSent < 0)
-			throw std::runtime_error("Error: send failed");
-		if (bytesSent == (int)response.length())
+		responseState->bytesSent += bytesSent;
+		if (responseState->isFinished())
 		{
-			std::cerr << "Small file sent completely" << std::endl;
+			Logger::log(Logger::DEBUG, "Small response sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
 			_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
 			_responses.erase(clientSocket);
 			if (responseState->closeConnection)
 			{
-				std::cerr << "Closing connection after sending small response" << std::endl;
+				Logger::log(Logger::INFO, "Closing connection after sending small response to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
 				close(clientSocket);
 			}
 			delete responseState;
 		}
+		else {
+			Logger::log(Logger::DEBUG, "Partial small response sent", "Server::sendSmallResponse");
+		}
 	}
+}
+
+void	Server::handleClientResponse(int clientSocket)
+{
+	if (_responses.count(clientSocket) == 0)
+	{
+		Logger::log(Logger::ERROR, "No response state found for client socket " + std::to_string(clientSocket), "Server::handleClientResponse");
+		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		return;
+	}
+
+	Logger::log(Logger::DEBUG, "Handling client response for socket " + std::to_string(clientSocket), "Server::handleClientResponse");
+	ResponseState *responseState = _responses[clientSocket];
+
+	if (responseState->getType() == SMALL_RESPONSE)
+		sendSmallResponse(clientSocket, responseState);
 	else if (responseState->getType() == LARGE_RESPONSE)
 	{
 		// send headers first, then send file in chunks

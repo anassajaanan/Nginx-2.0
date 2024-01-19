@@ -64,6 +64,7 @@ public:
 	void	handleClientDisconnection(int clientSocket);
 	void	handleClientRequest(int clientSocket);
 	void	handleClientResponse(int clientSocket);
+	void	sendSmallResponse(int clientSocket, ResponseState *responseState);
 
 	void	checkForTimeouts();
 
