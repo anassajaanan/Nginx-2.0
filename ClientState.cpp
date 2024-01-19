@@ -97,7 +97,11 @@ void	ClientState::handleGetRequest(Server &server)
 {
 
 	if (!requestBody.empty() || request.getHeader("Content-Length") != "none" || request.getHeader("Transfer-Encoding") == "chunked")
+	{
+		// Log the situation where a GET request contains a body, which is unusual
+		Logger::log(Logger::WARN, "GET request with body received for fd " + std::to_string(fd), "ClientState::handleGetRequest");
 		server.handleInvalidGetRequest(fd);
+	}
 	else
 		server.processGetRequest(fd, request);
 }
@@ -108,27 +112,25 @@ void	ClientState::handlePostRequest(Server &server)
 {
 	if (request.getStatus() != 200)
 	{
+		Logger::log(Logger::WARN, "Invalid POST request status for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");
 		server.handleInvalidRequest(fd, request.getStatus());
 		return;
 	}
 	if (request.getHeader("Transfer-Encoding") == "chunked")
 	{
+		Logger::log(Logger::WARN, "Chunked Transfer-Encoding not supported for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");
 		server.handleInvalidRequest(fd, 501, "Chunked Transfer-Encoding Not Supported for Client Requests");
 		return;
 	}
-	else
+
+	requestBodySize = std::stoll(request.getHeader("Content-Length"));
+	if (requestBodySize > server._config.clientMaxBodySize)
 	{
-		requestBodySize = std::stoll(request.getHeader("Content-Length"));
-		if (requestBodySize > server._config.clientMaxBodySize)
-		{
-			std::cerr << "Body of post request is grater than the client max body size" << std::endl;
-			std::cerr << "Body size: " << requestBodySize << std::endl;
-			std::cerr << "Client max body size: " << server._config.clientMaxBodySize << std::endl;
-			server.handleInvalidRequest(fd, 413);
-			return;
-		}
-		initializeBodyStorage(server);
+		Logger::log(Logger::WARN, "Body size of POST request exceeds client max body size for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");
+		server.handleInvalidRequest(fd, 413);
+		return;
 	}
+	initializeBodyStorage(server);
 }
 
 void	ClientState::initializeBodyStorage(Server &server)
@@ -139,12 +141,16 @@ void	ClientState::initializeBodyStorage(Server &server)
 	requestBodyFile.open(requestBodyFilePath.c_str(), std::ios::out | std::ios::binary);
 	if (!requestBodyFile.is_open())
 	{
+		Logger::log(Logger::ERROR, "Failed to open temporary file for storing POST body for client with socket fd " + std::to_string(fd), "ClientState::initializeBodyStorage");
 		server.handleInvalidRequest(fd, 500, "Internal Server Error: Temporary File Creation Failed");
 		return;
 	}
+
+	Logger::log(Logger::DEBUG, "Temporary file for POST body created: " + requestBodyFilePath, "ClientState::initializeBodyStorage");
+	
 	if (requestBody.size() == requestBodySize)
 	{
-		std::cerr << "Body of post request is completed from the first read" << std::endl;
+		Logger::log(Logger::DEBUG, "POST request body is complete from the first read for client with socket fd " + std::to_string(fd), "ClientState::initializeBodyStorage");
 		requestBodyFile << requestBody;
 		requestBodyFile.close();
 		isBodyComplete = true;
@@ -152,7 +158,7 @@ void	ClientState::initializeBodyStorage(Server &server)
 	}
 	else if (requestBody.size() > requestBodySize)
 	{
-		std::cerr << "Body of post request is grater than the content length from the first read" << std::endl;
+		Logger::log(Logger::WARN, "POST request body exceeds the declared content length for client with socket fd " + std::to_string(fd), "ClientState::initializeBodyStorage");
 		requestBodyFile.close();
 		server.handleInvalidRequest(fd, 400, "Request Body Exceeds Content-Length");
 	}

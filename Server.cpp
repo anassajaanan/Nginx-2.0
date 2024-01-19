@@ -172,20 +172,23 @@ void	Server::handleClientRequest(int clientSocket)
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	ResponseState *responseState;
-
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
 	_clients[clientSocket]->resetClientState();
 	
 	if (response.getType() == SMALL_RESPONSE)
+	{
+		Logger::log(Logger::DEBUG, "Generating small response for client with socket fd " + std::to_string(clientSocket), "Server::processGetRequest");
 		responseState = new ResponseState(response.buildResponse());
-	else 
+	}
+	else
+	{
+		Logger::log(Logger::DEBUG, "Generating large response for client with socket fd " + std::to_string(clientSocket), "Server::processGetRequest");
 		responseState = new ResponseState(response.buildResponse(), response.filePath, response.fileSize);
-	
+	}
+
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
-
-
 }
 
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
