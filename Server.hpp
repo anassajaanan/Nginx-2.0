@@ -65,6 +65,9 @@ public:
 	void	handleClientRequest(int clientSocket);
 	void	handleClientResponse(int clientSocket);
 	void	sendSmallResponse(int clientSocket, ResponseState *responseState);
+	void	sendLargeResponse(int clientSocket, ResponseState *responseState);
+	void	sendLargeResponseHeaders(int clientSocket, ResponseState *responseState);
+	void	sendLargeResponseChunk(int clientSocket, ResponseState *responseState);
 
 	void	checkForTimeouts();
 

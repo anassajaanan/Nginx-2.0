@@ -6,6 +6,8 @@
 
 #include "HttpResponse.hpp"
 
+#include <sstream>
+
 
 class ResponseState
 {
@@ -27,6 +29,7 @@ public:
 	bool				isHeaderSent;
 	bool				closeConnection;
 	size_t				bytesSent;
+	size_t				headersSent;
 
 private:
 	ResponseType	type;
