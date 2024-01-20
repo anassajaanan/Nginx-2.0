@@ -8,6 +8,7 @@
 
 #include <sstream>
 
+#define CHUNK_SIZE  6000 // 4KB
 
 class ResponseState
 {
@@ -18,10 +19,8 @@ public:
 	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large response
 
 	ResponseType		getType() const;
-
 	const std::string	&getSmallResponse() const;
 	const std::string	&getHeaders() const;
-
 	std::string			getNextChunk();
 
 	bool				isFinished() const;
@@ -30,6 +29,8 @@ public:
 	bool				closeConnection;
 	size_t				bytesSent;
 	size_t				headersSent;
+	std::string			currentChunk;
+	size_t				currentChunkPosition;
 
 private:
 	ResponseType	type;

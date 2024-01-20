@@ -1,7 +1,9 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
 #include "Logger.hpp"
+#include <string>
 #include <sys/_types/_size_t.h>
+#include <sys/_types/_ssize_t.h>
 
 Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
 {
@@ -269,7 +271,7 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 	size_t remainingLength = totalLength - responseState->bytesSent;
 	const char *responsePtr = response.c_str() + responseState->bytesSent;
 
-	size_t bytesSent = send(clientSocket, responsePtr, remainingLength, 0);
+	ssize_t bytesSent = send(clientSocket, responsePtr, remainingLength, 0);
 
 	if (bytesSent < 0)
 	{
@@ -307,7 +309,7 @@ void	Server::sendLargeResponseHeaders(int clientSocket, ResponseState *responseS
 	size_t remainingLength = totalLength - responseState->headersSent;
 	const char *headersPtr = headers.c_str() + responseState->headersSent;
 
-	size_t bytesSent = send(clientSocket, headersPtr, remainingLength, 0);
+	ssize_t bytesSent = send(clientSocket, headersPtr, remainingLength, 0);
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send large response headers to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseHeaders");
@@ -328,29 +330,81 @@ void	Server::sendLargeResponseHeaders(int clientSocket, ResponseState *responseS
 	}
 }
 
+// handle partial chunk sending
+
+// void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseState)
+// {
+	// Logger::log(Logger::DEBUG, "Sending Large Response chunk to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
+
+// 	std::string chunk = responseState->getNextChunk();
+// 	ssize_t bytesSent = send(clientSocket, chunk.c_str(), chunk.length(), 0);
+// 	if (bytesSent < 0)
+// 	{
+		// Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
+		// _kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		// _responses.erase(clientSocket);
+		// delete responseState;
+// 	}
+// 	else
+// 	{
+// 		if (bytesSent == chunk.size())
+// 		{
+// 			Logger::log(Logger::DEBUG, "Chunk sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
+//             if (responseState->isFinished())
+// 			{
+// 				// send end chunk
+// 				std::string endChunk = "0\r\n\r\n";
+// 				ssize_t bytesSent = send(clientSocket, endChunk.c_str(), endChunk.length(), 0);
+// 				if (bytesSent < 0)
+// 				{
+// 					Logger::log(Logger::ERROR, "Failed to send end chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
+// 					_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+// 					_responses.erase(clientSocket);
+// 					delete responseState;
+// 				}
+// 				else
+// 				{
+// 					Logger::log(Logger::DEBUG, "End chunk sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
+// 					_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+// 					_responses.erase(clientSocket);
+// 					delete responseState;
+// 				}
+// 			}
+// 		}
+// 		else
+// 			Logger::log(Logger::DEBUG, "❌ Chunk not sent completely ❌  and this is what has been send: " + std::to_string(bytesSent) + " and chunk length is : " + std::to_string(chunk.length()), "Server::sendLargeResponseChunk");
+// 	}
+// }
+
 void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseState)
 {
 	Logger::log(Logger::DEBUG, "Sending Large Response chunk to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
 
 	std::string chunk = responseState->getNextChunk();
-	size_t bytesSent = send(clientSocket, chunk.c_str(), chunk.length(), 0);
+	size_t totalLength = chunk.length();
+	size_t remainingLength = totalLength - responseState->currentChunkPosition;
+	const char *chunkPtr = chunk.c_str() + responseState->currentChunkPosition;
+	ssize_t bytesSent = send(clientSocket, chunkPtr, remainingLength, 0);
+
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
-		_responses.erase(clientSocket);
-		delete responseState;
+		// _kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		// _responses.erase(clientSocket);
+		// delete responseState;
 	}
 	else
 	{
-		if (bytesSent == chunk.size())
+		responseState->currentChunkPosition += bytesSent;
+		if (responseState->currentChunkPosition >= totalLength)
 		{
 			Logger::log(Logger::DEBUG, "Chunk sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
-            if (responseState->isFinished())
+			responseState->currentChunkPosition = 0;
+			if (responseState->isFinished())
 			{
 				// send end chunk
 				std::string endChunk = "0\r\n\r\n";
-				int bytesSent = send(clientSocket, endChunk.c_str(), endChunk.length(), 0);
+				ssize_t bytesSent = send(clientSocket, endChunk.c_str(), endChunk.length(), 0);
 				if (bytesSent < 0)
 				{
 					Logger::log(Logger::ERROR, "Failed to send end chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
@@ -368,8 +422,11 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 			}
 		}
 		else
-			Logger::log(Logger::DEBUG, "❌ Chunk not sent completely ❌ ", "Server::sendLargeResponseChunk");
+		{
+			Logger::log(Logger::DEBUG, "Partial chunk sent to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
+		}
 	}
+
 }
 
 void	Server::sendLargeResponse(int clientSocket, ResponseState *responseState)
