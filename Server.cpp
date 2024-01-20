@@ -386,6 +386,9 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	const char *chunkPtr = chunk.c_str() + responseState->currentChunkPosition;
 	ssize_t bytesSent = send(clientSocket, chunkPtr, remainingLength, 0);
 
+
+	// Logger::log(Logger::DEBUG, "This is the total length of chunk : " + std::to_string(totalLength), "Server::sendLargeResponseChunk");
+
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
@@ -396,9 +399,11 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	else
 	{
 		responseState->currentChunkPosition += bytesSent;
+		Logger::log(Logger::DEBUG, "This the bytes sent of chunk : " + std::to_string(bytesSent), "Server::sendLargeResponseChunk");
+		Logger::log(Logger::DEBUG, "This is the current chunk position : " + std::to_string(responseState->currentChunkPosition), "Server::sendLargeResponseChunk");
 		if (responseState->currentChunkPosition >= totalLength)
 		{
-			Logger::log(Logger::DEBUG, "Chunk sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
+			Logger::log(Logger::DEBUG, "Chunk sent completely to client with socket fd " + std::to_string(clientSocket) + " and this what has been sent : " + std::to_string(bytesSent), "Server::sendLargeResponseChunk");
 			responseState->currentChunkPosition = 0;
 			if (responseState->isFinished())
 			{
@@ -423,7 +428,7 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 		}
 		else
 		{
-			Logger::log(Logger::DEBUG, "Partial chunk sent to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
+			Logger::log(Logger::DEBUG, "Partial chunk sent to client with socket fd " + std::to_string(clientSocket) + " and this what has been sent: " + std::to_string(bytesSent), "Server::sendLargeResponseChunk");
 		}
 	}
 

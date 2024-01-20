@@ -8,7 +8,7 @@
 
 #include <sstream>
 
-#define CHUNK_SIZE  6000 // 4KB
+#define CHUNK_SIZE  10000 // 4KB
 
 class ResponseState
 {

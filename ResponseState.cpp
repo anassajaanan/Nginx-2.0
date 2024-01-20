@@ -39,7 +39,8 @@ std::string ResponseState::getNextChunk()
 			this->bytesSent += data.length();
 			this->currentChunk = ss.str() + "\r\n" + data + "\r\n";
 		}
-		return (currentChunk.substr(currentChunkPosition));
+		// return (currentChunk.substr(currentChunkPosition));
+		return (currentChunk);
 	}
 	else
 		return "";
