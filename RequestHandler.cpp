@@ -1,4 +1,6 @@
 #include "RequestHandler.hpp"
+#include "HttpResponse.hpp"
+#include <sys/_types/_size_t.h>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
@@ -256,6 +258,25 @@ HttpResponse	RequestHandler::serverSmallFile(const std::string &path)
 	return (response);
 }
 
+HttpResponse	RequestHandler::serveChunkedResponse(const std::string &path, size_t fileSize)
+{
+	HttpResponse	response;
+
+	response.setFilePath(path);
+	response.setFileSize(fileSize);
+	response.setType(LARGE_RESPONSE);
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("200");
+	response.setStatusMessage("OK");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	response.setHeader("Accept-Ranges", "bytes");
+	response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+	response.setHeader("Transfer-Encoding", "chunked");
+
+	return (response);
+}
+
 HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config, const std::string& path)
 {
 	HttpResponse	response;
@@ -302,21 +323,9 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 				response.setHeader("Content-Range", "bytes " + std::to_string(startByte) + "-" + std::to_string(endByte) + "/" + std::to_string(fileSize));
 				file.close();
 			}
-			else {
-					// send large file in chunks
-				// response.filePath = path;
-				// response.fileSize = fileSize;
-				response.setFilePath(path);
-				response.setFileSize(fileSize);
-				response.setType(LARGE_RESPONSE);
-				response.setVersion("HTTP/1.1");
-				response.setStatusCode("200");
-				response.setStatusMessage("OK");
-				response.setHeader("Content-Type", mimeTypes.getMimeType(path));
-				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "keep-alive");
-				response.setHeader("Transfer-Encoding", "chunked");
-				response.setHeader("Accept-Ranges", "bytes");
+			else
+			{
+				return serveChunkedResponse(path, fileSize);
 			}
 		}
 	}
