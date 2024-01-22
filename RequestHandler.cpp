@@ -105,7 +105,7 @@ void	RequestHandler::replaceUri(std::string &str, const std::string &replace, co
 	while (i != std::string::npos)
 	{
 		str.replace(i, replace.length(), to);
-		i += replace.length();
+		i += to.length();
 		i = str.find(replace, i);
 	}
 }
@@ -271,8 +271,8 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 				std::string end = range.substr(range.find('-') + 1);
 				if (end.empty())
 					end = std::to_string(fileSize - 1);
-				size_t startByte = std::stoi(start);
-				size_t endByte = std::stoi(end);
+				size_t startByte = std::stoll(start);
+				size_t endByte = std::stoll(end);
 				if (endByte > fileSize - 1)
 					endByte = fileSize - 1;
 				size_t contentLength = endByte - startByte + 1;
@@ -443,7 +443,6 @@ HttpResponse RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseC
 
 HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 {
-	
 	if (serverConfig.returnDirective.isEnabled())
 		return handleReturnDirective(request, &serverConfig);
 
@@ -471,6 +470,8 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
+
+	replaceUri(request.getUri(), "%20", " ");
 	
 	std::cerr << "RequestHandler is handling a request of type: " << request.getMethod() << std::endl;
 	if (request.getMethod() == "GET")

@@ -373,7 +373,7 @@ const std::string	&HttpRequest::getMethod() const
 	return (this->method);
 }
 
-const std::string	&HttpRequest::getUri() const
+std::string	&HttpRequest::getUri()
 {
 	return (this->uri);
 }
