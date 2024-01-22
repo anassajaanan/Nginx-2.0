@@ -6,6 +6,7 @@
 #include <string>
 #include <sys/_types/_size_t.h>
 #include <utility>
+#include <unistd.h>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
@@ -427,7 +428,146 @@ HttpResponse	RequestHandler::servePath(HttpRequest &request, BaseConfig *config)
 		return (handleErrorPage(request, config, 404));
 }
 
+HttpResponse	RequestHandler::serveCgiOutput(HttpRequest &request, const std::string &message)
+{
+	HttpResponse response;
 
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode(std::to_string(200));
+	response.setStatusMessage(statusCodeMessages[200]);
+	response.setBody(message);
+	/*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	/*2*/ response.setHeader("Content-Type", "text/plain");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	return response;
+}
+
+void			RequestHandler::delete2dArray(char **str)
+{
+	for (int i = 0; str[i]; i++)
+		delete str[i];
+	delete str;
+}
+
+char		**RequestHandler::initiateEnvVariables(HttpRequest &request)
+{
+	std::vector<std::string>	envVector;
+
+	if (!request.getQueries().empty())
+		envVector.insert(envVector.end(), request.getQueries().begin(), request.getQueries().end());
+	envVector.push_back("CONTENT_TYPE=" + request.getHeader("content-type"));
+	envVector.push_back("CONTENT_LENGHT=" + request.getHeader("content-length"));
+	envVector.push_back("HTTP_COOKIE=" + request.getHeader("Cookie"));
+	std::string	fullQuery;
+	// int i = 0;
+	for (int i = 0; i < request.getQueries().size(); i++)
+	{
+		if (i != 0)
+			fullQuery += "&" + request.getQueries()[i];
+		else
+			fullQuery += request.getQueries()[i];
+	}
+	std::map<std::string, std::string>::const_iterator	t = request.getHeaders().begin();
+	for (; t != request.getHeaders().end(); t++)
+		std::cout << t->first << "==>" << t->second << std::endl;
+	std::cout << "fall = " << fullQuery << std::endl;
+	envVector.push_back("QUERY_STRING=" + fullQuery);
+	std::cout << "user agent = " <<  request.getHeader("user-agent") << std::endl;
+	envVector.push_back("HTTP_USER_AGENT= \"" + request.getHeader("user-agent") + "\"");
+	envVector.push_back("REQUEST_METHOD=" + request.getMethod());
+	envVector.push_back("SERVER_NAME=\"Nginx 2.0\"");
+	envVector.push_back("SERVER_PROTOCOL=" + request.getVersion());
+	envVector.push_back("SCRIPT_FILENAME=" + serverConfig.root + request.getUri());
+	envVector.push_back("SERVER_NAME=" + request.getHeader("host"));
+	//ADD PATH_INFO
+	char	**envArray = new char * [envVector.size() + 1];
+	int		counter = 0;
+	for (; counter < envVector.size(); counter++)
+		envArray[counter] = strdup(envVector[counter].c_str());
+	envArray[counter] = NULL;
+	return (envArray);
+}
+
+HttpResponse	RequestHandler::handleCgiDirective(HttpRequest &request)
+{
+	int		pid;
+	int		pipeFd[2];
+	char	**parameters;
+	char	**envp;
+
+	if (pipe(pipeFd) < 0)
+	{
+		std::cerr << "Pipe Error" << std::endl;
+		// return ;
+	}
+	envp = initiateEnvVariables(request);
+	parameters = new char *[2];
+	parameters[0] = strdup((serverConfig.root + request.getUri()).c_str());
+	std::cout << "para = " << parameters[0] << std::endl;
+	parameters[1] = NULL;
+	pid = fork();
+	if (pid == 0)
+	{
+		close(pipeFd[0]);
+		if (dup2(pipeFd[1], STDOUT_FILENO) < 0)
+		{
+			std::cerr << "Failed To Dup2" << std::endl;
+			this->delete2dArray(parameters);
+			exit (0);
+		}
+		close(pipeFd[1]);
+		if (execve(parameters[0], parameters, envp) < 0)
+		{
+			std::cerr << "Failed To Execute" << std::endl;
+			this->delete2dArray(parameters);
+			exit(0);
+		}
+	}
+	close(pipeFd[1]);
+	int i = 0;
+	std::string		toSend;
+	std::string		buf;
+	char s[1000] = {0};
+	while (read(pipeFd[0], s, 1000) > 0)
+	{
+		toSend += s;
+		std::memset(s, 0, 1000);
+	}
+	if (i < 0)
+		std::cerr << "Read" << std::endl;
+	std::cout << " i = " << i << std::endl;
+	close(pipeFd[0]);
+	std::cout << "reached = " << toSend << std::endl;
+	wait(NULL);
+	this->delete2dArray(parameters);
+	return (serveCgiOutput(request, toSend));
+}
+
+bool			RequestHandler::validateFileExtension(HttpRequest &request)
+{
+	std::vector<std::string>	cgiExten = serverConfig.cgiExtension.getExtensions();
+	std::string					uri = request.getUri();
+
+	std::cout << "uri cgi = " << uri.substr(uri.find('.'), uri.length()) << std::endl;
+	std::vector<std::string>::iterator it = cgiExten.begin();
+	for (; it != cgiExten.end(); it++)
+		std::cout << "{" << *it << "}" << std::endl;
+	if (uri.find('.') == std::string::npos ||
+	std::find(cgiExten.begin(), cgiExten.end(),
+	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
+		return false;
+	return true;
+}
+
+bool			RequestHandler::validCgiRequest(HttpRequest &request, ServerConfig &config)
+{
+	std::cout << "cgi path = " << config.root + request.getUri() << std::endl;
+	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
+	|| !this->fileExists(config.root + request.getUri()) || !validateFileExtension(request))
+		return false;
+	return true;
+}
 
 HttpResponse	RequestHandler::handleReturnDirective(HttpRequest &request, BaseConfig *config)
 {
@@ -511,7 +651,15 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 {
 	if (serverConfig.returnDirective.isEnabled())
 		return handleReturnDirective(request, &serverConfig);
-
+	if (serverConfig.cgiExtension.isEnabled())
+	{
+		// std::cerr << "getUri = " << request.getUri() << std::endl;
+		if (validCgiRequest(request, serverConfig))
+		{
+			return (handleCgiDirective(request));
+			// std::cout << "Valid" << std::endl;
+		}
+	}
 	BaseConfig		*config = &serverConfig;
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 

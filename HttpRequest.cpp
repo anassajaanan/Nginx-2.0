@@ -65,6 +65,7 @@ bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 		{
 			if (!this->validateUri(token))
 				return (this->setStatus(400), false);
+			token = token.substr(0, token.find('?'));
 			this->setUri(token);
 		}
 		if (i == 2 && !token.empty())
@@ -91,10 +92,31 @@ int	HttpRequest::getStatus() const
 	return (this->status);
 }
 
+std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uri)
+{
+	std::vector<std::string> queryVector;
+	std::stringstream	ss;
+	std::string			queryString;
+
+	queryString = uri.substr(uri.find('?') + 1, uri.length());
+	ss << queryString;
+	while (std::getline(ss, queryString, '&'))
+	{
+		if (!queryString.empty())
+        	queryVector.push_back((queryString));
+	}
+    std::vector<std::string>::iterator it = queryVector.begin();
+	return (queryVector);
+}
+
 bool	HttpRequest::validateUri(const std::string &str)
 {
 	if (str.empty() || str.find("/") == std::string::npos)
 		return (false);
+	// if (str.length() >= MAX_URL_LENGTH)
+	// 	return (this->setStatus(414), false);
+	if (str.find('?') != std::string::npos)
+		this->queries = parseQueryString(str);
 	return (true);
 }
 
@@ -245,7 +267,7 @@ bool	HttpRequest::validateValue(std::string &hostName)
 	value = value.substr(index, value.length());
 	if (value.empty())
 		return (false);
-	std::cout << "val = " << value  << " size = " << value.size() << std::endl;
+	// std::cout << "val = " << value  << " size = " << value.size() << std::endl;
 	if (value.empty() || value == hostName)
 		hostName = "";
 	else
@@ -266,6 +288,16 @@ bool	HttpRequest::checkVersionNumber(const std::string &str)
 			return (this->setStatus(505), false);
 	}
 	return false;
+}
+
+const std::vector<std::string>	&HttpRequest::getQueries() const
+{
+	return (this->queries);
+}
+
+const std::map<std::string, std::string>	&HttpRequest::getHeaders() const
+{
+	return (this->headers);
 }
 
 bool	HttpRequest::validateVersion(const std::string &version)

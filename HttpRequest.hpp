@@ -28,6 +28,7 @@ private:
 		std::string							host;
 		std::map<std::string, std::string>	headers;
 		std::string							body;
+		std::vector<std::string>			queries;
 		
 		int									status;
 
@@ -51,6 +52,7 @@ private:
 		bool						loadRequestContent(const std::vector<std::string> &requestVec);
 		std::vector<std::string>	splitByString(const std::string &str, const char *del);
 		bool						checkDuplicatedHost();
+		std::vector<std::string>	parseQueryString(const std::string &uri);
 
 		void				setStatus(const int statusNum);
 public:
@@ -65,6 +67,8 @@ public:
 	const std::string	&getVersion() const;
 	const std::string	&getHost() const;
 	const std::string	&getHeader(const std::string &key) const;
+	const std::vector<std::string>	&getQueries() const;
+	const std::map<std::string, std::string>	&getHeaders() const;
 
 	int				getRecursionDepth() const;
 	void			incrementRecursionDepth();

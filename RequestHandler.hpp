@@ -38,6 +38,7 @@ private:
 	bool			fileExistsAndAccessible(const std::string &path);
 	bool			isRedirectStatusCode(int statusCode);
 	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
+	void			delete2dArray(char **str);
 
 public:
 
@@ -73,6 +74,17 @@ public:
 	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleRequest(HttpRequest &request);
+
+	HttpResponse	serveCgiOutput(HttpRequest &request, const std::string &message);
+
+	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
+
+	HttpResponse	handleCgiDirective(HttpRequest &request);
+
+	bool			validateFileExtension(HttpRequest &request);
+
+	char			**initiateEnvVariables(HttpRequest &request);
+
 
 	HttpResponse	handleGetRequest(HttpRequest &request);
 

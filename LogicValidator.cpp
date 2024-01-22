@@ -14,6 +14,7 @@ LogicValidator::LogicValidator()
 	possibleDirs["return"] = std::make_pair(OneOrTwoArgs, ParentNeeded); /*one or two*/
 	possibleDirs["limit_except"] = std::make_pair(OneOrMoreArgs, ParentNeeded); /*one or more*/
 	possibleDirs["keepalive_timeout"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
+	possibleDirs["cgi_extension"] = std::make_pair(OneOrMoreArgs, ParentNeeded); /*only one*/
 }
 
 
@@ -62,6 +63,11 @@ void	LogicValidator::validateDirectiveParent(const std::string &key, const std::
 		{
 			if (parentName == "location")
 				throw (std::runtime_error("\"keepalive_timeout\" directive is not allowed in this context"));
+		}
+		else if (key == "cgi_extension")
+		{
+			if (parentName != "server")
+				throw (std::runtime_error("\"cgi_extension\" directive is not allowed in this context"));
 		}
 }
 

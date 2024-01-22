@@ -6,6 +6,7 @@
 # define SERVERCONFIG_HPP
 
 #include "BaseConfig.hpp"
+#include "CgiDirective.hpp"
 
 // Default configuration values
 #define DEFAULT_SERVER_PORT 80
@@ -35,6 +36,7 @@ public:
 	std::string								serverName;
 	size_t									keepalive_timeout;
 	std::map<std::string, LocationConfig>	locations;
+	CgiDirective							cgiExtension;
 
 	ServerConfig();
 	ServerConfig(const std::string &rootValue, const std::vector<std::string> &indexValues,

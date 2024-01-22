@@ -37,6 +37,7 @@ void ConfigLoader::processLocationNode(ContextNode* locationNode, LocationConfig
 				locationConfig.setReturn(directive->getValues());
 			else if (directive->getKey() == "limit_except")
 				locationConfig.setAllowedMethods(directive->getValues());
+			
 		}
 	}
 }
@@ -70,6 +71,8 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 				serverConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
 				serverConfig.setReturn(directive->getValues());
+			else if (directive->getKey() == "cgi_extension")
+				serverConfig.cgiExtension.setExtensions(directive->getValues());
 		}
 	}
 	for (size_t i = 0; i < serverChildren.size(); i++)
