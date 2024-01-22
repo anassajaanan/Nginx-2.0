@@ -1,8 +1,5 @@
 #include "RequestHandler.hpp"
-#include "BaseConfig.hpp"
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
-#include <cstddef>
+#include "Logger.hpp"
 #include <string>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
@@ -264,14 +261,50 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 		}
 		else
 		{
-			// send large file in chunks
-			response.filePath = path;
-			response.fileSize = fileSize;
-			response.setType(LARGE_RESPONSE);
-			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
-			response.setHeader("Server", "Nginx 2.0");
-			response.setHeader("Connection", "keep-alive");
-			response.setHeader("Transfer-Encoding", "chunked");
+			if (request.getHeader("Range") != "none")
+			{
+				Logger::log(Logger::ERROR, "Range header is not none", "RequestHandler");
+				std::cerr << "Range header is not none" << std::endl;
+				std::string rangeHeader = request.getHeader("Range");
+				std::string range = rangeHeader.substr(rangeHeader.find('=') + 1);
+				std::string start = range.substr(0, range.find('-'));
+				std::string end = range.substr(range.find('-') + 1);
+				if (end.empty())
+					end = std::to_string(fileSize - 1);
+				size_t startByte = std::stoi(start);
+				size_t endByte = std::stoi(end);
+				if (endByte > fileSize - 1)
+					endByte = fileSize - 1;
+				size_t contentLength = endByte - startByte + 1;
+				if (contentLength > 60000)
+					contentLength = 60000;
+				std::ifstream file(path, std::ios::binary);
+				file.seekg(startByte);
+				std::vector<char> buffer(contentLength);
+				file.read(buffer.data(), contentLength);
+				std::string content(buffer.begin(), buffer.end());
+				response.setVersion("HTTP/1.1");
+				response.setStatusCode("206");
+				response.setStatusMessage("Partial Content");
+				response.setBody(content);
+				response.setHeader("Content-Length", std::to_string(contentLength));
+				response.setHeader("Content-Type", "text/plain");
+				response.setHeader("Server", "Nginx 2.0");
+				response.setHeader("Connection", "keep-alive");
+				response.setHeader("Content-Range", "bytes " + std::to_string(startByte) + "-" + std::to_string(endByte) + "/" + std::to_string(fileSize));
+				file.close();
+			}
+			else {
+					// send large file in chunks
+				response.filePath = path;
+				response.fileSize = fileSize;
+				response.setType(LARGE_RESPONSE);
+				response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+				response.setHeader("Server", "Nginx 2.0");
+				response.setHeader("Connection", "keep-alive");
+				response.setHeader("Transfer-Encoding", "chunked");
+				response.setHeader("Accept-Ranges", "bytes");
+			}
 		}
 	}
 	return (response);
