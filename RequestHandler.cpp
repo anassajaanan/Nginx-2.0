@@ -1,6 +1,7 @@
 #include "RequestHandler.hpp"
 #include "HttpResponse.hpp"
 #include "Logger.hpp"
+#include <cstddef>
 #include <fstream>
 #include <string>
 #include <sys/_types/_size_t.h>
@@ -287,33 +288,44 @@ HttpResponse	RequestHandler::serveChunkedResponse(const std::string &path, size_
 	return (response);
 }
 
+bool	RequestHandler::parseRangeHeader(HttpRequest &request, size_t &startByte, size_t &endByte, size_t fileSize)
+{
+	std::string rangeHeader = request.getHeader("Range");
+	std::string range = rangeHeader.substr(rangeHeader.find('=') + 1);
+	std::string start = range.substr(0, range.find('-'));
+	std::string end = range.substr(range.find('-') + 1);
+	if (start.empty())
+		return (false);
+	if (start.find_first_not_of("0123456789") != std::string::npos)
+		return (false);
+	startByte = std::stoll(start);
+	if (end.empty())
+	{
+		endByte = std::min(startByte + RANGE_REQUEST_SIZE - 1, fileSize - 1);
+	}
+	else {
+		if (end.find_first_not_of("0123456789") != std::string::npos)
+			return (false);
+		endByte = std::stoll(end);
+		endByte = std::min(endByte, startByte + RANGE_REQUEST_SIZE - 1);
+		endByte = std::min(endByte, fileSize - 1);
+	}
+	if (startByte > fileSize || endByte >= fileSize || startByte > endByte)
+		return (false);
+	return (true);
+}
+
 HttpResponse	RequestHandler::handleRangeRequest(HttpRequest& request, const std::string &path, size_t fileSize)
 {
 	HttpResponse	response;
 
-	std::string rangeHeader = request.getHeader("Range");
-
-	std::string range = rangeHeader.substr(rangeHeader.find('=') + 1);
-	std::string start = range.substr(0, range.find('-'));
-	std::string end = range.substr(range.find('-') + 1);
-	if (end.empty())
-		end = std::to_string(fileSize - 1);
-
-	size_t startByte = std::stoll(start);
-	size_t endByte = std::stoll(end);
-
-	if (startByte > fileSize || endByte >= fileSize || startByte > endByte)
+	size_t startByte, endByte;
+	if (!parseRangeHeader(request, startByte, endByte, fileSize))
 	{
-		Logger::log(Logger::ERROR, "Range header is not valid, this is startByte: " + std::to_string(startByte) + " this endByte: " + std::to_string(endByte), "RequestHandler::handleRangeRequest");
+		Logger::log(Logger::ERROR, "Range header is not valid", "RequestHandler::handleRangeRequest");
 		return (serveError(416));
 	}
-
-	endByte = startByte + RANGE_REQUEST_SIZE - 1;
-	if (endByte >= fileSize)
-		endByte = fileSize - 1;
-
 	size_t contentLength = endByte - startByte + 1;
-
 	std::ifstream file(path, std::ios::binary);
 	if (!file.is_open())
 	{
@@ -334,9 +346,8 @@ HttpResponse	RequestHandler::handleRangeRequest(HttpRequest& request, const std:
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	response.setHeader("Content-Range", "bytes " + std::to_string(startByte) + "-" + std::to_string(endByte) + "/" + std::to_string(fileSize));
-
+	
 	return (response);
-
 }
 
 HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config, const std::string& path)

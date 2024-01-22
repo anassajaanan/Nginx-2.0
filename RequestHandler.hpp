@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include <cstddef>
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -57,6 +58,7 @@ public:
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
+	bool			parseRangeHeader(HttpRequest &request, size_t &startByte, size_t &endByte, size_t fileSize);
 	HttpResponse	handleRangeRequest(HttpRequest& request, const std::string &path, size_t fileSize);
 	HttpResponse	serveChunkedResponse(const std::string &path, size_t fileSize);
 	HttpResponse	serverSmallFile(const std::string &path);
