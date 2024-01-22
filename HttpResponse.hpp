@@ -21,13 +21,13 @@ class HttpResponse
 		std::map<std::string, std::string>	headers;
 		std::string							body;
 
-		
+		std::string							filePath;
+		size_t								fileSize;
 
 	public:
 		HttpResponse();
 
-		std::string							filePath;
-		size_t								fileSize;
+		
 
 		void			setType(ResponseType type);
 		void			setVersion(const std::string& version);
@@ -35,6 +35,8 @@ class HttpResponse
 		void			setStatusMessage(const std::string& statusMessage);
 		void			setHeader(const std::string& key, const std::string& value);
 		void			setBody(const std::string& body);
+		void			setFilePath(const std::string& filePath);
+		void			setFileSize(size_t fileSize);
 
 
 		ResponseType	getType() const;
@@ -43,13 +45,14 @@ class HttpResponse
 		std::string		getStatusMessage() const;
 		std::string		getHeader(const std::string& key) const;
 		std::string		getBody() const;
+		std::string		getFilePath() const;
+		size_t			getFileSize() const;
 
 
 		std::string getStatusLine() const;
 		std::string getHeadersAsString() const;
 
 		std::string buildResponse() const; // for small files
-		std::string	buildResponseHeaders() const; // for large files
 
 		void	generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail = "");
 

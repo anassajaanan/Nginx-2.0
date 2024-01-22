@@ -9,11 +9,12 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "MimeTypeParser.hpp"
+#include "Logger.hpp"
 #include <sys/stat.h>
 #include <dirent.h>
 
 
-#define MAX_FILE_SIZE 16384 // 16 KB
+#define SMALL_FILE_THRESHOLD 2097152 // 2 MB
 
 
 class RequestHandler
@@ -54,6 +55,8 @@ public:
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
+	
+	HttpResponse	serverSmallFile(const std::string &path);
 	HttpResponse	serveFile(HttpRequest &request, BaseConfig *config, const std::string& path);
 
 	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);

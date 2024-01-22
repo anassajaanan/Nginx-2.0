@@ -60,7 +60,7 @@ public:
 
 
 	const std::string	&getMethod() const;
-	std::string	&getUri();
+	std::string			&getUri();
 	void				setUri(const std::string &str);
 	const std::string	&getVersion() const;
 	const std::string	&getHost() const;

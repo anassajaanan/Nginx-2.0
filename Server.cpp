@@ -185,7 +185,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	else
 	{
 		Logger::log(Logger::DEBUG, "Generating large response for client with socket fd " + std::to_string(clientSocket), "Server::processGetRequest");
-		responseState = new ResponseState(response.buildResponse(), response.filePath, response.fileSize);
+		responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
 	}
 
 	_responses[clientSocket] = responseState;
@@ -347,9 +347,9 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
-		// _kq.unregisterEvent(clientSocket, EVFILT_WRITE);
-		// _responses.erase(clientSocket);
-		// delete responseState;
+		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		_responses.erase(clientSocket);
+		delete responseState;
 	}
 	else
 	{

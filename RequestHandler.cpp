@@ -1,6 +1,4 @@
 #include "RequestHandler.hpp"
-#include "Logger.hpp"
-#include <string>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
@@ -235,6 +233,29 @@ HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, BaseConfig 
 	return (handleRequest(request));
 }
 
+HttpResponse	RequestHandler::serverSmallFile(const std::string &path)
+{
+	HttpResponse	response;
+
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("200");
+	response.setStatusMessage("OK");
+	std::ifstream file(path, std::ios::binary);
+	if (!file.is_open())
+	{
+		Logger::log(Logger::ERROR, "Could not open file", "RequestHandler::serverSmallFile");
+		return (serveError(500));
+	}
+	std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	response.setBody(content);
+	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	file.close();
+	return (response);
+}
+
 HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config, const std::string& path)
 {
 	HttpResponse	response;
@@ -243,22 +264,9 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 		return handleErrorPage(request, config, 403);
 	else
 	{
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode("200");
-		response.setStatusMessage("OK");
 		size_t fileSize = getFileSize(path);
-		if (fileSize <= MAX_FILE_SIZE)
-		{
-			std::cout << "File size is small" << std::endl;
-			std::ifstream file(path, std::ios::binary);
-			std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-			response.setBody(content);
-			response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-			response.setHeader("Content-Type", mimeTypes.getMimeType(path));
-			response.setHeader("Server", "Nginx 2.0");
-			response.setHeader("Connection", "keep-alive");
-			file.close();
-		}
+		if (fileSize <= SMALL_FILE_THRESHOLD)
+			return serverSmallFile(path);
 		else
 		{
 			if (request.getHeader("Range") != "none")
@@ -276,8 +284,8 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 				if (endByte > fileSize - 1)
 					endByte = fileSize - 1;
 				size_t contentLength = endByte - startByte + 1;
-				if (contentLength > 60000)
-					contentLength = 60000;
+				if (contentLength > 600000)
+					contentLength = 600000;
 				std::ifstream file(path, std::ios::binary);
 				file.seekg(startByte);
 				std::vector<char> buffer(contentLength);
@@ -296,9 +304,14 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 			}
 			else {
 					// send large file in chunks
-				response.filePath = path;
-				response.fileSize = fileSize;
+				// response.filePath = path;
+				// response.fileSize = fileSize;
+				response.setFilePath(path);
+				response.setFileSize(fileSize);
 				response.setType(LARGE_RESPONSE);
+				response.setVersion("HTTP/1.1");
+				response.setStatusCode("200");
+				response.setStatusMessage("OK");
 				response.setHeader("Content-Type", mimeTypes.getMimeType(path));
 				response.setHeader("Server", "Nginx 2.0");
 				response.setHeader("Connection", "keep-alive");
@@ -473,7 +486,6 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 
 	replaceUri(request.getUri(), "%20", " ");
 	
-	std::cerr << "RequestHandler is handling a request of type: " << request.getMethod() << std::endl;
 	if (request.getMethod() == "GET")
 		return (handleGetRequest(request));
 	else if (request.getMethod() == "POST")

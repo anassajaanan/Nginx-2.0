@@ -34,6 +34,16 @@ void	HttpResponse::setBody(const std::string& body)
 	this->body = body;
 }
 
+void	HttpResponse::setFilePath(const std::string& filePath)
+{
+	this->filePath = filePath;
+}
+
+void	HttpResponse::setFileSize(size_t fileSize)
+{
+	this->fileSize = fileSize;
+}
+
 ResponseType	HttpResponse::getType() const
 {
 	return this->type;
@@ -64,6 +74,16 @@ std::string	HttpResponse::getBody() const
 	return this->body;
 }
 
+std::string	HttpResponse::getFilePath() const
+{
+	return this->filePath;
+}
+
+size_t	HttpResponse::getFileSize() const
+{
+	return this->fileSize;
+}
+
 std::string	HttpResponse::getStatusLine() const
 {
 	return this->version + " " + this->statusCode + " " + this->statusMessage;
@@ -85,11 +105,6 @@ std::string	HttpResponse::getHeadersAsString() const
 std::string HttpResponse::buildResponse() const
 {
 	return this->getStatusLine() + "\r\n" + this->getHeadersAsString() + "\r\n" + this->getBody();
-}
-
-std::string HttpResponse::buildResponseHeaders() const
-{
-	return this->getStatusLine() + "\r\n" + this->getHeadersAsString() + "\r\n";
 }
 
 
