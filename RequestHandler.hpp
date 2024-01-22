@@ -1,7 +1,6 @@
 
 
 #pragma once
-#include <sys/_types/_size_t.h>
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -16,6 +15,8 @@
 
 
 #define SMALL_FILE_THRESHOLD 2097152 // 2 MB
+// define the range request response size if endByte is not specified
+#define RANGE_REQUEST_SIZE 2097152 // 2 MB
 
 
 class RequestHandler
@@ -56,6 +57,7 @@ public:
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
+	HttpResponse	handleRangeRequest(HttpRequest& request, const std::string &path, size_t fileSize);
 	HttpResponse	serveChunkedResponse(const std::string &path, size_t fileSize);
 	HttpResponse	serverSmallFile(const std::string &path);
 	HttpResponse	serveFile(HttpRequest &request, BaseConfig *config, const std::string& path);

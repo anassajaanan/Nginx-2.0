@@ -1,6 +1,10 @@
 #include "RequestHandler.hpp"
 #include "HttpResponse.hpp"
+#include "Logger.hpp"
+#include <fstream>
+#include <string>
 #include <sys/_types/_size_t.h>
+#include <utility>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
@@ -25,6 +29,9 @@ void	RequestHandler::initStatusCodeMessages()
 	statusCodeMessages[404] = "Not Found";
 	statusCodeMessages[405] = "Method Not Allowed";
 	statusCodeMessages[413] = "Payload Too Large";
+	statusCodeMessages[414] = "URI Too Long";
+	statusCodeMessages[415] = "Unsupported Media Type";
+	statusCodeMessages[416] = "Range Not Satisfiable";
 	statusCodeMessages[500] = "Internal Server Error";
 	statusCodeMessages[501] = "Not Implemented";
 	statusCodeMessages[503] = "Service Unavailable";
@@ -163,6 +170,8 @@ HttpResponse	RequestHandler::serveError(int statusCode)
 	response.setHeader("Connection", "keep-alive");
 	if (statusCode >= 500 && statusCode < 600 && statusCode != 503)
 		response.setHeader("Connection", "close");
+	if (statusCode == 416)
+		response.setHeader("Connection", "close");
 	return (response);
 }
 
@@ -272,9 +281,62 @@ HttpResponse	RequestHandler::serveChunkedResponse(const std::string &path, size_
 	response.setHeader("Connection", "keep-alive");
 	response.setHeader("Accept-Ranges", "bytes");
 	response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+	response.setHeader("Content-Length", std::to_string(fileSize));
 	response.setHeader("Transfer-Encoding", "chunked");
 
 	return (response);
+}
+
+HttpResponse	RequestHandler::handleRangeRequest(HttpRequest& request, const std::string &path, size_t fileSize)
+{
+	HttpResponse	response;
+
+	std::string rangeHeader = request.getHeader("Range");
+
+	std::string range = rangeHeader.substr(rangeHeader.find('=') + 1);
+	std::string start = range.substr(0, range.find('-'));
+	std::string end = range.substr(range.find('-') + 1);
+	if (end.empty())
+		end = std::to_string(fileSize - 1);
+
+	size_t startByte = std::stoll(start);
+	size_t endByte = std::stoll(end);
+
+	if (startByte > fileSize || endByte >= fileSize || startByte > endByte)
+	{
+		Logger::log(Logger::ERROR, "Range header is not valid, this is startByte: " + std::to_string(startByte) + " this endByte: " + std::to_string(endByte), "RequestHandler::handleRangeRequest");
+		return (serveError(416));
+	}
+
+	endByte = startByte + RANGE_REQUEST_SIZE - 1;
+	if (endByte >= fileSize)
+		endByte = fileSize - 1;
+
+	size_t contentLength = endByte - startByte + 1;
+
+	std::ifstream file(path, std::ios::binary);
+	if (!file.is_open())
+	{
+		Logger::log(Logger::ERROR, "Could not open file", "RequestHandler::handleRangeRequest");
+		return (serveError(500));
+	}
+	file.seekg(startByte);
+	std::vector<char> buffer(contentLength);
+	file.read(buffer.data(), contentLength);
+	file.close();
+
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode("206");
+	response.setStatusMessage("Partial Content");
+	response.setBody(std::string(buffer.begin(), buffer.end()));
+	response.setHeader("Content-Length", std::to_string(contentLength));
+	response.setHeader("Content-Type", "text/plain");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
+	response.setHeader("Content-Range", "bytes " + std::to_string(startByte) + "-" + std::to_string(endByte) + "/" + std::to_string(fileSize));
+
+	return (response);
+
 }
 
 HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config, const std::string& path)
@@ -292,36 +354,7 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 		{
 			if (!request.getHeader("Range").empty())
 			{
-				Logger::log(Logger::ERROR, "Range header is not none", "RequestHandler");
-				std::cerr << "Range header is not none" << std::endl;
-				std::string rangeHeader = request.getHeader("Range");
-				std::string range = rangeHeader.substr(rangeHeader.find('=') + 1);
-				std::string start = range.substr(0, range.find('-'));
-				std::string end = range.substr(range.find('-') + 1);
-				if (end.empty())
-					end = std::to_string(fileSize - 1);
-				size_t startByte = std::stoll(start);
-				size_t endByte = std::stoll(end);
-				if (endByte > fileSize - 1)
-					endByte = fileSize - 1;
-				size_t contentLength = endByte - startByte + 1;
-				if (contentLength > 600000)
-					contentLength = 600000;
-				std::ifstream file(path, std::ios::binary);
-				file.seekg(startByte);
-				std::vector<char> buffer(contentLength);
-				file.read(buffer.data(), contentLength);
-				std::string content(buffer.begin(), buffer.end());
-				response.setVersion("HTTP/1.1");
-				response.setStatusCode("206");
-				response.setStatusMessage("Partial Content");
-				response.setBody(content);
-				response.setHeader("Content-Length", std::to_string(contentLength));
-				response.setHeader("Content-Type", "text/plain");
-				response.setHeader("Server", "Nginx 2.0");
-				response.setHeader("Connection", "keep-alive");
-				response.setHeader("Content-Range", "bytes " + std::to_string(startByte) + "-" + std::to_string(endByte) + "/" + std::to_string(fileSize));
-				file.close();
+				return handleRangeRequest(request, path, fileSize);
 			}
 			else
 			{
