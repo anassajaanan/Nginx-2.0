@@ -95,7 +95,7 @@ void	ClientState::handleGetRequest(Server &server)
 {
 
 	// Log the situation where a GET request contains a body, which is unusual
-	if (!requestBody.empty() || request.getHeader("Content-Length") != "none" || request.getHeader("Transfer-Encoding") == "chunked")
+	if (!requestBody.empty() || !request.getHeader("Content-Length").empty() || request.getHeader("Transfer-Encoding") == "chunked")
 		server.handleInvalidGetRequest(fd);
 	else
 		server.processGetRequest(fd, request);

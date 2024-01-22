@@ -290,7 +290,7 @@ HttpResponse	RequestHandler::serveFile(HttpRequest &request, BaseConfig *config,
 			return serverSmallFile(path);
 		else
 		{
-			if (request.getHeader("Range") != "none")
+			if (!request.getHeader("Range").empty())
 			{
 				Logger::log(Logger::ERROR, "Range header is not none", "RequestHandler");
 				std::cerr << "Range header is not none" << std::endl;

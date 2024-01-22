@@ -176,7 +176,7 @@ bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 	if (!this->searchForHost())
 		return (this->setStatus(400), false);
 	this->setHost((this->headers.find("host"))->second);
-	this->headers.insert(std::pair<std::string, std::string>("none", "none"));	
+	this->headers.insert(std::pair<std::string, std::string>("none", ""));	
 	if (this->getMethod() == "POST")
 		if (!validatePostRequirements())
 			return (false);
