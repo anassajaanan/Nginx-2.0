@@ -133,7 +133,6 @@ bool	HttpRequest::checkDuplicatedHost()
 {
 	std::map<std::string, std::string>::iterator mapIt = this->headers.begin();
 	std::string	lowerKey;
-	// std::cout << "inside check" << std::endl;
 	for (;mapIt != this->headers.end(); mapIt++)
 	{
 		lowerKey.resize(mapIt->first.size());
@@ -202,7 +201,7 @@ bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 	if (this->getMethod() == "POST")
 		if (!validatePostRequirements())
 			return (false);
-	return true;
+	return (true);
 }
 
 bool		HttpRequest::validatePostRequirements()

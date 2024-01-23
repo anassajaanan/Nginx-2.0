@@ -1,4 +1,5 @@
 #include "ClientState.hpp"
+#include <string>
 
 ClientState::ClientState(int fd)
 	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0),
@@ -130,8 +131,9 @@ void	ClientState::handlePostRequest(Server &server)
 
 void	ClientState::initializeBodyStorage(Server &server)
 {
+	std::string	b = "body";
 	std::string filename = "post_body_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + "_" + std::to_string(fd) + ".tmp";
-	requestBodyFilePath = TEMP_FILE_DIRECTORY + filename;
+	requestBodyFilePath = TEMP_FILE_DIRECTORY + b;
 
 	requestBodyFile.open(requestBodyFilePath.c_str(), std::ios::out | std::ios::binary);
 	if (!requestBodyFile.is_open())

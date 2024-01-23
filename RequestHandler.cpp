@@ -7,6 +7,7 @@
 #include <sys/_types/_size_t.h>
 #include <utility>
 #include <unistd.h>
+#include <fcntl.h>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
 	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
@@ -437,7 +438,8 @@ HttpResponse	RequestHandler::serveCgiOutput(HttpRequest &request, const std::str
 	response.setStatusMessage(statusCodeMessages[200]);
 	response.setBody(message);
 	/*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	/*2*/ response.setHeader("Content-Type", "text/plain");
+	if (message.find("Content-Type") == std::string::npos)
+		/*2*/ response.setHeader("Content-Type", "text/plain");
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	return response;
@@ -507,16 +509,25 @@ HttpResponse	RequestHandler::handleCgiDirective(HttpRequest &request)
 	std::cout << "para = " << parameters[0] << std::endl;
 	parameters[1] = NULL;
 	pid = fork();
+	int postBodyFd = open("/Users/atukka/Desktop/cursus/webserve_par/contentbody", O_RDONLY);
+	if (postBodyFd < 0)
+	{
+		std::cout << "Error While Opening The Body File" << std::endl;
+	}
 	if (pid == 0)
 	{
 		close(pipeFd[0]);
 		if (dup2(pipeFd[1], STDOUT_FILENO) < 0)
 		{
-			std::cerr << "Failed To Dup2" << std::endl;
+			std::cerr << "Failed To Dup2 Output" << std::endl;
 			this->delete2dArray(parameters);
 			exit (0);
 		}
+		if (request.getMethod() == "POST")
+			if (dup2(postBodyFd, STDIN_FILENO))
+				std::cerr << "Failed To Dup2 Input" << std::endl;
 		close(pipeFd[1]);
+		close(postBodyFd);
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
 			std::cerr << "Failed To Execute" << std::endl;
@@ -525,6 +536,7 @@ HttpResponse	RequestHandler::handleCgiDirective(HttpRequest &request)
 		}
 	}
 	close(pipeFd[1]);
+	close(postBodyFd);
 	int i = 0;
 	std::string		toSend;
 	std::string		buf;
@@ -537,9 +549,9 @@ HttpResponse	RequestHandler::handleCgiDirective(HttpRequest &request)
 	if (i < 0)
 		std::cerr << "Read" << std::endl;
 	std::cout << " i = " << i << std::endl;
-	close(pipeFd[0]);
 	std::cout << "reached = " << toSend << std::endl;
 	wait(NULL);
+	close(pipeFd[0]);
 	this->delete2dArray(parameters);
 	return (serveCgiOutput(request, toSend));
 }
@@ -682,6 +694,7 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
+		std::cerr << "getUri = " << request.getUri() << std::endl;
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
 
@@ -691,6 +704,15 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return (handleGetRequest(request));
 	else if (request.getMethod() == "POST")
 	{
+		if (serverConfig.cgiExtension.isEnabled())
+	{
+		std::cerr << "getUri = " << request.getUri() << std::endl;
+		if (validCgiRequest(request, serverConfig))
+		{
+			return (handleCgiDirective(request));
+			// std::cout << "Valid" << std::endl;
+		}
+	}
 		HttpResponse response;
 
 		response.setVersion("HTTP/1.1");
