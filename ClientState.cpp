@@ -1,4 +1,6 @@
 #include "ClientState.hpp"
+#include "Logger.hpp"
+#include <sstream>
 #include <string>
 
 ClientState::ClientState(int fd, const std::string &clientIpAddr)
@@ -68,7 +70,6 @@ void	ClientState::parseHeaders(Server &server)
 	requestHeaders.resize(endOfHeaders);
 
 	this->request = HttpRequest(requestHeaders);
-	Logger::log(Logger::DEBUG, "Parsed HTTP headers for fd " + std::to_string(fd), "ClientState::parseHeaders");
 
 	if (request.getUri().size() > MAX_URI_SIZE)
 	{
@@ -78,13 +79,20 @@ void	ClientState::parseHeaders(Server &server)
 
 	if (request.getMethod() == "GET")
 	{
-		// Logger::log(Logger::INFO, "Handling GET request for fd " + std::to_string(fd), "ClientState::parseHeaders");
+		
+		std::ostringstream logStream;
+		logStream << "Received a GET request for '" << request.getUri() << "' from IP '"
+				<< clientIpAddr << "', processing on socket descriptor " << fd;
+		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handleGetRequest(server);
 	}
 
 	else if (request.getMethod() == "POST")
 	{
-		Logger::log(Logger::INFO, "Handling POST request for fd " + std::to_string(fd), "ClientState::parseHeaders");
+		std::ostringstream logStream;
+		logStream << "Received a POST request for '" << request.getUri() << "' from IP '"
+				<< clientIpAddr << "', processing on socket descriptor " << fd;
+		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handlePostRequest(server);
 	}
 	else

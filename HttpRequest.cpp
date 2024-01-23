@@ -1,5 +1,4 @@
 #include "HttpRequest.hpp"
-#include <sys/_types/_size_t.h>
 
 HttpRequest::HttpRequest()
 {
@@ -10,8 +9,10 @@ HttpRequest::HttpRequest()
 HttpRequest::HttpRequest(const std::string &requestStr)
 {
 	if (requestStr.empty())
-		throw (std::runtime_error("Error While Getting The Request"));
-	std::cout << requestStr << std::endl;
+	{
+		this->status = 400;
+		return ;
+	}
 	this->status = 200;
 	this->recursionDepth = 0;
 	this->requestTokenizer(requestStr);
@@ -178,7 +179,6 @@ bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 		std::getline(ss, token, ':');
 		lowerString.resize(token.size());
 		std::transform(token.begin(), token.end(), lowerString.begin(), ::tolower);
-		// std::cout << "token = " << token << std::endl;
 		if (token.find(' ') != std::string::npos)
 			return ( this->setStatus(400), false);
 		if (lowerString  == "host")
@@ -267,7 +267,6 @@ bool	HttpRequest::validateValue(std::string &hostName)
 	value = value.substr(index, value.length());
 	if (value.empty())
 		return (false);
-	// std::cout << "val = " << value  << " size = " << value.size() << std::endl;
 	if (value.empty() || value == hostName)
 		hostName = "";
 	else
@@ -411,11 +410,7 @@ std::string	&HttpRequest::getUri()
 }
 
 
-HttpRequest::~HttpRequest()
-{
-	// write(2, "i went out Dumbass", 19);
-	std::cout << "i went out" << std::endl;
-}
+HttpRequest::~HttpRequest() { }
 
 int	HttpRequest::getRecursionDepth() const
 {

@@ -12,6 +12,8 @@
 #include "Logger.hpp"
 #include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 
 #define SMALL_FILE_THRESHOLD 2097152 // 2 MB
@@ -75,6 +77,7 @@ public:
 
 	HttpResponse	handleRequest(HttpRequest &request);
 	HttpResponse	handleGetRequest(HttpRequest &request);
+	HttpResponse	handlePostRequest(HttpRequest &request);
 
 
 	void			delete2dArray(char **str);
