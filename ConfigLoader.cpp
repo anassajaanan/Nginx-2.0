@@ -37,7 +37,6 @@ void ConfigLoader::processLocationNode(ContextNode* locationNode, LocationConfig
 				locationConfig.setReturn(directive->getValues());
 			else if (directive->getKey() == "limit_except")
 				locationConfig.setAllowedMethods(directive->getValues());
-			
 		}
 	}
 }

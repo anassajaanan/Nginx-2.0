@@ -1,4 +1,5 @@
 
+#pragma once
 #ifndef CGIDIRECTIVE_HPP
 # define CGIDIRECTIVE_HPP
 

@@ -37,7 +37,8 @@ private:
 	bool			fileExistsAndAccessible(const std::string &path);
 	bool			isRedirectStatusCode(int statusCode);
 	void			replaceUri(std::string &str, const std::string &replace, const std::string &to);
-	void			delete2dArray(char **str);
+	bool			parseRangeHeader(HttpRequest &request, size_t &startByte, size_t &endByte, size_t fileSize);
+	
 
 public:
 
@@ -58,7 +59,7 @@ public:
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
-	bool			parseRangeHeader(HttpRequest &request, size_t &startByte, size_t &endByte, size_t fileSize);
+	
 	HttpResponse	handleRangeRequest(HttpRequest& request, const std::string &path, size_t fileSize);
 	HttpResponse	serveChunkedResponse(const std::string &path, size_t fileSize);
 	HttpResponse	serverSmallFile(const std::string &path);
@@ -73,24 +74,19 @@ public:
 	HttpResponse	handleTryFilesDirective(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleRequest(HttpRequest &request);
-
-	HttpResponse	serveCgiOutput(HttpRequest &request, const std::string &message);
-
-	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
-
-	HttpResponse	handleCgiDirective(HttpRequest &request);
-
-	bool			validateFileExtension(HttpRequest &request);
-
-	char			**initiateEnvVariables(HttpRequest &request);
-
-
 	HttpResponse	handleGetRequest(HttpRequest &request);
+
+
+	void			delete2dArray(char **str);
+	HttpResponse	serveCgiOutput(HttpRequest &request, const std::string &message);
+	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
+	HttpResponse	handleCgiDirective(HttpRequest &request);
+	bool			validateFileExtension(HttpRequest &request);
+	char			**initiateEnvVariables(HttpRequest &request);
 
 };
 
-
-
+	
 
 
 

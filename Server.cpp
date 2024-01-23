@@ -124,7 +124,7 @@ void	Server::acceptNewConnection()
 		return;
 	}
 	Logger::log(Logger::INFO, "Accepted new connection on socket fd " + std::to_string(clientSocket), "Server::acceptNewConnection");
-	ClientState *clientState = new ClientState(clientSocket);
+	ClientState *clientState = new ClientState(clientSocket, inet_ntoa(clientAddr.sin_addr));
 	_clients[clientSocket] = clientState;
 	_kq.registerEvent(clientSocket, EVFILT_READ);
 }

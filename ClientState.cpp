@@ -1,8 +1,8 @@
 #include "ClientState.hpp"
 #include <string>
 
-ClientState::ClientState(int fd)
-	: fd(fd), requestCount(0), areHeaderComplete(false), isBodyComplete(false)
+ClientState::ClientState(int fd, const std::string &clientIpAddr)
+	: fd(fd), clientIpAddr(clientIpAddr), requestCount(0), areHeaderComplete(false), isBodyComplete(false)
 {
 	this->lastRequestTime = std::chrono::steady_clock::now();
 }
@@ -78,7 +78,7 @@ void	ClientState::parseHeaders(Server &server)
 
 	if (request.getMethod() == "GET")
 	{
-		Logger::log(Logger::INFO, "Handling GET request for fd " + std::to_string(fd), "ClientState::parseHeaders");
+		// Logger::log(Logger::INFO, "Handling GET request for fd " + std::to_string(fd), "ClientState::parseHeaders");
 		handleGetRequest(server);
 	}
 
@@ -195,6 +195,11 @@ void	ClientState::processBody(Server &server, const char *buffer, size_t bytesRe
 int		ClientState::getFd() const
 {
 	return fd;
+}
+
+const std::string &ClientState::getClientIpAddr() const
+{
+	return clientIpAddr;
 }
 
 int		ClientState::getRequestCount() const

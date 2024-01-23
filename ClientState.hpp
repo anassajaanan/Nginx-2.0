@@ -12,6 +12,7 @@ class ClientState
 private:
 
 	int													fd;
+	std::string											clientIpAddr;
 	int													requestCount;
 	std::chrono::time_point<std::chrono::steady_clock>	lastRequestTime;
 
@@ -26,7 +27,7 @@ private:
 	
 public:
 
-	ClientState(int fd);
+	ClientState(int fd, const std::string &clientIpAddr);
 	~ClientState();
 
 	void	resetClientState();
@@ -44,9 +45,10 @@ public:
 	
 	bool	headersCompleted(const char *buffer) const;
 
-	int		getFd() const;
-	int		getRequestCount() const;
-	bool	isTimedOut(size_t keepalive_timeout) const;
+	int					getFd() const;
+	const std::string	&getClientIpAddr() const;
+	int					getRequestCount() const;
+	bool				isTimedOut(size_t keepalive_timeout) const;
 };
 
 

@@ -321,13 +321,13 @@ HttpResponse	RequestHandler::handleRangeRequest(HttpRequest& request, const std:
 {
 	HttpResponse	response;
 
-	size_t startByte, endByte;
+	size_t startByte, endByte, contentLength;
 	if (!parseRangeHeader(request, startByte, endByte, fileSize))
 	{
 		Logger::log(Logger::ERROR, "Range header is not valid", "RequestHandler::handleRangeRequest");
 		return (serveError(416));
 	}
-	size_t contentLength = endByte - startByte + 1;
+	contentLength = endByte - startByte + 1;
 	std::ifstream file(path, std::ios::binary);
 	if (!file.is_open())
 	{
@@ -664,6 +664,7 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 {
 	if (serverConfig.returnDirective.isEnabled())
 		return handleReturnDirective(request, &serverConfig);
+
 	if (serverConfig.cgiExtension.isEnabled())
 	{
 		// std::cerr << "getUri = " << request.getUri() << std::endl;
@@ -673,6 +674,7 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 			// std::cout << "Valid" << std::endl;
 		}
 	}
+	
 	BaseConfig		*config = &serverConfig;
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 
@@ -706,13 +708,13 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 	else if (request.getMethod() == "POST")
 	{
 		if (serverConfig.cgiExtension.isEnabled())
-	{
-		std::cerr << "getUri = " << request.getUri() << std::endl;
-		if (validCgiRequest(request, serverConfig))
 		{
-			return (handleCgiDirective(request));
+			std::cerr << "getUri = " << request.getUri() << std::endl;
+			if (validCgiRequest(request, serverConfig))
+			{
+				return (handleCgiDirective(request));
+			}
 		}
-	}
 		HttpResponse response;
 
 		response.setVersion("HTTP/1.1");
