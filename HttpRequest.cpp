@@ -1,4 +1,5 @@
 #include "HttpRequest.hpp"
+#include <sys/_types/_size_t.h>
 
 HttpRequest::HttpRequest()
 {
@@ -105,7 +106,7 @@ std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uri)
 		if (!queryString.empty())
         	queryVector.push_back((queryString));
 	}
-    std::vector<std::string>::iterator it = queryVector.begin();
+    // std::vector<std::string>::iterator it = queryVector.begin();
 	return (queryVector);
 }
 
@@ -249,7 +250,7 @@ bool	HttpRequest::validateValue(std::string &hostName)
 {
 	std::string		value;
 	std::string		tmp;
-	int				index = 0;
+	size_t			index = 0;
 
 	value = hostName;
 	tmp = hostName;

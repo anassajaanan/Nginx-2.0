@@ -1,6 +1,7 @@
 #include "ServerManager.hpp"
 #include "Logger.hpp"
 #include <string>
+#include <sys/_types/_uintptr_t.h>
 
 
 int	ServerManager::running = 1;
@@ -45,9 +46,9 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if (event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0)
+		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0)
 		{
-			if (event.ident == servers[i]->_socket)
+			if ((int)event.ident == servers[i]->_socket)
 				servers[i]->acceptNewConnection();
 			else
 			{

@@ -203,7 +203,7 @@ HttpResponse	RequestHandler::handleErrorPage(HttpRequest &request, BaseConfig *c
 		// internal redirection
 		// config->errorPages.clear();
 		// config->errorPagesContext.clear();
-		return (handleFallbackUri(request, config, errorPageFileOrUrl));
+		return (handleFallbackUri(request, errorPageFileOrUrl));
 	}
 }
 
@@ -238,7 +238,7 @@ HttpResponse	RequestHandler::sendRedirect(HttpRequest &request, const std::strin
 	return (response);
 }
 
-HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, BaseConfig *config, const std::string &fallback)
+HttpResponse	RequestHandler::handleFallbackUri(HttpRequest &request, const std::string &fallback)
 {
 	if (request.getRecursionDepth() >= MAX_RECURSION_DEPTH)
 		return (serveError(500));
@@ -393,7 +393,7 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 
 	// Single fallback URI case
 	if (config->index.size() == 1 && config->index[0][0] == '/')
-		return (handleFallbackUri(request, config, config->index[0]));
+		return (handleFallbackUri(request, config->index[0]));
 	
 	// Check if requested URI is a directory
 	if (!isDirectory(config->root + request.getUri()))
@@ -402,12 +402,12 @@ HttpResponse	RequestHandler::handleDirectory(HttpRequest &request, BaseConfig *c
 	for (size_t i = 0; i < config->index.size(); i++)
 	{
 		if (i == config->index.size() - 1 && config->index[i][0] == '/')
-			return (handleFallbackUri(request, config, config->index[i]));
+			return (handleFallbackUri(request, config->index[i]));
 		std::string indexPath = config->root + request.getUri() + config->index[i];
 		if (pathExists(indexPath))
 		{
 			if (isDirectory(indexPath))
-				return (handleFallbackUri(request, config, request.getUri() + config->index[i]));
+				return (handleFallbackUri(request, request.getUri() + config->index[i]));
 			else if (fileExists(indexPath))
 				return serveFile(request, config, indexPath);
 			else
@@ -431,6 +431,7 @@ HttpResponse	RequestHandler::servePath(HttpRequest &request, BaseConfig *config)
 
 HttpResponse	RequestHandler::serveCgiOutput(HttpRequest &request, const std::string &message)
 {
+	(void)request;
 	HttpResponse response;
 
 	response.setVersion("HTTP/1.1");
@@ -463,7 +464,7 @@ char		**RequestHandler::initiateEnvVariables(HttpRequest &request)
 	envVector.push_back("HTTP_COOKIE=" + request.getHeader("Cookie"));
 	std::string	fullQuery;
 	// int i = 0;
-	for (int i = 0; i < request.getQueries().size(); i++)
+	for (size_t i = 0; i < request.getQueries().size(); i++)
 	{
 		if (i != 0)
 			fullQuery += "&" + request.getQueries()[i];
@@ -484,7 +485,7 @@ char		**RequestHandler::initiateEnvVariables(HttpRequest &request)
 	envVector.push_back("SERVER_NAME=" + request.getHeader("host"));
 	//ADD PATH_INFO
 	char	**envArray = new char * [envVector.size() + 1];
-	int		counter = 0;
+	size_t		counter = 0;
 	for (; counter < envVector.size(); counter++)
 		envArray[counter] = strdup(envVector[counter].c_str());
 	envArray[counter] = NULL;
@@ -655,7 +656,7 @@ HttpResponse RequestHandler::handleTryFilesDirective(HttpRequest &request, BaseC
 	{
 		std::string fallbackUri = config->tryFiles.getFallBackUri();
 		replaceUri(fallbackUri, "$uri", request.getUri());
-		return (handleFallbackUri(request, config, fallbackUri));
+		return (handleFallbackUri(request, fallbackUri));
 	}
 }
 

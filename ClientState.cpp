@@ -2,8 +2,10 @@
 #include <string>
 
 ClientState::ClientState(int fd)
-	: fd(fd), lastRequestTime(std::chrono::steady_clock::now()), requestCount(0),
-	areHeaderComplete(false), isBodyComplete(false) { }
+	: fd(fd), requestCount(0), areHeaderComplete(false), isBodyComplete(false)
+{
+	this->lastRequestTime = std::chrono::steady_clock::now();
+}
 
 ClientState::~ClientState()
 {

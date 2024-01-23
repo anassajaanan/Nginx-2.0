@@ -13,25 +13,6 @@
 class ResponseState
 {
 
-public:
-
-	ResponseState(const std::string &smallResponse, bool closeConnection = false); // small response
-	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large response
-
-	ResponseType		getType() const;
-	const std::string	&getSmallResponse() const;
-	const std::string	&getHeaders() const;
-	std::string			getNextChunk();
-
-	bool				isFinished() const;
-
-	bool				isHeaderSent;
-	bool				closeConnection;
-	size_t				bytesSent;
-	size_t				headersSent;
-	std::string			currentChunk;
-	size_t				currentChunkPosition;
-
 private:
 	ResponseType	type;
 	std::string		smallResponse;
@@ -39,8 +20,25 @@ private:
 	std::string		filePath;
 	std::ifstream	fileStream;
 	size_t			fileSize;
-	
-	
+
+public:
+
+	ResponseState(const std::string &smallResponse, bool closeConnection = false); // small response
+	ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize); // large response
+
+	bool				closeConnection;
+	size_t				bytesSent;
+	size_t				headersSent;
+	bool				isHeaderSent;
+	std::string			currentChunk;
+	size_t				currentChunkPosition;
+
+	ResponseType		getType() const;
+	const std::string	&getSmallResponse() const;
+	const std::string	&getHeaders() const;
+	std::string			getNextChunk();
+
+	bool				isFinished() const;
 };
 
 

@@ -4,7 +4,7 @@ ResponseState::ResponseState(const std::string &smallResponse, bool closeConnect
 	: type(SMALL_RESPONSE), smallResponse(smallResponse), closeConnection(closeConnection), bytesSent(0) {}
 
 ResponseState::ResponseState(const std::string &responseHeaders, const std::string &filePath, size_t fileSize)
-	: type(LARGE_RESPONSE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), headersSent(0), bytesSent(0), isHeaderSent(false), currentChunkPosition(0)
+	: type(LARGE_RESPONSE), headers(responseHeaders), filePath(filePath), fileSize(fileSize), bytesSent(0), headersSent(0), isHeaderSent(false), currentChunkPosition(0)
 {
 	fileStream.open(filePath, std::ifstream::binary);
 }

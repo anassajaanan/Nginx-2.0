@@ -1,7 +1,6 @@
 
 
 #pragma once
-#include <cstddef>
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
@@ -26,8 +25,8 @@ class RequestHandler
 private:
 
 
-	MimeTypeParser						&mimeTypes;
 	ServerConfig						&serverConfig;
+	MimeTypeParser						&mimeTypes;
 	std::map<int, std::string>			statusCodeMessages;
 
 	void			initStatusCodeMessages();
@@ -55,7 +54,7 @@ public:
 
 	HttpResponse	serveDirectoryListing(const std::string &uri, const std::string &path);
 
-	HttpResponse	handleFallbackUri(HttpRequest &request, BaseConfig *config, const std::string &fallback);
+	HttpResponse	handleFallbackUri(HttpRequest &request, const std::string &fallback);
 
 	HttpResponse	sendRedirect(HttpRequest &request, const std::string &url);
 
