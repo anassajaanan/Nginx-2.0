@@ -178,15 +178,9 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	_clients[clientSocket]->resetClientState();
 	
 	if (response.getType() == SMALL_RESPONSE)
-	{
-		Logger::log(Logger::DEBUG, "Generating small response for client with socket fd " + std::to_string(clientSocket), "Server::processGetRequest");
 		responseState = new ResponseState(response.buildResponse());
-	}
 	else
-	{
-		Logger::log(Logger::DEBUG, "Generating large response for client with socket fd " + std::to_string(clientSocket), "Server::processGetRequest");
 		responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
-	}
 
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
@@ -194,8 +188,6 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
-	Logger::log(Logger::INFO, "Processing POST request for client with socket fd " + std::to_string(clientSocket), "Server::processPostRequest");
-
 	ResponseState *responseState;
 	RequestHandler handler(_config, _mimeTypes);
 	HttpResponse response = handler.handleRequest(request);
@@ -205,8 +197,6 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 	_responses[clientSocket] = responseState;
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
-
-	Logger::log(Logger::DEBUG, "POST request processed and response ready for client with socket fd " + std::to_string(clientSocket), "Server::processPostRequest");
 }
 
 void	Server::handleHeaderSizeExceeded(int clientSocket)
@@ -296,7 +286,7 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 			delete responseState;
 		}
 		else
-			Logger::log(Logger::DEBUG, "Partial small response sent", "Server::sendSmallResponse");
+			Logger::log(Logger::DEBUG, "Partial small response sent to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
 	}
 }
 
@@ -326,7 +316,7 @@ void	Server::sendLargeResponseHeaders(int clientSocket, ResponseState *responseS
 			responseState->isHeaderSent = true;
 		}
 		else
-			Logger::log(Logger::DEBUG, "Partial large response headers sent", "Server::sendLargeResponseHeaders");
+			Logger::log(Logger::DEBUG, "Partial large response headers sent to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseHeaders");
 	}
 }
 
@@ -341,9 +331,6 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	const char *chunkPtr = chunk.c_str() + responseState->currentChunkPosition;
 	ssize_t bytesSent = send(clientSocket, chunkPtr, remainingLength, 0);
 
-
-	// Logger::log(Logger::DEBUG, "This is the total length of chunk : " + std::to_string(totalLength), "Server::sendLargeResponseChunk");
-
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
@@ -354,8 +341,6 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	else
 	{
 		responseState->currentChunkPosition += bytesSent;
-		Logger::log(Logger::DEBUG, "This the bytes sent of chunk : " + std::to_string(bytesSent), "Server::sendLargeResponseChunk");
-		Logger::log(Logger::DEBUG, "This is the current chunk position : " + std::to_string(responseState->currentChunkPosition), "Server::sendLargeResponseChunk");
 		if (responseState->currentChunkPosition >= totalLength)
 		{
 			Logger::log(Logger::DEBUG, "Chunk sent completely to client with socket fd " + std::to_string(clientSocket) + " and this what has been sent : " + std::to_string(bytesSent), "Server::sendLargeResponseChunk");
@@ -406,7 +391,6 @@ void	Server::handleClientResponse(int clientSocket)
 		return;
 	}
 
-	Logger::log(Logger::DEBUG, "Handling client response for socket " + std::to_string(clientSocket), "Server::handleClientResponse");
 	ResponseState *responseState = _responses[clientSocket];
 
 	if (responseState->getType() == SMALL_RESPONSE)

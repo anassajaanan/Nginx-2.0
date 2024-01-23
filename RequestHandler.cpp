@@ -725,6 +725,5 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return (handlePostRequest(request));
 	else
 		return (serveError(405));
-
 }
 

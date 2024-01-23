@@ -23,7 +23,7 @@
 
 
 
-#define SERVER_BACKLOG 30
+#define SERVER_BACKLOG 60
 
 #define BUFFER_SIZE 4096 // 4 KB
 

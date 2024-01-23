@@ -28,14 +28,42 @@ SRCS = BaseConfig.cpp \
 		TryFilesDirective.cpp \
 		main.cpp
 
+HEADERS = BaseConfig.hpp \
+		CgiDirective.hpp \
+		ClientState.hpp \
+		ConfigLoader.hpp \
+		ConfigNode.hpp \
+		ConfigParser.hpp \
+		ConfigTokenizer.hpp \
+		ContextNode.hpp \
+		DirectiveNode.hpp \
+		HttpRequest.hpp \
+		HttpResponse.hpp \
+		KqueueManager.hpp \
+		LocationConfig.hpp \
+		Logger.hpp \
+		LogicValidator.hpp \
+		MimeTypeParser.hpp \
+		RequestHandler.hpp \
+		ResponseState.hpp \
+		ReturnDirective.hpp \
+		Server.hpp \
+		ServerConfig.hpp \
+		ServerManager.hpp \
+		SyntaxValidator.hpp \
+		TreeBuilder.hpp \
+		TryFilesDirective.hpp
+
 OBJS = $(SRCS:.cpp=.o)
+
+
 
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -fsanitize=address
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
 clean:
