@@ -561,7 +561,7 @@ bool			RequestHandler::validateFileExtension(HttpRequest &request)
 	std::vector<std::string>	cgiExten = serverConfig.cgiExtension.getExtensions();
 	std::string					uri = request.getUri();
 
-	std::cout << "uri cgi = " << uri.substr(uri.find('.'), uri.length()) << std::endl;
+	// std::cout << "uri cgi = " << uri.substr(uri.find('.'), uri.length()) << std::endl;
 	std::vector<std::string>::iterator it = cgiExten.begin();
 	for (; it != cgiExten.end(); it++)
 		std::cout << "{" << *it << "}" << std::endl;
@@ -574,7 +574,7 @@ bool			RequestHandler::validateFileExtension(HttpRequest &request)
 
 bool			RequestHandler::validCgiRequest(HttpRequest &request, ServerConfig &config)
 {
-	std::cout << "cgi path = " << config.root + request.getUri() << std::endl;
+	// std::cout << "cgi path = " << config.root + request.getUri() << std::endl;
 	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
 	|| !this->fileExists(config.root + request.getUri()) || !validateFileExtension(request))
 		return false;
@@ -710,7 +710,6 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		if (validCgiRequest(request, serverConfig))
 		{
 			return (handleCgiDirective(request));
-			// std::cout << "Valid" << std::endl;
 		}
 	}
 		HttpResponse response;
