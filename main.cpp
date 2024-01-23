@@ -38,7 +38,6 @@ int main()
 		ConfigLoader loader(treeRoot);
 		loader.loadServers(serverConfigs);
 
-
 		ServerManager serverManager(serverConfigs, mimeTypeParser);
 
 		Logger::log(Logger::DEBUG, "Starting server manager", "main");

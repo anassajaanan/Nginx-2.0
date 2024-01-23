@@ -1,8 +1,4 @@
 #include "MimeTypeParser.hpp"
-#include <algorithm>
-#include <stdexcept>
-#include <string>
-#include <sys/_types/_size_t.h>
 
 MimeTypeParser::MimeTypeParser(const std::string &fileName)
 	: mimeTypeFileName(fileName) { }
