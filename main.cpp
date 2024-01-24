@@ -31,9 +31,7 @@ int main()
 
 		ConfigLoader loader(parser.getConfigTreeRoot());
 		loader.loadServers(serverConfigs);
-
-		
-
+	
 	}
 	catch (const std::exception &e)
 	{

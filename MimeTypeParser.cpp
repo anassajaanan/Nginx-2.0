@@ -65,15 +65,10 @@ void	MimeTypeParser::tokenizeMimeTypeFile()
 	}
 	if (!currentToken.empty())
 		mimeTypeTokens.push_back(currentToken);
-
-
 }
 
-void	MimeTypeParser::parseMimeTypeFile(MimeTypeConfig &mimeTypeConfig)
+void	MimeTypeParser::parseMimeType(MimeTypeConfig &mimeTypeConfig)
 {
-	readMimeTypeFile();
-	tokenizeMimeTypeFile();
-
 	if (mimeTypeTokens.size() == 0)
 		throw std::runtime_error("Error: The MIME type file ('"
 		+ mimeTypeFileName + "') is empty. Please provide a valid file.");
@@ -106,4 +101,11 @@ void	MimeTypeParser::parseMimeTypeFile(MimeTypeConfig &mimeTypeConfig)
 		throw (std::runtime_error("unexpected end of file in MIME type file"));
 	if (i != mimeTypeTokens.size() - 1)
 		throw (std::runtime_error("unexpected \"" + mimeTypeTokens[i + 1] + "\" in MIME type file"));
+}
+
+void	MimeTypeParser::parseMimeTypeFile(MimeTypeConfig &mimeTypeConfig)
+{
+	readMimeTypeFile();
+	tokenizeMimeTypeFile();
+	parseMimeType(mimeTypeConfig);
 }

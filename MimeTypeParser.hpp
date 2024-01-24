@@ -28,6 +28,7 @@ public:
 
 	void		readMimeTypeFile();
 	void		tokenizeMimeTypeFile();
+	void		parseMimeType(MimeTypeConfig &mimeTypeConfig);
 	void		parseMimeTypeFile(MimeTypeConfig &mimeTypeConfig);
 };
 
