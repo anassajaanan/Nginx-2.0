@@ -18,8 +18,9 @@ class CgiDirective
         ~CgiDirective();
 
         bool    isEnabled();
-        void	setExtensions(const std::vector<std::string> &content);
-        std::vector<std::string>    &getExtensions();
+        // void	setExtensions(const std::vector<std::string> &content);
+        void    addCgiExtension(const std::string &extension);
+        const std::vector<std::string>    &getExtensions();
 };
 
 

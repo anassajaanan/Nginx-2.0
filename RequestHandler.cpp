@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include <sys/wait.h>
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeConfig &mimeTypeConfig)
 	: serverConfig(serverConfig), mimeTypeConfig(mimeTypeConfig) { }
@@ -530,6 +531,7 @@ HttpResponse	RequestHandler::handleCgiDirective(HttpRequest &request)
 	close(pipeFd[1]);
 	close(postBodyFd);
 	int i = 0;
+	int status = 0;
 	std::string		toSend;
 	std::string		buf;
 	char s[1000] = {0};
@@ -542,9 +544,20 @@ HttpResponse	RequestHandler::handleCgiDirective(HttpRequest &request)
 		std::cerr << "Read" << std::endl;
 	std::cout << " i = " << i << std::endl;
 	std::cout << "reached = " << toSend << std::endl;
-	wait(NULL);
+	// wait(NULL);
+	int k = 0;
+	// if (setsid() < 0)
+	// 	std::cout << "failed to setsid" << std::endl;
+	k = waitpid(pid, &status, WNOHANG);
+	// if (WIFEXITED(status))
+	// 	std::cout << "Exited" << std::endl;
+	// else
+	//  	std::cout << "Not Yet" << std::endl;
+	std::cout << "k = " << k << std::endl;
+	std::cout << "status = " << status << std::endl;
 	close(pipeFd[0]);
 	this->delete2dArray(parameters);
+	this->delete2dArray(envp);
 	return (serveCgiOutput(request, toSend));
 }
 
@@ -712,11 +725,10 @@ HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
+	std::cout << "Uri = " << request.getUri() << std::endl;
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
 
-	replaceUri(request.getUri(), "%20", " ");
-	
 	if (request.getMethod() == "GET")
 		return (handleGetRequest(request));
 	else if (request.getMethod() == "POST")

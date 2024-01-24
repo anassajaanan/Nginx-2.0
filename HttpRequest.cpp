@@ -65,9 +65,11 @@ bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 			this->setMethod(token);
 		if (i == 1 && !token.empty())
 		{
+			replaceUri(token, "%20", " ");
 			if (!this->validateUri(token))
 				return (this->setStatus(400), false);
 			token = token.substr(0, token.find('?'));
+			// std::cout << "token = " << token << std::endl;
 			this->setUri(token);
 		}
 		if (i == 2 && !token.empty())
@@ -82,6 +84,19 @@ bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 	if (i != 3)
 		return (this->setStatus(400), false);
 	return true;
+}
+
+void	HttpRequest::replaceUri(std::string &str, const std::string &replace, const std::string &replaceBy)
+{
+	size_t	i = 0;
+
+	i = str.find(replace, i);
+	while (i != std::string::npos)
+	{
+		str.replace(i, replace.length(), replaceBy);
+		i += replaceBy.length();
+		i = str.find(replace, i);
+	}
 }
 
 void	HttpRequest::setStatus(const int statusNum)
@@ -117,6 +132,7 @@ bool	HttpRequest::validateUri(const std::string &str)
 		return (false);
 	// if (str.length() >= MAX_URL_LENGTH)
 	// 	return (this->setStatus(414), false);
+	// replaceUri()
 	if (str.find('?') != std::string::npos)
 		this->queries = parseQueryString(str);
 	return (true);
