@@ -2,4 +2,5 @@
 a.out
 a.out.dSYM/
 .DS_Store
+objs/
 tmp.cpp

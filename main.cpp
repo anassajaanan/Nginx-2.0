@@ -17,37 +17,37 @@ void	signalHandler(int signum)
 
 int main()
 {
+	MimeTypeParser mimeTypeParser("mime.types");
+	std::vector<ServerConfig>	serverConfigs;
+
+
     try
 	{
-		signal(SIGPIPE, SIG_IGN);
-		signal(SIGINT, signalHandler);
-		signal(SIGTERM, signalHandler);
-
-
-		// ConfigParser parser("/goinfre/aajaanan/brew/etc/nginx/nginx.conf");
 		ConfigParser parser("./nginx.conf");
 		parser.parseConfigFile();
 
-		MimeTypeParser mimeTypeParser("mime.types");
-		mimeTypeParser.parseMimeTypeFile();
-	
-		ConfigNode *treeRoot = parser.getConfigTreeRoot();
-
-		std::vector<ServerConfig>	serverConfigs;
-		
-		ConfigLoader loader(treeRoot);
+		ConfigLoader loader(parser.getConfigTreeRoot());
 		loader.loadServers(serverConfigs);
 
-		ServerManager serverManager(serverConfigs, mimeTypeParser);
-
-		Logger::log(Logger::DEBUG, "Starting server manager", "main");
-		serverManager.start();
+		mimeTypeParser.parseMimeTypeFile();
 
 	}
 	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
+
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
+
+	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
+
+	ServerManager serverManager(serverConfigs, mimeTypeParser);
+	Logger::log(Logger::DEBUG, "Starting server manager", "main");
+	serverManager.start();
+
+	Logger::cleanup();
 
 	return 0;
 }

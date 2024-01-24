@@ -6,6 +6,7 @@
 #define LOGGER_HPP
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <chrono>
 #include <iomanip>
@@ -19,21 +20,26 @@ public:
 
 	enum Level { DEBUG, INFO, WARN, ERROR, FATAL };
 
-
 	static void	setLevel(Level level);
 	static void	setOutput(std::ostream &outputStream);
 	static void	setFormat(const std::string &formatString);
 
+	static void	init(Logger::Level logLevel, const std::string &logFilePath = "");
+	static void cleanup();
+
 	static void log(Level level, const std::string& message, const std::string& source);
 
-
+	
 
 private:
 
 
-	static Level		currentLevel;
-	static std::ostream	*output;
-	static std::string	format;
+	static Level			currentLevel;
+	static std::ostream		*output;
+	static std::string		format;
+	static std::ofstream	logFile;
+	static bool				isStandardOutput;
+	
 
 	static std::string levelToString(Level level);
 	static std::string getCurrentTimeFormatted();
