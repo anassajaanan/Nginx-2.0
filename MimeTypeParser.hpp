@@ -4,13 +4,13 @@
 #ifndef MIMETYPEPARSER_HPP
 #define MIMETYPEPARSER_HPP
 
-#include <map>
+#include "MimeTypeConfig.hpp"
+
 #include <set>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sys/stat.h>
-#include <iostream>
 
 class MimeTypeParser
 {
@@ -18,7 +18,7 @@ private:
 	std::string							mimeTypeFileName;
 	std::string							mimeTypeFileContent;
 	std::vector<std::string>			mimeTypeTokens;
-	std::map<std::string, std::string>	mimeTypeMap;
+	
 
 	MimeTypeParser();
 
@@ -28,21 +28,7 @@ public:
 
 	void		readMimeTypeFile();
 	void		tokenizeMimeTypeFile();
-	void		parseMimeTypeFile();
-	std::string	getMimeType(const std::string &filePath);
-
-	void		printMimeTypeMap();
-
-	// Getters
-	std::map<std::string, std::string>	&getMimeTypeMap();
-
-
+	void		parseMimeTypeFile(MimeTypeConfig &mimeTypeConfig);
 };
-
-
-
-
-
-
 
 #endif // MIMETYPEPARSER_HPP

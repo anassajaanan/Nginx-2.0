@@ -6,7 +6,6 @@ MimeTypeParser::MimeTypeParser(const std::string &fileName)
 MimeTypeParser::~MimeTypeParser()
 {
 	mimeTypeTokens.clear();
-	mimeTypeMap.clear();
 }
 
 void	MimeTypeParser::readMimeTypeFile()
@@ -70,7 +69,7 @@ void	MimeTypeParser::tokenizeMimeTypeFile()
 
 }
 
-void	MimeTypeParser::parseMimeTypeFile()
+void	MimeTypeParser::parseMimeTypeFile(MimeTypeConfig &mimeTypeConfig)
 {
 	readMimeTypeFile();
 	tokenizeMimeTypeFile();
@@ -93,7 +92,7 @@ void	MimeTypeParser::parseMimeTypeFile()
 		std::string type = mimeTypeTokens[i++];
 		while (i < mimeTypeTokens.size() && mimeTypeTokens[i] != ";" && mimeTypeTokens[i] != "{" && mimeTypeTokens[i] != "}")
 		{
-			mimeTypeMap[mimeTypeTokens[i]] = type;
+			mimeTypeConfig.addMimeType(mimeTypeTokens[i], type);
 			i++;
 		}
 		if (i == mimeTypeTokens.size())
@@ -107,26 +106,4 @@ void	MimeTypeParser::parseMimeTypeFile()
 		throw (std::runtime_error("unexpected end of file in MIME type file"));
 	if (i != mimeTypeTokens.size() - 1)
 		throw (std::runtime_error("unexpected \"" + mimeTypeTokens[i + 1] + "\" in MIME type file"));
-}
-
-std::string	MimeTypeParser::getMimeType(const std::string &filePath)
-{
-	std::string	extension;
-	size_t		pos = filePath.find_last_of('.');
-	if (pos != std::string::npos)
-		extension = filePath.substr(pos + 1);
-	else
-		return ("application/octet-stream");
-	// convert extension to lowercase
-	std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-	std::map<std::string, std::string>::iterator it = mimeTypeMap.find(extension);
-	if (it != mimeTypeMap.end())
-		return (it->second);
-	return ("application/octet-stream");
-}
-
-void	MimeTypeParser::printMimeTypeMap()
-{
-	for (std::map<std::string, std::string>::iterator it = mimeTypeMap.begin(); it != mimeTypeMap.end(); it++)
-		std::cout << it->first << " : " << it->second << std::endl;
 }

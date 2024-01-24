@@ -2,6 +2,7 @@
 
 
 #pragma once
+#include "MimeTypeConfig.hpp"
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -43,11 +44,11 @@ private:
 
 
 public:
-	Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq);
+	Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq);
 	~Server();
 
 	ServerConfig						&_config;
-	MimeTypeParser						&_mimeTypes;
+	MimeTypeConfig						&_mimeTypes;
 	KqueueManager						&_kq;
 	int									_socket;
 	struct sockaddr_in					_serverAddr;

@@ -1,19 +1,17 @@
 #include "ServerManager.hpp"
-#include "Logger.hpp"
-#include <string>
-#include <sys/_types/_uintptr_t.h>
+#include "MimeTypeConfig.hpp"
 
 
 int	ServerManager::running = 1;
 
-ServerManager::ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypes)
+ServerManager::ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes)
 {
 	initializeServers(serverConfigs, mimeTypes);
 }
 
 ServerManager::~ServerManager() { }
 
-void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypes)
+void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes)
 {
 	for (size_t i = 0; i < serverConfigs.size(); i++)
 	{

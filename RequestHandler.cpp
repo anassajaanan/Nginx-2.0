@@ -1,9 +1,7 @@
 #include "RequestHandler.hpp"
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
 
-RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes)
-	: serverConfig(serverConfig), mimeTypes(mimeTypes) { }
+RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeConfig &mimeTypeConfig)
+	: serverConfig(serverConfig), mimeTypeConfig(mimeTypeConfig) { }
 
 RequestHandler::~RequestHandler() { }
 
@@ -256,7 +254,7 @@ HttpResponse	RequestHandler::serverSmallFile(const std::string &path)
 	std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	response.setBody(content);
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+	response.setHeader("Content-Type", mimeTypeConfig.getMimeType(path));
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	file.close();
@@ -276,7 +274,7 @@ HttpResponse	RequestHandler::serveChunkedResponse(const std::string &path, size_
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	response.setHeader("Accept-Ranges", "bytes");
-	response.setHeader("Content-Type", mimeTypes.getMimeType(path));
+	response.setHeader("Content-Type", mimeTypeConfig.getMimeType(path));
 	response.setHeader("Content-Length", std::to_string(fileSize));
 	response.setHeader("Transfer-Encoding", "chunked");
 

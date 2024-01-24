@@ -28,7 +28,7 @@ private:
 
 
 	ServerConfig						&serverConfig;
-	MimeTypeParser						&mimeTypes;
+	MimeTypeConfig						&mimeTypeConfig;
 	std::map<int, std::string>			statusCodeMessages;
 
 	void			initStatusCodeMessages();
@@ -44,7 +44,7 @@ private:
 
 public:
 
-	RequestHandler(ServerConfig &serverConfig, MimeTypeParser &mimeTypes);
+	RequestHandler(ServerConfig &serverConfig, MimeTypeConfig &mimeTypeConfig);
 	~RequestHandler();
 
 	std::string		generateDirectoryListing(const std::string &uri, const std::string &path);

@@ -1,11 +1,8 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
-#include "Logger.hpp"
-#include <string>
-#include <sys/_types/_size_t.h>
-#include <sys/_types/_ssize_t.h>
 
-Server::Server(ServerConfig &config, MimeTypeParser &mimeTypes, KqueueManager &kq) : _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
+Server::Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq)
+	: _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
 {
 	// std::cout << "Server constructor" << std::endl;
 	_serverAddr.sin_family = AF_INET;

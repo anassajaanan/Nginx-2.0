@@ -26,6 +26,7 @@ SRCS =	BaseConfig.cpp \
 		SyntaxValidator.cpp \
 		TreeBuilder.cpp \
 		TryFilesDirective.cpp \
+		MimeTypeConfig.cpp \
 		main.cpp
 
 HEADERS =	BaseConfig.hpp \
@@ -52,7 +53,8 @@ HEADERS =	BaseConfig.hpp \
 			ServerManager.hpp \
 			SyntaxValidator.hpp \
 			TreeBuilder.hpp \
-			TryFilesDirective.hpp
+			TryFilesDirective.hpp \
+			MimeTypeConfig.hpp
 
 
 OBJS_DIR = objs/

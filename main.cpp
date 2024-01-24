@@ -1,6 +1,7 @@
 
 #include "ConfigParser.hpp"
 #include "ConfigLoader.hpp"
+#include "MimeTypeConfig.hpp"
 #include "ServerManager.hpp"
 #include "Logger.hpp"
 
@@ -17,24 +18,27 @@ void	signalHandler(int signum)
 
 int main()
 {
-	MimeTypeParser mimeTypeParser("mime.types");
 	std::vector<ServerConfig>	serverConfigs;
-
+	MimeTypeConfig				mimeTypeConfig;
 
     try
 	{
 		ConfigParser parser("./nginx.conf");
 		parser.parseConfigFile();
 
+		MimeTypeParser mimeTypeParser("mime.types");
+		mimeTypeParser.parseMimeTypeFile(mimeTypeConfig);
+
 		ConfigLoader loader(parser.getConfigTreeRoot());
 		loader.loadServers(serverConfigs);
 
-		mimeTypeParser.parseMimeTypeFile();
+		
 
 	}
 	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
+		return 1;
 	}
 
 	signal(SIGPIPE, SIG_IGN);
@@ -43,7 +47,7 @@ int main()
 
 	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
 
-	ServerManager serverManager(serverConfigs, mimeTypeParser);
+	ServerManager serverManager(serverConfigs, mimeTypeConfig);
 	Logger::log(Logger::DEBUG, "Starting server manager", "main");
 	serverManager.start();
 

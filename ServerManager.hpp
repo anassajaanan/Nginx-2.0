@@ -2,6 +2,7 @@
 
 
 #pragma once
+#include "MimeTypeConfig.hpp"
 #ifndef SERVERMANAGER_HPP
 #define SERVERMANAGER_HPP
 
@@ -23,12 +24,12 @@ private:
 public:
 	static int								running;
 
-	ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypes);
+	ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
 	~ServerManager();
 	
 	
 
-	void	initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeParser &mimeTypes);
+	void	initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
 	void 	checkTimeouts();
 	void	processReadEvent(const struct kevent &event);
 	void	processWriteEvent(const struct kevent &event);
