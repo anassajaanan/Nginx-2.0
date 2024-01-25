@@ -727,7 +727,6 @@ HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
-	std::cout << "Uri = " << request.getUri() << std::endl;
 	if (request.getStatus() != 200)
 		return (serveError(request.getStatus()));
 
