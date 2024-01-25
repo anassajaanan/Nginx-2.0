@@ -19,8 +19,8 @@ public:
 	ReturnDirective();
 	~ReturnDirective();
 
-	void	setStatusCode(int statusCode);
-	void	setResponseTextOrUrl(const std::string &responseTextOrUrl);
+	void	setStatusCode(int statusCodeValue);
+	void	setResponseTextOrUrl(const std::string &responseTextOrUrlValue);
 	
 
 	int					getStatusCode() const;

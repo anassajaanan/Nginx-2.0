@@ -5,3 +5,4 @@ a.out.dSYM/
 objs/
 build/
 tmp.cpp
+content/dist/*

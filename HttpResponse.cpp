@@ -4,24 +4,24 @@
 HttpResponse::HttpResponse(): type(SMALL_RESPONSE) { }
 
 
-void	HttpResponse::setType(ResponseType type)
+void	HttpResponse::setType(ResponseType typeValue)
 {
-	this->type = type;
+	this->type = typeValue;
 }
 
-void	HttpResponse::setVersion(const std::string& version)
+void	HttpResponse::setVersion(const std::string& versionValue)
 {
-	this->version = version;
+	this->version = versionValue;
 }
 
-void	HttpResponse::setStatusCode(const std::string& statusCode)
+void	HttpResponse::setStatusCode(const std::string& statusCodeValue)
 {
-	this->statusCode = statusCode;
+	this->statusCode = statusCodeValue;
 }
 
-void	HttpResponse::setStatusMessage(const std::string& statusMessage)
+void	HttpResponse::setStatusMessage(const std::string& statusMessageValue)
 {
-	this->statusMessage = statusMessage;
+	this->statusMessage = statusMessageValue;
 }
 
 void	HttpResponse::setHeader(const std::string& key, const std::string& value)
@@ -29,19 +29,19 @@ void	HttpResponse::setHeader(const std::string& key, const std::string& value)
 	this->headers[key] = value;
 }
 
-void	HttpResponse::setBody(const std::string& body)
+void	HttpResponse::setBody(const std::string& bodyValue)
 {
-	this->body = body;
+	this->body = bodyValue;
 }
 
-void	HttpResponse::setFilePath(const std::string& filePath)
+void	HttpResponse::setFilePath(const std::string& filePathValue)
 {
-	this->filePath = filePath;
+	this->filePath = filePathValue;
 }
 
-void	HttpResponse::setFileSize(size_t fileSize)
+void	HttpResponse::setFileSize(size_t fileSizeValue)
 {
-	this->fileSize = fileSize;
+	this->fileSize = fileSizeValue;
 }
 
 ResponseType	HttpResponse::getType() const
@@ -108,15 +108,15 @@ std::string HttpResponse::buildResponse() const
 }
 
 
-void	HttpResponse::generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail)
+void	HttpResponse::generateStandardErrorResponse(const std::string &statusCodeValue, const std::string &statusMessageValue, const std::string &title, const std::string &detail)
 {
 	this->setVersion("HTTP/1.1");
-	this->setStatusCode(statusCode);
-	this->setStatusMessage(statusMessage);
+	this->setStatusCode(statusCodeValue);
+	this->setStatusMessage(statusMessageValue);
 	this->setHeader("Content-Type", "text/html");
 	
 	std::string htmlBody = "<html><head><title>" + title + "</title></head>"
-                           "<body><center><h1>" + statusCode + " " + statusMessage + "</h1></center>"
+                           "<body><center><h1>" + statusCodeValue + " " + statusMessageValue + "</h1></center>"
                            "<center>" + detail + "</center><hr><center>nginx 2.0</center></body></html>";
 	this->setBody(htmlBody);
 	this->setHeader("Content-Length", std::to_string(htmlBody.length()));

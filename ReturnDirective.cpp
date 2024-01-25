@@ -5,17 +5,17 @@ ReturnDirective::ReturnDirective() : statusCode(0), _isEnabled(false) { }
 
 ReturnDirective::~ReturnDirective() { }
 
-void	ReturnDirective::setStatusCode(int statusCode)
+void	ReturnDirective::setStatusCode(int statusCodeValue)
 {
 	_isEnabled = true;
-	this->statusCode = statusCode;
+	this->statusCode = statusCodeValue;
 }
 
-void	ReturnDirective::setResponseTextOrUrl(const std::string &responseTextOrUrl)
+void	ReturnDirective::setResponseTextOrUrl(const std::string &responseTextOrUrlValue)
 {
 	_isEnabled = true;
 	// url if status code is 301 or 302, otherwise response text
-	this->responseTextOrUrl = responseTextOrUrl;
+	this->responseTextOrUrl = responseTextOrUrlValue;
 }
 
 bool	ReturnDirective::isEnabled() const

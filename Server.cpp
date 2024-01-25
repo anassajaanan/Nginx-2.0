@@ -101,7 +101,7 @@ void	Server::bindAndListen()
 	if (_socket == -1)
 		return;
 
-	if (bind(this->_socket, (struct sockaddr *)&this->_serverAddr, sizeof(this->_serverAddr)) < 0)
+	if (bind(this->_socket, reinterpret_cast< sockaddr *>(&this->_serverAddr), sizeof(this->_serverAddr)) < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to bind socket: " + std::string(strerror(errno)), "Server::bindAndListen");
 		_socket = -1;
@@ -360,7 +360,7 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 			{
 				// send end chunk
 				std::string endChunk = "0\r\n\r\n";
-				ssize_t bytesSent = send(clientSocket, endChunk.c_str(), endChunk.length(), 0);
+				bytesSent = send(clientSocket, endChunk.c_str(), endChunk.length(), 0);
 				if (bytesSent < 0)
 				{
 					Logger::log(Logger::ERROR, "Failed to send end chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");

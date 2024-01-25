@@ -29,14 +29,14 @@ class HttpResponse
 
 		
 
-		void			setType(ResponseType type);
-		void			setVersion(const std::string& version);
-		void			setStatusCode(const std::string& statusCode);
-		void			setStatusMessage(const std::string& statusMessage);
+		void			setType(ResponseType typeValue);
+		void			setVersion(const std::string& versionValue);
+		void			setStatusCode(const std::string& statusCodeValue);
+		void			setStatusMessage(const std::string& statusMessageValue);
 		void			setHeader(const std::string& key, const std::string& value);
-		void			setBody(const std::string& body);
-		void			setFilePath(const std::string& filePath);
-		void			setFileSize(size_t fileSize);
+		void			setBody(const std::string& bodyValue);
+		void			setFilePath(const std::string& filePathValue);
+		void			setFileSize(size_t fileSizeValue);
 
 
 		ResponseType	getType() const;
@@ -54,7 +54,7 @@ class HttpResponse
 
 		std::string buildResponse() const; // for small files
 
-		void	generateStandardErrorResponse(const std::string &statusCode, const std::string &statusMessage, const std::string &title, const std::string &detail = "");
+		void	generateStandardErrorResponse(const std::string &statusCodeValue, const std::string &statusMessageValue, const std::string &title, const std::string &detail = "");
 
 };
 
