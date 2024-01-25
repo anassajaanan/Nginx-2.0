@@ -109,13 +109,13 @@ int	HttpRequest::getStatus() const
 	return (this->status);
 }
 
-std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uri)
+std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uriValue)
 {
 	std::vector<std::string> queryVector;
 	std::stringstream	ss;
 	std::string			queryString;
 
-	queryString = uri.substr(uri.find('?') + 1, uri.length());
+	queryString = uriValue.substr(uriValue.find('?') + 1, uriValue.length());
 	ss << queryString;
 	while (std::getline(ss, queryString, '&'))
 	{
@@ -178,7 +178,6 @@ bool	HttpRequest::searchForHost()
 
 bool	HttpRequest::loadRequestContent(const std::vector<std::string> &requestVec)
 {
-	std::stringstream			ss;
 	std::vector<std::string>	splitedTokens;
 	std::string					token;
 	std::string					value;
@@ -294,10 +293,10 @@ bool	HttpRequest::checkVersionNumber(const std::string &str)
 {
 	if (str.length() == 3 && std::isdigit(str[0]) && str[1] == '.' && std::isdigit(str[2]))
 	{
-		float version = std::stof(str);
-		if (version < 1)
+		float versionValue = std::stof(str);
+		if (versionValue < 1)
 			return false;
-		if (version >= 1 && version <= 1.9)
+		if (versionValue >= 1 && versionValue <= 1.9)
 			return true;
 		else
 			return (this->setStatus(505), false);
@@ -315,13 +314,13 @@ const std::map<std::string, std::string>	&HttpRequest::getHeaders() const
 	return (this->headers);
 }
 
-bool	HttpRequest::validateVersion(const std::string &version)
+bool	HttpRequest::validateVersion(const std::string &versionValue)
 {
-	if (version.empty() || version.find("/") == std::string::npos || version.find(".") == std::string::npos)
+	if (versionValue.empty() || versionValue.find("/") == std::string::npos || versionValue.find(".") == std::string::npos)
 		return (this->setStatus(400), false);
-	if (std::count(version.begin(), version.end(), '.') != 1)
+	if (std::count(versionValue.begin(), versionValue.end(), '.') != 1)
 		return (this->setStatus(400), false);
-	std::stringstream	ss(version);
+	std::stringstream	ss(versionValue);
 	std::string			token;
 	int					i = 0;
 	while (std::getline(ss, token, '/'))
