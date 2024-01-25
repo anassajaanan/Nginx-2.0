@@ -1,5 +1,4 @@
 #include "ServerManager.hpp"
-#include "MimeTypeConfig.hpp"
 
 
 int	ServerManager::running = 1;
@@ -55,6 +54,7 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 				else
 					servers[i]->handleClientRequest(event.ident);
 			}
+			break;
 		}
 	}
 }
@@ -102,6 +102,7 @@ void	ServerManager::start()
 		{
 			if (kqueue.events[ev].filter == EVFILT_READ)
 				processReadEvent(kqueue.events[ev]);
+
 		}
 
 		for (int ev = 0; ev < nev; ev++)
@@ -111,9 +112,7 @@ void	ServerManager::start()
 		}
 	}
 
-	std::cout << "ServerManager stopped" << std::endl;
 	stop();
-	
 }
 
 void	ServerManager::stop()

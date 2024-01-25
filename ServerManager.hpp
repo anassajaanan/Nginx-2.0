@@ -2,7 +2,6 @@
 
 
 #pragma once
-#include "MimeTypeConfig.hpp"
 #ifndef SERVERMANAGER_HPP
 #define SERVERMANAGER_HPP
 

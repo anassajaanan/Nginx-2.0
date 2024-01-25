@@ -2,7 +2,6 @@
 
 
 #pragma once
-#include "MimeTypeConfig.hpp"
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -30,7 +29,6 @@
 
 #define MAX_REQUEST_HEADERS_SIZE 16384 // 16 KB
 
-// define max uri size as 4 KB
 #define MAX_URI_SIZE 4096 // 4 KB
 
 #define TEMP_FILE_DIRECTORY "./uploads/"
@@ -40,8 +38,6 @@ class ClientState;
 
 class Server
 {
-private:
-
 
 public:
 	Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq);
@@ -55,37 +51,42 @@ public:
 	std::map<int, ClientState *>		_clients;
 	std::map<int, ResponseState *>		_responses;
 
+	// Server Creation
+	void		createServerSocket();
+	void		setSocketOptions();
+	void		setSocketToNonBlocking();
+	void		bindAndListen();
 
+	void		run();
 
-	void	createServerSocket();
-	void	setSocketOptions();
-	void	setSocketToNonBlocking();
-	void	bindAndListen();
-	void	acceptNewConnection();
-	void	handleClientDisconnection(int clientSocket);
-	void	handleClientRequest(int clientSocket);
-	void	handleClientResponse(int clientSocket);
-	void	sendSmallResponse(int clientSocket, ResponseState *responseState);
-	void	sendLargeResponse(int clientSocket, ResponseState *responseState);
-	void	sendLargeResponseHeaders(int clientSocket, ResponseState *responseState);
-	void	sendLargeResponseChunk(int clientSocket, ResponseState *responseState);
+	// Client Handling
+	void		acceptNewConnection();
+	void		handleClientDisconnection(int clientSocket);
 
-	void	checkForTimeouts();
+	// Request Handling
+	void		handleClientRequest(int clientSocket);
+	void		processGetRequest(int clientSocket, HttpRequest &request);
+	void		processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection = false);
 
-	void	removeClient(int clientSocket);
-	void	handleHeaderSizeExceeded(int clientSocket);
-	void	handleUriTooLarge(int clientSocket);
-	void	handleInvalidGetRequest(int clientSocket);
-	void	handleInvalidRequest(int clientSocket, int requestStatusCode, const std::string &detail = "");
+	// Response Handling
+	void		handleClientResponse(int clientSocket);
+	void		sendSmallResponse(int clientSocket, ResponseState *responseState);
+	void		sendLargeResponse(int clientSocket, ResponseState *responseState);
+	void		sendLargeResponseHeaders(int clientSocket, ResponseState *responseState);
+	void		sendLargeResponseChunk(int clientSocket, ResponseState *responseState);
 
-	void	processGetRequest(int clientSocket, HttpRequest &request);
-	void	processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection = false);
+	// Error Handling
+	void		handleHeaderSizeExceeded(int clientSocket);
+	void		handleUriTooLarge(int clientSocket);
+	void		handleInvalidGetRequest(int clientSocket);
+	void		handleInvalidRequest(int clientSocket, int requestStatusCode, const std::string &detail = "");
 
-	
+	// Timeout and Cleanup
+	void		checkForTimeouts();
+	void		removeClient(int clientSocket);
 
+	// Utility
 	std::string	getStatusMessage(int statusCode);
-
-	void	run();
 
 };
 

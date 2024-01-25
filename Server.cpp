@@ -1,10 +1,14 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
+#include "HttpResponse.hpp"
+
+// -----------------------------------
+// Constructor and Destructor
+// -----------------------------------
 
 Server::Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq)
 	: _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
 {
-	// std::cout << "Server constructor" << std::endl;
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_port = htons(_config.port);
 	_serverAddr.sin_addr.s_addr = inet_addr(_config.ipAddress.c_str());
@@ -38,6 +42,10 @@ Server::~Server()
 		close(_socket);
 	}
 }
+
+// -----------------------------------
+// Server Creation
+// -----------------------------------
 
 void	Server::createServerSocket()
 {
@@ -109,6 +117,17 @@ void	Server::bindAndListen()
 		Logger::log(Logger::INFO, "Server is now listening on socket", "Server::bindAndListen");
 }
 
+void	Server::run()
+{
+	createServerSocket();
+	setSocketOptions();
+	setSocketToNonBlocking();
+	bindAndListen();
+}
+
+// -----------------------------------
+// Client Connection Handling
+// -----------------------------------
 
 void	Server::acceptNewConnection()
 {
@@ -144,6 +163,11 @@ void	Server::handleClientDisconnection(int clientSocket)
 	close(clientSocket);
 }
 
+// -----------------------------------
+// Request Processing
+// -----------------------------------
+
+
 void	Server::handleClientRequest(int clientSocket)
 {
 	char buffer[BUFFER_SIZE];
@@ -164,6 +188,19 @@ void	Server::handleClientRequest(int clientSocket)
 
 		Logger::log(Logger::DEBUG, "Received new request from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
 		client->processIncomingData(*this, buffer, bytesRead);
+		// HttpResponse response;
+		// response.setVersion("HTTP/1.1");
+		// response.setStatusCode("200");
+		// response.setStatusMessage("OK");
+		// response.setBody("Hello World");
+		// response.setHeader("Content-Type", "text/plain");
+		// response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+		// response.setHeader("Server", "webserv");
+		// response.setHeader("Connection", "close");
+		// ResponseState *responseState = new ResponseState(response.buildResponse());
+
+		// _responses[clientSocket] = responseState;
+		// _kq.registerEvent(clientSocket, EVFILT_WRITE);
 	}
 }
 
@@ -196,57 +233,26 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
-void	Server::handleHeaderSizeExceeded(int clientSocket)
+// -----------------------------------
+// Response Handling
+// -----------------------------------
+
+
+void	Server::handleClientResponse(int clientSocket)
 {
-	Logger::log(Logger::WARN, "Request headers size exceeded the maximum limit for fd " + std::to_string(clientSocket), "Server::handleHeaderSizeExceeded");
+	if (_responses.count(clientSocket) == 0)
+	{
+		Logger::log(Logger::ERROR, "No response state found for client socket " + std::to_string(clientSocket), "Server::handleClientResponse");
+		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		return;
+	}
 
-	HttpResponse response;
+	ResponseState *responseState = _responses[clientSocket];
 
-	removeClient(clientSocket);
-	response.generateStandardErrorResponse("400", "Bad Request", "400 Request Header Or Cookie Too Large", "Request Header Or Cookie Too Large");
-	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
-	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
-}
-
-void	Server::handleUriTooLarge(int clientSocket)
-{
-	Logger::log(Logger::WARN, "URI size exceeded the maximum limit for fd " + std::to_string(clientSocket), "Server::handleUriTooLarge");
-	
-	HttpResponse response;
-
-	removeClient(clientSocket);
-	response.generateStandardErrorResponse("414", "Request-URI Too Large", "414 Request-URI Too Large");
-	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
-	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
-}
-
-void	Server::handleInvalidGetRequest(int clientSocket)
-{
-	Logger::log(Logger::WARN, "GET request with body received for fd " + std::to_string(clientSocket), "Server::handleInvalidGetRequest");
-	
-	HttpResponse response;
-
-	removeClient(clientSocket);
-	response.generateStandardErrorResponse("400", "Bad Request", "400 Invalid GET Request (with body indicators)", "Invalid GET Request (with body indicators)");
-	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
-	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
-}
-
-
-void	Server::handleInvalidRequest(int clientSocket, int requestStatusCode, const std::string &detail)
-{
-	std::string statusCode = std::to_string(requestStatusCode);
-	std::string statusMessage = getStatusMessage(requestStatusCode);
-
-	HttpResponse response;
-	removeClient(clientSocket);
-	response.generateStandardErrorResponse(statusCode, statusMessage, statusCode + " " + statusMessage, detail);
-	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
-	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	if (responseState->getType() == SMALL_RESPONSE)
+		sendSmallResponse(clientSocket, responseState);
+	else if (responseState->getType() == LARGE_RESPONSE)
+		sendLargeResponse(clientSocket, responseState);
 }
 
 void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
@@ -285,6 +291,14 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 		else
 			Logger::log(Logger::DEBUG, "Partial small response sent to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
 	}
+}
+
+void	Server::sendLargeResponse(int clientSocket, ResponseState *responseState)
+{
+	if (!responseState->isHeaderSent)
+		sendLargeResponseHeaders(clientSocket, responseState);
+	else
+		sendLargeResponseChunk(clientSocket, responseState);
 }
 
 void	Server::sendLargeResponseHeaders(int clientSocket, ResponseState *responseState)
@@ -371,30 +385,68 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 
 }
 
-void	Server::sendLargeResponse(int clientSocket, ResponseState *responseState)
+// -----------------------------------
+// Error Handling
+// -----------------------------------
+
+
+void	Server::handleHeaderSizeExceeded(int clientSocket)
 {
-	if (!responseState->isHeaderSent)
-		sendLargeResponseHeaders(clientSocket, responseState);
-	else
-		sendLargeResponseChunk(clientSocket, responseState);
+	Logger::log(Logger::WARN, "Request headers size exceeded the maximum limit for fd " + std::to_string(clientSocket), "Server::handleHeaderSizeExceeded");
+
+	HttpResponse response;
+
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse("400", "Bad Request", "400 Request Header Or Cookie Too Large", "Request Header Or Cookie Too Large");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
-void	Server::handleClientResponse(int clientSocket)
+void	Server::handleUriTooLarge(int clientSocket)
 {
-	if (_responses.count(clientSocket) == 0)
-	{
-		Logger::log(Logger::ERROR, "No response state found for client socket " + std::to_string(clientSocket), "Server::handleClientResponse");
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
-		return;
-	}
+	Logger::log(Logger::WARN, "URI size exceeded the maximum limit for fd " + std::to_string(clientSocket), "Server::handleUriTooLarge");
+	
+	HttpResponse response;
 
-	ResponseState *responseState = _responses[clientSocket];
-
-	if (responseState->getType() == SMALL_RESPONSE)
-		sendSmallResponse(clientSocket, responseState);
-	else if (responseState->getType() == LARGE_RESPONSE)
-		sendLargeResponse(clientSocket, responseState);
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse("414", "Request-URI Too Large", "414 Request-URI Too Large");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
+
+void	Server::handleInvalidGetRequest(int clientSocket)
+{
+	Logger::log(Logger::WARN, "GET request with body received for fd " + std::to_string(clientSocket), "Server::handleInvalidGetRequest");
+	
+	HttpResponse response;
+
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse("400", "Bad Request", "400 Invalid GET Request (with body indicators)", "Invalid GET Request (with body indicators)");
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
+
+
+void	Server::handleInvalidRequest(int clientSocket, int requestStatusCode, const std::string &detail)
+{
+	std::string statusCode = std::to_string(requestStatusCode);
+	std::string statusMessage = getStatusMessage(requestStatusCode);
+
+	HttpResponse response;
+	removeClient(clientSocket);
+	response.generateStandardErrorResponse(statusCode, statusMessage, statusCode + " " + statusMessage, detail);
+	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+}
+
+// -----------------------------------
+// Timeout and Cleanup
+// -----------------------------------
+
 
 void	Server::checkForTimeouts()
 {
@@ -446,13 +498,4 @@ std::string	Server::getStatusMessage(int statusCode)
 	if (statusCodeMessages.count(statusCode) == 0)
 		return "";
 	return statusCodeMessages[statusCode];
-}
-
-
-void	Server::run()
-{
-	createServerSocket();
-	setSocketOptions();
-	setSocketToNonBlocking();
-	bindAndListen();
 }

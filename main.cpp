@@ -9,7 +9,6 @@
 
 void	signalHandler(int signum)
 {
-	std::cout << "Signal " << signum << " received" << std::endl;
 	if (signum == SIGINT || signum == SIGTERM)
 	{
 		ServerManager::running = 0;
@@ -23,10 +22,10 @@ int main()
 
     try
 	{
-		ConfigParser parser("./nginx.conf");
+		ConfigParser parser("./config/nginx.conf");
 		parser.parseConfigFile();
 
-		MimeTypeParser mimeTypeParser("mime.types");
+		MimeTypeParser mimeTypeParser("./config/mime.types");
 		mimeTypeParser.parseMimeTypeFile(mimeTypeConfig);
 
 		ConfigLoader loader(parser.getConfigTreeRoot());
@@ -43,7 +42,7 @@ int main()
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
 
-	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
+	Logger::init(Logger::ERROR, "./logs/WebServer.log");
 
 	ServerManager serverManager(serverConfigs, mimeTypeConfig);
 	Logger::log(Logger::DEBUG, "Starting server manager", "main");

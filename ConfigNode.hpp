@@ -15,7 +15,7 @@
 enum NodeType
 {
 	Context,
-	Directive,
+	Directive
 };
 
 class ConfigNode

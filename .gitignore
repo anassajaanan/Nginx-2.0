@@ -3,4 +3,5 @@ a.out
 a.out.dSYM/
 .DS_Store
 objs/
+build/
 tmp.cpp
