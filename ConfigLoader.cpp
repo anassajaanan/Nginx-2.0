@@ -71,7 +71,7 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			else if (directive->getKey() == "return")
 				serverConfig.setReturn(directive->getValues());
 			else if (directive->getKey() == "cgi_extension")
-				serverConfig.cgiExtension.setExtensions(directive->getValues());
+				serverConfig.setCgiExtension(directive->getValues());
 		}
 	}
 	for (size_t i = 0; i < serverChildren.size(); i++)

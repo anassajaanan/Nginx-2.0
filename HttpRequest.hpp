@@ -55,6 +55,7 @@ private:
 		std::vector<std::string>	parseQueryString(const std::string &uri);
 
 		void				setStatus(const int statusNum);
+		void			replaceUri(std::string &str, const std::string &replace, const std::string &replaceBy);
 public:
 	HttpRequest();
 	HttpRequest(const std::string &requestStr);

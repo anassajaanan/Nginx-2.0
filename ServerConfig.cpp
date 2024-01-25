@@ -119,6 +119,19 @@ void	ServerConfig::addLocation(const std::string &path, const LocationConfig &lo
 		throw std::runtime_error("duplicate location \"" + path + "\" in Config file");
 	locations[path] = locationConfig;
 }
+void	ServerConfig::setCgiExtension(const std::vector<std::string> &extensionsValue)
+{
+	if (extensionsValue.empty())
+			return;
+		for (size_t i = 0; i < extensionsValue.size();i++)
+		{
+			if (extensionsValue[i].find('.') == std::string::npos || extensionsValue[i].size() <= 2 || extensionsValue[i].substr(0, 2) != "*.") // optional give a max length 
+				throw (std::runtime_error("invalid cgi extension in \"cgi_extension\" directive"));
+		}
+		// this->_isEnabled = true;
+		for (size_t i = 0; i < extensionsValue.size(); i++)
+			cgiExtension.addCgiExtension(extensionsValue[i].substr(1, extensionsValue[i].length()));
+}
 
 std::map<std::string, LocationConfig>	&ServerConfig::getLocations()
 {

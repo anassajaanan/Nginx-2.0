@@ -4,6 +4,8 @@ echo $x
 echo -n "y = "
 echo $y
 
+sleep 10
+
 echo "CGI Information :"
 echo "FILENAME = $SCRIPT_FILENAME"
 echo "QUERY_STRING = $QUERY_STRING"

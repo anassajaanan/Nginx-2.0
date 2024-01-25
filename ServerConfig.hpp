@@ -2,6 +2,7 @@
 
 
 #pragma once
+#include <vector>
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
@@ -48,6 +49,8 @@ public:
 	void					setListen(const std::string &listenValue);
 	void					setServerName(const std::string &serverNameValue);
 	void					setKeepaliveTimeout(const std::string &keepaliveTimeoutValue);
+	void					setCgiExtension(const std::vector<std::string> &extensionsValue);
+
 
 	void					addLocation(const std::string &path, const LocationConfig &locationConfig);
 
