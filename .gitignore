@@ -6,3 +6,4 @@ objs/
 build/
 tmp.cpp
 content/dist/*
+webserver

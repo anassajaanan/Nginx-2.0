@@ -101,7 +101,7 @@ void	Server::bindAndListen()
 	if (_socket == -1)
 		return;
 
-	if (bind(this->_socket, reinterpret_cast< sockaddr *>(&this->_serverAddr), sizeof(this->_serverAddr)) < 0)
+	if (bind(this->_socket, (const struct sockaddr *)(&this->_serverAddr), sizeof(this->_serverAddr)) < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to bind socket: " + std::string(strerror(errno)), "Server::bindAndListen");
 		_socket = -1;
