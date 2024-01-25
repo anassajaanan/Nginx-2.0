@@ -1,11 +1,8 @@
 #! /bin/bash
-echo -n "x = "
-echo $x
-echo -n "y = "
-echo $y
-
-sleep 10
-
+echo -n "FirstName = "
+echo $FirstName
+echo -n "SecondName = "
+echo $SecondName
 echo "CGI Information :"
 echo "FILENAME = $SCRIPT_FILENAME"
 echo "QUERY_STRING = $QUERY_STRING"
