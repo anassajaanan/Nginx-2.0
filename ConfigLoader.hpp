@@ -21,7 +21,7 @@
 class ConfigLoader
 {
 private:
-	ConfigNode	*treeRoot;
+	ConfigNode	*treeRootNode;
 
 	void processHttpNode(ContextNode* httpNode, std::vector<ServerConfig> &servers);
     void processServerNode(ContextNode* serverNode, ServerConfig &serverConfig);

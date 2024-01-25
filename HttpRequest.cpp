@@ -109,20 +109,19 @@ int	HttpRequest::getStatus() const
 	return (this->status);
 }
 
-std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uri)
+std::vector<std::string>	HttpRequest::parseQueryString(const std::string &queryStr)
 {
 	std::vector<std::string> queryVector;
 	std::stringstream	ss;
 	std::string			queryString;
 
-	queryString = uri.substr(uri.find('?') + 1, uri.length());
+	queryString = queryStr.substr(queryStr.find('?') + 1, queryStr.length());
 	ss << queryString;
 	while (std::getline(ss, queryString, '&'))
 	{
 		if (!queryString.empty())
         	queryVector.push_back((queryString));
 	}
-    // std::vector<std::string>::iterator it = queryVector.begin();
 	return (queryVector);
 }
 

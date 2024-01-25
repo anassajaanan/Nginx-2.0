@@ -9,7 +9,7 @@ ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
 	this->autoindex = DEFAULT_HTTP_AUTOINDEX_VALUE;
 	this->keepalive_timeout = DEFAULT_HTTP_KEEPALIVE_TIMEOUT;
 	this->client_max_body_size = DEFAULT_HTTP_CLIENT_MAX_BODY_SIZE;
-	this->treeRoot = treeRoot;
+	this->treeRootNode = treeRoot;
 }
 
 
@@ -131,6 +131,6 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 
 void	ConfigLoader::loadServers(std::vector<ServerConfig> &servers)
 {
-	ContextNode *httpNode = static_cast<ContextNode *>(treeRoot);
+	ContextNode *httpNode = static_cast<ContextNode *>(treeRootNode);
 	processHttpNode(httpNode, servers);
 }

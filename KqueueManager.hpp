@@ -36,3 +36,4 @@ public:
 
 
 #endif /* KQUEUE_MANAGER_HPP */
+

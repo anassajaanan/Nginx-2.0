@@ -57,4 +57,6 @@ FATAL: A very severe error event that will presumably lead the application to ab
 */
 
 
+
 #endif /* LOGGER_HPP */
+

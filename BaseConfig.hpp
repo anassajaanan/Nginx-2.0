@@ -46,3 +46,4 @@ public:
 
 
 #endif /* BASECONFIG_HPP */
+

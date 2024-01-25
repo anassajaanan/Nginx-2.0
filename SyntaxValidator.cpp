@@ -28,6 +28,7 @@ void		SyntaxValidator::validateBraces(const std::vector<std::string> &tokens)
 		if (*it == "}")
 		{
 			if (st.empty()) /* when we got '}' put no '{' inside the st  */
+
 				throw (SyntaxError(UNEXPECTED_CLOSING_BRACE));
 			st.pop();
 		}

@@ -430,9 +430,11 @@ HttpResponse	RequestHandler::serveCgiOutput(HttpRequest &request, const std::str
 	response.setStatusCode(std::to_string(200));
 	response.setStatusMessage(statusCodeMessages[200]);
 	response.setBody(message);
-	/*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	/*1*/
+ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	if (message.find("Content-Type") == std::string::npos)
-		/*2*/ response.setHeader("Content-Type", "text/plain");
+		/*2*/
+ response.setHeader("Content-Type", "text/plain");
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	return response;

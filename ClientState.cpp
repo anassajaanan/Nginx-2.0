@@ -129,7 +129,7 @@ void	ClientState::handlePostRequest(Server &server)
 		return;
 	}
 
-	requestBodySize = std::stoll(request.getHeader("Content-Length"));
+	requestBodySize = std::stoull(request.getHeader("Content-Length"));
 	if (requestBodySize > server._config.clientMaxBodySize)
 	{
 		Logger::log(Logger::WARN, "Body size of POST request exceeds client max body size for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");

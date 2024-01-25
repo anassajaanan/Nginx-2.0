@@ -25,3 +25,4 @@ class CgiDirective
 
 
 #endif /* CGIDIRECTIVE_HPP */
+

@@ -52,7 +52,7 @@ private:
 		bool						loadRequestContent(const std::vector<std::string> &requestVec);
 		std::vector<std::string>	splitByString(const std::string &str, const char *del);
 		bool						checkDuplicatedHost();
-		std::vector<std::string>	parseQueryString(const std::string &uri);
+		std::vector<std::string>	parseQueryString(const std::string &queryString);
 
 		void				setStatus(const int statusNum);
 		void			replaceUri(std::string &str, const std::string &replace, const std::string &replaceBy);

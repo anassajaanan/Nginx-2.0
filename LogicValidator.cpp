@@ -4,17 +4,29 @@
 LogicValidator::LogicValidator()
 {
     possibleDirs["root"] = std::make_pair(OneArg, Independent); /*only one*/
+
 	possibleDirs["listen"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
+
 	possibleDirs["autoindex"] = std::make_pair(OneArg, Independent); /*only one*/
+
 	possibleDirs["server_name"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
+
 	possibleDirs["client_max_body_size"] = std::make_pair(OneArg, Independent); /*only one*/
+
 	possibleDirs["error_page"] = std::make_pair(TwoOrMoreArgs, Independent); /*two or more*/
+
 	possibleDirs["try_files"] = std::make_pair(TwoOrMoreArgs, ParentNeeded); /*two or more*/
+
 	possibleDirs["index"] = std::make_pair(OneOrMoreArgs, Independent); /*one or more*/
+
 	possibleDirs["return"] = std::make_pair(OneOrTwoArgs, ParentNeeded); /*one or two*/
+
 	possibleDirs["limit_except"] = std::make_pair(OneOrMoreArgs, ParentNeeded); /*one or more*/
+
 	possibleDirs["keepalive_timeout"] = std::make_pair(OneArg, ParentNeeded); /*only one*/
+
 	possibleDirs["cgi_extension"] = std::make_pair(OneOrMoreArgs, ParentNeeded); /*only one*/
+
 }
 
 
