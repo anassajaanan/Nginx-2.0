@@ -7,7 +7,7 @@
 
 
 
-void	signalHandler(int signum)
+static void	signalHandler(int signum)
 {
 	if (signum == SIGINT || signum == SIGTERM)
 	{
@@ -22,10 +22,10 @@ int main()
 
     try
 	{
-		ConfigParser parser("./config/nginx.conf");
+		ConfigParser parser("conf/nginx.conf");
 		parser.parseConfigFile();
 
-		MimeTypeParser mimeTypeParser("./config/mime.types");
+		MimeTypeParser mimeTypeParser("./conf/mime.types");
 		mimeTypeParser.parseMimeTypeFile(mimeTypeConfig);
 
 		ConfigLoader loader(parser.getConfigTreeRoot());
