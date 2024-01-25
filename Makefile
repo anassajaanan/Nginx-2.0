@@ -34,7 +34,7 @@ OBJS_RELEASE = $(addprefix $(RELEASE_DIR), $(SRCS:.cpp=.o))
 DEPS_RELEASE = $(OBJS_RELEASE:.o=.d)
 
 # Development Flags
-CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused \
+CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wnon-virtual-dtor -Wcast-align -Wunused \
 				-Woverloaded-virtual -Wmisleading-indentation -fsanitize=address \
 				-fsanitize=undefined -fstack-protector-strong -fstrict-overflow
 

@@ -60,31 +60,31 @@ bool	ServerConfig::isValidIPv4()
 	return (count == 4);
 }
 
-bool	ServerConfig::isValidPort(const std::string &port)
+bool	ServerConfig::isValidPort(const std::string &portValue)
 {
-	if (port.empty() || port.size() > 5)
+	if (portValue.empty() || portValue.size() > 5)
 		return (false);
-	for (size_t i = 0; i < port.size(); i++)
+	for (size_t i = 0; i < portValue.size(); i++)
 	{
-		if (!std::isdigit(port[i]))
+		if (!std::isdigit(portValue[i]))
 			return (false);
 	}
-	this->port = std::stoi(port);
+	this->port = std::stoi(portValue);
 	return (this->port >= 0 && this->port <= 65535);
 }
 
 void	ServerConfig::setListen(const std::string &listenValue)
 {
-	std::string port = listenValue;
+	std::string portString = listenValue;
 	size_t	colonPos = listenValue.find(':');
 	if (colonPos != std::string::npos)
 	{
 		this->ipAddress = listenValue.substr(0, colonPos);
-		port = listenValue.substr(colonPos + 1);
+		portString = listenValue.substr(colonPos + 1);
 		if (!isValidIPv4())
 			throw std::runtime_error("invalid IPv4 address in \"listen\" directive: \"" + this->ipAddress + "\"");
 	}
-	if (!isValidPort(port))
+	if (!isValidPort(portString))
 		throw std::runtime_error("invalid port in \"" + listenValue + "\" of the \"listen\" directive");
 }
 
