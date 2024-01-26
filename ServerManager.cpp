@@ -1,4 +1,8 @@
 #include "ServerManager.hpp"
+#include "HttpResponse.hpp"
+#include "Server.hpp"
+#include <atomic>
+#include <unistd.h>
 
 
 int	ServerManager::running = 1;
@@ -43,20 +47,55 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0)
+		// if ()
+		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.count() > 0)
 		{
+			
 			if ((int)event.ident == servers[i]->_socket)
 				servers[i]->acceptNewConnection();
-			else
+			else if (servers[i]->_clients.count(event.ident) > 0)
 			{
 				if (event.flags & EV_EOF)
 					servers[i]->handleClientDisconnection(event.ident);
 				else
 					servers[i]->handleClientRequest(event.ident);
 			}
+			else
+			{
+				// read from the fd;
+				// read(event.ident, hjjhfd, 1000);
+				std::string responseMessage = readCgiResponse(event.ident);
+				// prepare response
+				// servers[i]->_cgi.response
+				HttpResponse	cgiResponse = servers[i]->_cgi[event.ident]->serveCgiOutput(responseMessage);
+
+				ResponseState *responseState;
+				// if (response.getType() == SMALL_RESPONSE)
+					responseState = new ResponseState(cgiResponse.buildResponse());
+				// else
+				
+				// 	responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
+				// _responses[] = responseState;
+				// kqueue.registerEvent(servers[i]->_cgi., EVFILT_WRITE);
+				// delete servers[i]->_cgi->second;
+				// servers[i]->_cgi.erase()
+			}
 			break;
 		}
 	}
+}
+
+std::string	ServerManager::readCgiResponse(int fd)
+{
+	char	s[1000];
+	std::string	toSend;
+	std::memset(s, 0, 1000);
+	while (read(fd, s, 100))
+	{
+		toSend += s;
+		std::memset(s, 0, 1000);
+	}
+	return toSend;
 }
 
 void	ServerManager::processWriteEvent(const struct kevent &event)

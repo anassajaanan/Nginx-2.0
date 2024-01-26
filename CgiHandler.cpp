@@ -1,21 +1,22 @@
 #include "CgiHandler.hpp"
 #include "HttpResponse.hpp"
+#include "KqueueManager.hpp"
 #include "ServerConfig.hpp"
+#include <sys/event.h>
 
-CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig)
+CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq)
 {
-	this->setCgiResponseMessage(handleCgiDirective(request, serverConfig));
+	handleCgiDirective(request, serverConfig, kq);
 }
 
-HttpResponse	CgiHandler::serveCgiOutput(HttpRequest &request)
+HttpResponse	CgiHandler::serveCgiOutput(const std::string &message)
 {
-	(void)request;
 	HttpResponse response;
 
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(200));
 	response.setStatusMessage("OK");
-	response.setBody(this->getCgiResponseMessage());
+	response.setBody(message);
 	/*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	// if (message.find("Content-Type") == std::string::npos)
 	/*2*/ response.setHeader("Content-Type", "text/plain");
@@ -67,18 +68,18 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 	return (envArray);
 }
 
-std::string	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig)
+void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq)
 {
 	int		pid;
-	int		pipeFd[2];
 	char	**parameters;
 	char	**envp;
 
-	if (pipe(pipeFd) < 0)
+	if (pipe(this->pipeFd) < 0)
 	{
 		std::cerr << "Pipe Error" << std::endl;
-		// return ;
+		return ;
 	}
+	kq.registerEvent(this->pipeFd[0], EVFILT_READ);
 	envp = initiateEnvVariables(request, serverConfig);
 	parameters = new char *[2];
 	parameters[0] = strdup((serverConfig.root + request.getUri()).c_str());
@@ -91,8 +92,8 @@ std::string	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &
 	}
 	if (pid == 0)
 	{
-		close(pipeFd[0]);
-		if (dup2(pipeFd[1], STDOUT_FILENO) < 0)
+		close(this->pipeFd[0]);
+		if (dup2(this->pipeFd[1], STDOUT_FILENO) < 0)
 		{
 			std::cerr << "Failed To Dup2 Output" << std::endl;
 			this->delete2dArray(parameters);
@@ -102,7 +103,7 @@ std::string	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &
 		if (request.getMethod() == "POST")
 			if (dup2(postBodyFd, STDIN_FILENO))
 				std::cerr << "Failed To Dup2 Input" << std::endl;
-		close(pipeFd[1]);
+		close(this->pipeFd[1]);
 		close(postBodyFd);
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
@@ -112,39 +113,40 @@ std::string	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &
 			exit(0);
 		}
 	}
-	close(pipeFd[1]);
-	close(postBodyFd);
-	int i = 0;
-	int status = 0;
-	std::string		toSend;
-	std::string		buf;
-	char s[1000] = {0};
-	while (read(pipeFd[0], s, 1000) > 0)
-	{
-		toSend += s;
-		std::memset(s, 0, 1000);
-	}
-	if (i < 0)
-		std::cerr << "Read" << std::endl;
+	close(this->pipeFd[1]);
+	if (postBodyFd > 0)
+		close(postBodyFd);
+	// int i = 0;
+	// int status = 0;
+	// std::string		toSend;
+	// std::string		buf;
+	// char s[1000] = {0};
+	// while (read(pipeFd[0], s, 1000) > 0)
+	// {
+	// 	toSend += s;
+	// 	std::memset(s, 0, 1000);
+	// }
+	// if (i < 0)
+	// 	std::cerr << "Read" << std::endl;
 	// std::cout << " i = " << i << std::endl;
 	// std::cout << "reached = " << toSend << std::endl;
 	// wait(NULL);
-	int k = 0;
+	// int k = 0;
 	// if (setsid() < 0)
 	// 	std::cout << "failed to setsid" << std::endl;
-	k = waitpid(pid, &status, WNOHANG);
-	if (k < 0)
-		std::cout << "Wait error" << std::endl;
+	// k = waitpid(pid, &status, WNOHANG);
+	// if (k < 0)
+	// 	std::cout << "Wait error" << std::endl;
 	// if (WIFEXITED(status))
 	// 	std::cout << "Exited" << std::endl;
 	// else
 	//  	std::cout << "Not Yet" << std::endl;
 	// std::cout << "k = " << k << std::endl;
 	// std::cout << "status = " << status << std::endl;
-	close(pipeFd[0]);
+	// close(pipeFd[0]);
 	this->delete2dArray(parameters);
 	this->delete2dArray(envp);
-	return (toSend);
+	// return (toSend);
 }
 
 void					CgiHandler::setCgiResponseMessage(const std::string &messageValue)

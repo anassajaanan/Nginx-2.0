@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "CgiHandler.hpp"
 #include "ClientState.hpp"
 #include "HttpResponse.hpp"
 
@@ -204,33 +205,89 @@ void	Server::handleClientRequest(int clientSocket)
 	}
 }
 
+bool			Server::validateFileExtension(HttpRequest &request)
+{
+	std::vector<std::string>	cgiExten = _config.cgiExtension.getExtensions();
+	std::string					uri = request.getUri();
+
+	// std::cout << "uri cgi = " << uri.substr(uri.find('.'), uri.length()) << std::endl;
+	std::vector<std::string>::iterator it = cgiExten.begin();
+	for (; it != cgiExten.end(); it++)
+		std::cout << "{" << *it << "}" << std::endl;
+	if (uri.find('.') == std::string::npos ||
+	std::find(cgiExten.begin(), cgiExten.end(),
+	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
+		return false;
+	return true;
+}
+
+bool	Server::fileExists(const std::string &path)
+{
+	struct stat fileStat;
+
+	if (stat(path.c_str(), &fileStat) == 0)
+		return (true);
+	return (false);
+}
+
+bool			Server::validCgiRequest(HttpRequest &request, ServerConfig &config)
+{
+	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
+	|| !this->fileExists(config.root + request.getUri()) || !validateFileExtension(request))
+		return false;
+	return true;
+}
+
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
-	ResponseState *responseState;
-	RequestHandler handler(_config, _mimeTypes);
-	HttpResponse response = handler.handleRequest(request);
-	_clients[clientSocket]->resetClientState();
-	
-	if (response.getType() == SMALL_RESPONSE)
-		responseState = new ResponseState(response.buildResponse());
-	else
-		responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
+	if (_config.cgiExtension.isEnabled())
+	{
+		
+		if (validCgiRequest(request, _config))
+		{
 
-	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq);
+			_cgi[clientSocket] = cgiDirective;
+			// std::cout << "Valid Cgi" << std::endl;
+		}
+	}
+	else
+	{
+		ResponseState *responseState;
+		RequestHandler handler(_config, _mimeTypes);
+		HttpResponse response = handler.handleRequest(request);
+		_clients[clientSocket]->resetClientState();
+		
+		if (response.getType() == SMALL_RESPONSE)
+			responseState = new ResponseState(response.buildResponse());
+		else
+			responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
+
+		_responses[clientSocket] = responseState;
+		_kq.registerEvent(clientSocket, EVFILT_WRITE);
+		// do the rest
+	}
 }
 
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
-	ResponseState *responseState;
-	RequestHandler handler(_config, _mimeTypes);
-	HttpResponse response = handler.handleRequest(request);
-	_clients[clientSocket]->resetClientState();
-	
-	responseState = new ResponseState(response.buildResponse(), closeConnection);
 
-	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	if (validCgiRequest(request, _config))
+	{
+		std::cout << "Valid Cgi" << std::endl;
+	}
+	else
+	{
+		ResponseState *responseState;
+		RequestHandler handler(_config, _mimeTypes);
+		HttpResponse response = handler.handleRequest(request);
+		_clients[clientSocket]->resetClientState();
+		
+		responseState = new ResponseState(response.buildResponse(), closeConnection);
+
+		_responses[clientSocket] = responseState;
+		_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	}
 }
 
 // -----------------------------------

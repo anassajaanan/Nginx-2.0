@@ -2,6 +2,7 @@
 
 
 #pragma once
+#include "CgiHandler.hpp"
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -49,6 +50,7 @@ public:
 	int									_socket;
 	struct sockaddr_in					_serverAddr;
 	std::map<int, ClientState *>		_clients;
+	std::map<int, CgiHandler *>			_cgi;
 	std::map<int, ResponseState *>		_responses;
 
 	// Server Creation
@@ -87,6 +89,12 @@ public:
 
 	// Utility
 	std::string	getStatusMessage(int statusCode);
+
+	//cgi Utility
+	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
+	bool			validateFileExtension(HttpRequest &request);
+	bool			fileExists(const std::string &path);
+
 
 };
 

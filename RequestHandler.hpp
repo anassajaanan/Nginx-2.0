@@ -83,9 +83,9 @@ public:
 
 	// void			delete2dArray(char **str);
 	// HttpResponse	serveCgiOutput(HttpRequest &request, const std::string &message);
-	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
-	// HttpResponse	handleCgiDirective(HttpRequest &request);
-	bool			validateFileExtension(HttpRequest &request);
+	// bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
+	// // HttpResponse	handleCgiDirective(HttpRequest &request);
+	// bool			validateFileExtension(HttpRequest &request);
 	// char			**initiateEnvVariables(HttpRequest &request);
 
 };

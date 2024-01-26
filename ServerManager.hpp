@@ -28,10 +28,12 @@ public:
 	
 	
 
-	void	initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
-	void 	checkTimeouts();
-	void	processReadEvent(const struct kevent &event);
-	void	processWriteEvent(const struct kevent &event);
+	void				initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
+	void 				checkTimeouts();
+	void				processReadEvent(const struct kevent &event);
+	void				processWriteEvent(const struct kevent &event);
+	std::string			readCgiResponse(int fd);
+
 
 	void	start();
 	void	stop();
