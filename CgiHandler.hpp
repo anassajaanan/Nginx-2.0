@@ -21,6 +21,11 @@ class CgiHandler
 		const std::string		&getCgiResponseMessage() const;
 		char					**initiateEnvVariables(HttpRequest &request, ServerConfig &serverConfig);
 		void					handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq);
+		int						getCgiReadFd()const;
+		int						getCgiWriteFd()const;
+
+		//utilities
+		void					closeCgiPipe();
 		~CgiHandler();
 
 

@@ -135,6 +135,7 @@ void	Server::acceptNewConnection()
 	struct sockaddr_in	clientAddr;
 	socklen_t			clientAddrLen = sizeof(clientAddr);
 	int clientSocket = accept(this->_socket, (struct sockaddr *)&clientAddr, &clientAddrLen);
+	std::cout << "client = " << clientSocket << std::endl;
 	if (clientSocket < 0)
 	{
 		Logger::log(Logger::ERROR, "Error accepting new connection: " + std::string(strerror(errno)), "Server::acceptNewConnection");
@@ -240,16 +241,12 @@ bool			Server::validCgiRequest(HttpRequest &request, ServerConfig &config)
 
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
-	if (_config.cgiExtension.isEnabled())
+	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
 	{
-		
-		if (validCgiRequest(request, _config))
-		{
-
+			Logger::log(Logger::ERROR, "Here", "1");
+			std::cout << "Valid Cgi" << std::endl;
 			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq);
 			_cgi[clientSocket] = cgiDirective;
-			// std::cout << "Valid Cgi" << std::endl;
-		}
 	}
 	else
 	{
@@ -297,13 +294,14 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 void	Server::handleClientResponse(int clientSocket)
 {
+	std::cout << "sock = " << clientSocket << std::endl;
+	std::cout << "count = " << _responses.count(clientSocket) << std::endl;
 	if (_responses.count(clientSocket) == 0)
 	{
 		Logger::log(Logger::ERROR, "No response state found for client socket " + std::to_string(clientSocket), "Server::handleClientResponse");
 		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
 		return;
 	}
-
 	ResponseState *responseState = _responses[clientSocket];
 
 	if (responseState->getType() == SMALL_RESPONSE)

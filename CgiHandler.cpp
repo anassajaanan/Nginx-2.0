@@ -3,6 +3,7 @@
 #include "KqueueManager.hpp"
 #include "ServerConfig.hpp"
 #include <sys/event.h>
+#include <unistd.h>
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq)
 {
@@ -23,6 +24,16 @@ HttpResponse	CgiHandler::serveCgiOutput(const std::string &message)
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 	return (response);
+}
+
+int		CgiHandler::getCgiReadFd()const
+{
+	return (this->pipeFd[0]);
+}
+
+int		CgiHandler::getCgiWriteFd()const
+{
+	return (this->pipeFd[1]);
 }
 
 void			CgiHandler::delete2dArray(char **str)
@@ -66,6 +77,15 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 		envArray[counter] = strdup(envVector[counter].c_str());
 	envArray[counter] = NULL;
 	return (envArray);
+}
+
+void	CgiHandler::closeCgiPipe()
+{
+	if (this->pipeFd[0] > 0)
+		close(pipeFd[0]);
+	if (this->pipeFd[1] > 0)
+		close(pipeFd[1]);
+	
 }
 
 void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq)

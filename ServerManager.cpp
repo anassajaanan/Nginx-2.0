@@ -1,7 +1,12 @@
 #include "ServerManager.hpp"
 #include "HttpResponse.hpp"
+#include "Logger.hpp"
 #include "Server.hpp"
 #include <atomic>
+#include <iostream>
+#include <iterator>
+#include <ostream>
+#include <string>
 #include <unistd.h>
 
 
@@ -48,7 +53,8 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 	for (size_t i = 0; i < servers.size(); i++)
 	{
 		// if ()
-		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.count() > 0)
+		// int nevents = kevent(kqueue, NULL, 0, kqueue.events, 1, NULL);
+		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.size() > 0)
 		{
 			
 			if ((int)event.ident == servers[i]->_socket)
@@ -60,23 +66,36 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 				else
 					servers[i]->handleClientRequest(event.ident);
 			}
-			else
+			else if (servers[i]->_cgi.size() > 0 && (int)event.ident == servers[i]->_cgi.begin()->second->getCgiReadFd())
 			{
 				// read from the fd;
 				// read(event.ident, hjjhfd, 1000);
-				std::string responseMessage = readCgiResponse(event.ident);
 				// prepare response
-				// servers[i]->_cgi.response
-				HttpResponse	cgiResponse = servers[i]->_cgi[event.ident]->serveCgiOutput(responseMessage);
+				std::string responseMessage = readCgiResponse(event.ident);
+				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.size()), "1");
+				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.begin()->first), "1");
+				// servers[i]->_cgi[0];
 
+				// servers[i]->_cgi.response
+				HttpResponse	cgiResponse = servers[i]->_cgi.begin()->second->serveCgiOutput(responseMessage);
+				std::cout << "response = " << cgiResponse.getBody() << std::endl;
 				ResponseState *responseState;
 				// if (response.getType() == SMALL_RESPONSE)
 					responseState = new ResponseState(cgiResponse.buildResponse());
 				// else
 				
 				// 	responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
-				// _responses[] = responseState;
-				// kqueue.registerEvent(servers[i]->_cgi., EVFILT_WRITE);
+				std::cout << "i = " << i << std::endl;
+				servers[i]->_responses[servers[i]->_clients.begin()->first] = responseState;
+				std::cout << "sock is " << servers[i]->_socket << std::endl;
+				// std::cout << servers[i]->_clients.begin()->first << std::endl;
+				kqueue.registerEvent(servers[i]->_clients.begin()->first , EVFILT_WRITE);
+				// kqueue.registerEvent(6, EVFILT_WRITE);
+				std::cout << "reqistered = " << std::endl;
+				// servers[i]->_responses.erase(servers[i]->_socket);
+				// delete servers[i]->_cgi[servers[i]->_cgi.begin()->first];
+				servers[i]->_cgi.erase(servers[i]->_cgi.begin());
+				// delete responseState;
 				// delete servers[i]->_cgi->second;
 				// servers[i]->_cgi.erase()
 			}
@@ -100,10 +119,14 @@ std::string	ServerManager::readCgiResponse(int fd)
 
 void	ServerManager::processWriteEvent(const struct kevent &event)
 {
+	Logger::log(Logger::DEBUG, "zooooooooo6", "1");
+	// std::cout << servers.size() << std::endl; 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
+		// std::cout << "i = " << i << std::endl;
 		if (servers[i]->_responses.count(event.ident) > 0)
 		{
+			std::cout << "fjkdjf" << std::endl;
 			servers[i]->handleClientResponse(event.ident);
 			break;
 		}

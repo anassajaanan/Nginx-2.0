@@ -42,7 +42,7 @@ int main()
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
 
-	Logger::init(Logger::ERROR, "./logs/WebServer.log");
+	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
 
 	ServerManager serverManager(serverConfigs, mimeTypeConfig);
 	Logger::log(Logger::DEBUG, "Starting server manager", "main");

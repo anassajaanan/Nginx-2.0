@@ -7,3 +7,4 @@ build/
 tmp.cpp
 content/dist/*
 webserver
+content/
