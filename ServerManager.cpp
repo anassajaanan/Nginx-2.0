@@ -68,31 +68,21 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 			}
 			else if (servers[i]->_cgi.size() > 0 && (int)event.ident == servers[i]->_cgi.begin()->second->getCgiReadFd())
 			{
-				// read from the fd;
-				// read(event.ident, hjjhfd, 1000);
-				// prepare response
+
+				//README:
+
+				// anas if u know when its done to read from and  add it to the condition as i tried.
+
+				
 				std::string responseMessage = readCgiResponse(event.ident);
 				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.size()), "1");
 				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.begin()->first), "1");
-				// servers[i]->_cgi[0];
-
-				// servers[i]->_cgi.response
 				HttpResponse	cgiResponse = servers[i]->_cgi.begin()->second->serveCgiOutput(responseMessage);
 				std::cout << "response = " << cgiResponse.getBody() << std::endl;
 				ResponseState *responseState;
-				// if (response.getType() == SMALL_RESPONSE)
-					responseState = new ResponseState(cgiResponse.buildResponse());
-				// else
-				
-				// 	responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
-				std::cout << "i = " << i << std::endl;
+				responseState = new ResponseState(cgiResponse.buildResponse());
 				servers[i]->_responses[servers[i]->_clients.begin()->first] = responseState;
-				std::cout << "sock is " << servers[i]->_socket << std::endl;
-				// std::cout << servers[i]->_clients.begin()->first << std::endl;
 				kqueue.registerEvent(servers[i]->_clients.begin()->first , EVFILT_WRITE);
-				// kqueue.registerEvent(6, EVFILT_WRITE);
-				std::cout << "reqistered = " << std::endl;
-				// servers[i]->_responses.erase(servers[i]->_socket);
 				// delete servers[i]->_cgi[servers[i]->_cgi.begin()->first];
 				servers[i]->_cgi.erase(servers[i]->_cgi.begin());
 				// delete responseState;
