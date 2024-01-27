@@ -4,6 +4,8 @@
 #include "MimeTypeConfig.hpp"
 #include "ServerManager.hpp"
 #include "Logger.hpp"
+#include <signal.h>
+#include <sys/signal.h>
 
 
 
@@ -12,6 +14,15 @@ static void	signalHandler(int signum)
 	if (signum == SIGINT || signum == SIGTERM)
 	{
 		ServerManager::running = 0;
+	}
+	else if (signum == SIGCHLD)
+	{
+		int status;
+		pid_t pid;
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+		{
+			Logger::log(Logger::DEBUG, "Child process " + std::to_string(pid) + " exited with status " + std::to_string(status), "signalHandler");
+		}
 	}
 }
 
@@ -38,9 +49,19 @@ int main()
 		return 1;
 	}
 
+
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
+	struct sigaction sa;
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;	
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
+	sigaction(SIGCHLD, &sa, NULL);
+
 
 	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
 

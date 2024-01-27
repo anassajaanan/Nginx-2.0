@@ -7,6 +7,7 @@
 #include <iterator>
 #include <ostream>
 #include <string>
+#include <sys/errno.h>
 #include <unistd.h>
 
 
@@ -52,9 +53,7 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		// if ()
-		// int nevents = kevent(kqueue, NULL, 0, kqueue.events, 1, NULL);
-		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.size() > 0)
+		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgiStates.count(event.ident) > 0)
 		{
 			
 			if ((int)event.ident == servers[i]->_socket)
@@ -66,29 +65,34 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 				else
 					servers[i]->handleClientRequest(event.ident);
 			}
-			else if (servers[i]->_cgi.size() > 0 && (int)event.ident == servers[i]->_cgi.begin()->second->getCgiReadFd())
+			else
 			{
+				Logger::log(Logger::DEBUG, "Handling Read event for Cgi State", "ServerManager::processReadEvent");
+				servers[i]->handleCgiOutput(event.ident);
+			}
+			// else if (servers[i]->_cgi.size() > 0 && (int)event.ident == servers[i]->_cgi.begin()->second->getCgiReadFd())
+			// {
 
-				//README:
+			// 	//README:
 
-				// anas if u know when its done to read from and  add it to the condition as i tried.
+			// 	// anas if u know when its done to read from and  add it to the condition as i tried.
 
 				
-				std::string responseMessage = readCgiResponse(event.ident);
-				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.size()), "1");
-				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.begin()->first), "1");
-				HttpResponse	cgiResponse = servers[i]->_cgi.begin()->second->serveCgiOutput(responseMessage);
-				std::cout << "response = " << cgiResponse.getBody() << std::endl;
-				ResponseState *responseState;
-				responseState = new ResponseState(cgiResponse.buildResponse());
-				servers[i]->_responses[servers[i]->_clients.begin()->first] = responseState;
-				kqueue.registerEvent(servers[i]->_clients.begin()->first , EVFILT_WRITE);
-				// delete servers[i]->_cgi[servers[i]->_cgi.begin()->first];
-				servers[i]->_cgi.erase(servers[i]->_cgi.begin());
-				// delete responseState;
-				// delete servers[i]->_cgi->second;
-				// servers[i]->_cgi.erase()
-			}
+			// 	std::string responseMessage = readCgiResponse(event.ident);
+			// 	Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.size()), "1");
+			// 	Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.begin()->first), "1");
+			// 	HttpResponse	cgiResponse = servers[i]->_cgi.begin()->second->serveCgiOutput(responseMessage);
+			// 	std::cout << "response = " << cgiResponse.getBody() << std::endl;
+			// 	ResponseState *responseState;
+			// 	responseState = new ResponseState(cgiResponse.buildResponse());
+			// 	servers[i]->_responses[servers[i]->_clients.begin()->first] = responseState;
+			// 	kqueue.registerEvent(servers[i]->_clients.begin()->first , EVFILT_WRITE);
+			// 	// delete servers[i]->_cgi[servers[i]->_cgi.begin()->first];
+			// 	servers[i]->_cgi.erase(servers[i]->_cgi.begin());
+			// 	// delete responseState;
+			// 	// delete servers[i]->_cgi->second;
+			// 	// servers[i]->_cgi.erase()
+			// }
 			break;
 		}
 	}
@@ -109,14 +113,10 @@ std::string	ServerManager::readCgiResponse(int fd)
 
 void	ServerManager::processWriteEvent(const struct kevent &event)
 {
-	Logger::log(Logger::DEBUG, "zooooooooo6", "1");
-	// std::cout << servers.size() << std::endl; 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		// std::cout << "i = " << i << std::endl;
 		if (servers[i]->_responses.count(event.ident) > 0)
 		{
-			std::cout << "fjkdjf" << std::endl;
 			servers[i]->handleClientResponse(event.ident);
 			break;
 		}
@@ -137,9 +137,15 @@ void	ServerManager::start()
 		if (!running)
 			break;
 
+		Logger::log(Logger::DEBUG, "Received " + std::to_string(nev) + " events", "EventLoop");
 
 		if (nev < 0)
 		{
+			if (errno == EINTR)
+			{
+				Logger::log(Logger::DEBUG, "Interrupted by signal", "EventLoop");
+				continue;
+			}
 			Logger::log(Logger::ERROR, "Error in kqueue: " + std::string(strerror(errno)), "EventLoop");
 			continue;
 		}

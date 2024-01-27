@@ -2,6 +2,9 @@
 #include "CgiHandler.hpp"
 #include "ClientState.hpp"
 #include "HttpResponse.hpp"
+#include <cstdlib>
+#include <sys/_types/_pid_t.h>
+#include <sys/event.h>
 
 // -----------------------------------
 // Constructor and Destructor
@@ -135,7 +138,6 @@ void	Server::acceptNewConnection()
 	struct sockaddr_in	clientAddr;
 	socklen_t			clientAddrLen = sizeof(clientAddr);
 	int clientSocket = accept(this->_socket, (struct sockaddr *)&clientAddr, &clientAddrLen);
-	std::cout << "client = " << clientSocket << std::endl;
 	if (clientSocket < 0)
 	{
 		Logger::log(Logger::ERROR, "Error accepting new connection: " + std::string(strerror(errno)), "Server::acceptNewConnection");
@@ -190,19 +192,6 @@ void	Server::handleClientRequest(int clientSocket)
 
 		Logger::log(Logger::DEBUG, "Received new request from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
 		client->processIncomingData(*this, buffer, bytesRead);
-		// HttpResponse response;
-		// response.setVersion("HTTP/1.1");
-		// response.setStatusCode("200");
-		// response.setStatusMessage("OK");
-		// response.setBody("Hello World");
-		// response.setHeader("Content-Type", "text/plain");
-		// response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-		// response.setHeader("Server", "webserv");
-		// response.setHeader("Connection", "close");
-		// ResponseState *responseState = new ResponseState(response.buildResponse());
-
-		// _responses[clientSocket] = responseState;
-		// _kq.registerEvent(clientSocket, EVFILT_WRITE);
 	}
 }
 
@@ -212,9 +201,9 @@ bool			Server::validateFileExtension(HttpRequest &request)
 	std::string					uri = request.getUri();
 
 	// std::cout << "uri cgi = " << uri.substr(uri.find('.'), uri.length()) << std::endl;
-	std::vector<std::string>::iterator it = cgiExten.begin();
-	for (; it != cgiExten.end(); it++)
-		std::cout << "{" << *it << "}" << std::endl;
+	// std::vector<std::string>::iterator it = cgiExten.begin();
+	// for (; it != cgiExten.end(); it++)
+	// 	std::cout << "{" << *it << "}" << std::endl;
 	if (uri.find('.') == std::string::npos ||
 	std::find(cgiExten.begin(), cgiExten.end(),
 	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
@@ -239,14 +228,138 @@ bool			Server::validCgiRequest(HttpRequest &request, ServerConfig &config)
 	return true;
 }
 
+void	Server::handleCgiOutput(int pipeReadFd)
+{
+	Logger::log(Logger::INFO, "Handling CGI output", "Server::handleCgiOutput");
+
+	char	buffer[BUFFER_SIZE];
+	ssize_t	bytesRead = read(pipeReadFd, buffer, BUFFER_SIZE);
+	if (bytesRead < 0)
+	{
+		Logger::log(Logger::ERROR, "Error reading from CGI pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
+		return ;
+	}
+	// else if (bytesRead == 0)
+	// {
+	// 	Logger::log(Logger::INFO, "CGI process has closed the pipe", "Server::handleCgiOutput");
+	// 	return ;
+	// }
+	// else
+	// {
+	// 	CgiState *cgiState = _cgiStates[pipeReadFd];
+	// 	cgiState->_cgiResponseMessage = std::string(buffer, bytesRead);
+	// 	HttpResponse response;
+	// 	response.setVersion("HTTP/1.1");
+	// 	response.setStatusCode(std::to_string(200));
+	// 	response.setStatusMessage("OK");
+	// 	response.setBody(cgiState->_cgiResponseMessage);
+	// 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	// 	response.setHeader("Content-Type", "text/plain");
+	// 	response.setHeader("Server", "Nginx 2.0");
+	// 	response.setHeader("Connection", "keep-alive");
+	// 	ResponseState *responseState = new ResponseState(response.buildResponse());
+	// 	_clients[cgiState->_clientSocket]->resetClientState();
+	// 	_responses[cgiState->_clientSocket] = responseState;
+	// 	_kq.registerEvent(cgiState->_clientSocket, EVFILT_WRITE);
+	// 	_kq.unregisterEvent(pipeReadFd, EVFILT_READ);
+	// 	_cgiStates.erase(pipeReadFd);
+	// 	close(pipeReadFd);
+	// 	delete cgiState;
+	// }
+	else if (bytesRead == 0)
+	{
+		Logger::log(Logger::INFO, "Finished reading from CGI pipe", "Server::handleCgiOutput");
+		CgiState *cgiState = _cgiStates[pipeReadFd];
+		HttpResponse response;
+		response.setVersion("HTTP/1.1");
+		response.setStatusCode(std::to_string(200));
+		response.setStatusMessage("OK");
+		response.setBody(cgiState->_cgiResponseMessage);
+		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+		response.setHeader("Content-Type", "text/plain");
+		response.setHeader("Server", "Nginx 2.0");
+		response.setHeader("Connection", "keep-alive");
+		ResponseState *responseState = new ResponseState(response.buildResponse());
+		_clients[cgiState->_clientSocket]->resetClientState();
+		_responses[cgiState->_clientSocket] = responseState;
+		_kq.registerEvent(cgiState->_clientSocket, EVFILT_WRITE);
+		_kq.unregisterEvent(pipeReadFd, EVFILT_READ);
+		_cgiStates.erase(pipeReadFd);
+		close(pipeReadFd);
+		delete cgiState;
+	}
+	else {
+		CgiState *cgiState = _cgiStates[pipeReadFd];
+		cgiState->_cgiResponseMessage += std::string(buffer, bytesRead);
+	}
+}
+
+void	Server::handleCgiRequest(int clientSocket, HttpRequest &request)
+{
+	pid_t	pid;
+	int		pipeFd[2];
+	char	**params;
+
+	params = new char *[2];
+	params[0] = strdup((_config.root + request.getUri()).c_str());
+	params[1] = NULL;
+
+	if (pipe(pipeFd) < 0)
+	{
+		Logger::log(Logger::ERROR, "Pipe Error", "Server::handleCgiRequest");
+		return ;
+	}
+
+	pid = fork();
+	if (pid < 0)
+	{
+		Logger::log(Logger::ERROR, "Fork Error", "Server::handleCgiRequest");
+		return ;
+	}
+	else if (pid == 0)
+	{
+		close(pipeFd[0]);
+		dup2(pipeFd[1], STDOUT_FILENO);
+		close(pipeFd[1]);
+
+		if (execve(params[0], params, NULL) < 0)
+		{
+			Logger::log(Logger::ERROR, "Execve Error", "Server::handleCgiRequest");
+			delete params[0];
+			delete [] params;
+			exit(EXIT_FAILURE);
+		}
+		exit(EXIT_SUCCESS);
+	}
+	else
+	{
+		close(pipeFd[1]);
+		if (fcntl(pipeFd[0], F_SETFL, O_NONBLOCK) < 0)
+		{
+			Logger::log(Logger::ERROR, "Fcntl Error", "Server::handleCgiRequest");
+			return ;
+		}
+		_kq.registerEvent(pipeFd[0], EVFILT_READ);
+		CgiState *cgiState = new CgiState(pid, pipeFd[0], clientSocket);
+		_cgiStates[pipeFd[0]] = cgiState;
+
+		delete params[0];
+		delete [] params;
+	}
+	
+
+}
+
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
 	{
-			Logger::log(Logger::ERROR, "Here", "1");
-			std::cout << "Valid Cgi" << std::endl;
-			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq);
-			_cgi[clientSocket] = cgiDirective;
+			// Logger::log(Logger::ERROR, "Here", "1");
+			// std::cout << "Valid Cgi" << std::endl;
+			// CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq);
+			// _cgi[clientSocket] = cgiDirective;
+		Logger::log(Logger::INFO, "Handling 'GET' 'Cgi' request", "Server::processGetRequest");
+		handleCgiRequest(clientSocket, request);
 	}
 	else
 	{
@@ -262,7 +375,6 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 
 		_responses[clientSocket] = responseState;
 		_kq.registerEvent(clientSocket, EVFILT_WRITE);
-		// do the rest
 	}
 }
 
@@ -294,8 +406,6 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 void	Server::handleClientResponse(int clientSocket)
 {
-	std::cout << "sock = " << clientSocket << std::endl;
-	std::cout << "count = " << _responses.count(clientSocket) << std::endl;
 	if (_responses.count(clientSocket) == 0)
 	{
 		Logger::log(Logger::ERROR, "No response state found for client socket " + std::to_string(clientSocket), "Server::handleClientResponse");
@@ -554,3 +664,8 @@ std::string	Server::getStatusMessage(int statusCode)
 		return "";
 	return statusCodeMessages[statusCode];
 }
+
+
+// ----------------------------------- CGI_STATE -----------------------------------
+CgiState::CgiState(pid_t pid, int readFd, int clientSocket)
+	: _pid(pid), _pipeReadFd(readFd), _clientSocket(clientSocket) { }

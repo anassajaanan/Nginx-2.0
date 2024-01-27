@@ -2,7 +2,8 @@
 
 
 #pragma once
-#include "CgiHandler.hpp"
+#include "HttpRequest.hpp"
+#include <sys/_types/_pid_t.h>
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -11,6 +12,7 @@
 #include "MimeTypeParser.hpp"
 #include "RequestHandler.hpp"
 #include "ResponseState.hpp"
+#include "CgiHandler.hpp"
 
 
 #include <fcntl.h>
@@ -37,6 +39,8 @@
 
 class ClientState;
 
+class CgiState;
+
 class Server
 {
 
@@ -50,8 +54,8 @@ public:
 	int									_socket;
 	struct sockaddr_in					_serverAddr;
 	std::map<int, ClientState *>		_clients;
-	std::map<int, CgiHandler *>			_cgi;
 	std::map<int, ResponseState *>		_responses;
+	std::map<int, CgiState *>			_cgiStates;
 
 	// Server Creation
 	void		createServerSocket();
@@ -95,6 +99,28 @@ public:
 	bool			validateFileExtension(HttpRequest &request);
 	bool			fileExists(const std::string &path);
 
+
+
+	void	handleCgiRequest(int clientSocket, HttpRequest &request);
+	void	handleCgiOutput(int pipeReadFd);
+
+
+};
+
+
+class CgiState
+{
+
+private:
+
+
+public:
+	CgiState(pid_t childPid, int pipeReadFd, int clientSocket);
+	
+	pid_t		_pid;
+	int			_pipeReadFd;
+	int			_clientSocket;
+	std::string	_cgiResponseMessage;
 
 };
 
