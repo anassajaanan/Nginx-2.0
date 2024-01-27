@@ -61,7 +61,7 @@ public:
 	struct sockaddr_in					_serverAddr;
 	std::map<int, ClientState *>		_clients;
 	std::map<int, ResponseState *>		_responses;
-	std::map<int, CgiState *>			_cgiStates;
+	std::map<int, CgiHandler *>			_cgi;
 
 	// Server Creation
 	void		createServerSocket();
@@ -95,7 +95,7 @@ public:
 
 	// Timeout and Cleanup
 	void		checkForTimeouts();
-	void		checkForCgiTimeouts();
+	// void		checkForCgiTimeouts();
 	void		removeClient(int clientSocket);
 
 	// Utility
@@ -105,6 +105,7 @@ public:
 	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
 	bool			validateFileExtension(HttpRequest &request);
 	bool			fileExists(const std::string &path);
+	void			cgiOutput(int cgiOutputFile);
 
 
 

@@ -1,8 +1,9 @@
 #include "CgiHandler.hpp"
 
-CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq)
+CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath)
 {
-	handleCgiDirective(request, serverConfig, kq);
+	cgiClientSocket = cgiSocket;
+	handleCgiDirective(request, serverConfig, kq, postPath);
 }
 
 HttpResponse	CgiHandler::serveCgiOutput(const std::string &message)
@@ -29,6 +30,11 @@ int		CgiHandler::getCgiReadFd()const
 int		CgiHandler::getCgiWriteFd()const
 {
 	return (this->pipeFd[1]);
+}
+
+int		CgiHandler::getCgiClientSocket() const
+{
+	return (this->cgiClientSocket);
 }
 
 void			CgiHandler::delete2dArray(char **str)
@@ -83,7 +89,7 @@ void	CgiHandler::closeCgiPipe()
 	
 }
 
-void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq)
+void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath)
 {
 	int		pid;
 	char	**parameters;
@@ -94,17 +100,20 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 		std::cerr << "Pipe Error" << std::endl;
 		return ;
 	}
-	kq.registerEvent(this->pipeFd[0], EVFILT_READ);
+	
 	envp = initiateEnvVariables(request, serverConfig);
 	parameters = new char *[2];
 	parameters[0] = strdup((serverConfig.root + request.getUri()).c_str());
 	parameters[1] = NULL;
+	// if (request.getMethod() == "POST")
+	// {
+		int postBodyFd = open(postPath.c_str(), O_RDONLY);
+		if (postBodyFd < 0)
+		{
+			std::cout << "Error While Opening The Body File" << std::endl;
+		}
+	// }
 	pid = fork();
-	int postBodyFd = open("/Users/atukka/Desktop/cursus/webserve_par/contentbody", O_RDONLY);
-	if (postBodyFd < 0)
-	{
-		std::cout << "Error While Opening The Body File" << std::endl;
-	}
 	if (pid == 0)
 	{
 		close(this->pipeFd[0]);
@@ -119,7 +128,8 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 			if (dup2(postBodyFd, STDIN_FILENO))
 				std::cerr << "Failed To Dup2 Input" << std::endl;
 		close(this->pipeFd[1]);
-		close(postBodyFd);
+		if (postBodyFd > 0)
+			close(postBodyFd);
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
 			std::cerr << "Failed To Execute" << std::endl;
@@ -128,40 +138,20 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 			exit(0);
 		}
 	}
-	close(this->pipeFd[1]);
-	if (postBodyFd > 0)
-		close(postBodyFd);
-	// int i = 0;
-	// int status = 0;
-	// std::string		toSend;
-	// std::string		buf;
-	// char s[1000] = {0};
-	// while (read(pipeFd[0], s, 1000) > 0)
-	// {
-	// 	toSend += s;
-	// 	std::memset(s, 0, 1000);
-	// }
-	// if (i < 0)
-	// 	std::cerr << "Read" << std::endl;
-	// std::cout << " i = " << i << std::endl;
-	// std::cout << "reached = " << toSend << std::endl;
-	// wait(NULL);
-	// int k = 0;
-	// if (setsid() < 0)
-	// 	std::cout << "failed to setsid" << std::endl;
-	// k = waitpid(pid, &status, WNOHANG);
-	// if (k < 0)
-	// 	std::cout << "Wait error" << std::endl;
-	// if (WIFEXITED(status))
-	// 	std::cout << "Exited" << std::endl;
-	// else
-	//  	std::cout << "Not Yet" << std::endl;
-	// std::cout << "k = " << k << std::endl;
-	// std::cout << "status = " << status << std::endl;
-	// close(pipeFd[0]);
+	else
+	{
+	
+		close(this->pipeFd[1]);
+		if (fcntl(pipeFd[0], F_SETFL, O_NONBLOCK) < 0)
+		{
+			std::cerr << "cant be non blocking" << std::endl;
+		}
+		kq.registerEvent(this->pipeFd[0], EVFILT_READ);
+		if (postBodyFd > 0)
+			close(postBodyFd);
+	}
 	this->delete2dArray(parameters);
 	this->delete2dArray(envp);
-	// return (toSend);
 }
 
 void					CgiHandler::setCgiResponseMessage(const std::string &messageValue)

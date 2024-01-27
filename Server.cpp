@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <sys/_types/_pid_t.h>
 #include <sys/event.h>
+#include <cstddef>
 
 // -----------------------------------
 // Constructor and Destructor
@@ -229,123 +230,122 @@ bool			Server::validCgiRequest(HttpRequest &request, ServerConfig &config)
 	return true;
 }
 
-void	Server::handleCgiOutput(int pipeReadFd)
-{
-	Logger::log(Logger::INFO, "Handling CGI output", "Server::handleCgiOutput");
+// void	Server::handleCgiOutput(int pipeReadFd)
+// {
+// 	Logger::log(Logger::INFO, "Handling CGI output", "Server::handleCgiOutput");
 
-	char	buffer[BUFFER_SIZE];
-	ssize_t	bytesRead = read(pipeReadFd, buffer, BUFFER_SIZE);
-	if (bytesRead < 0)
-	{
-		Logger::log(Logger::ERROR, "Error reading from CGI pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
-		return ;
-	}
-	else if (bytesRead == 0)
-	{
-		Logger::log(Logger::INFO, "Finished reading from CGI pipe", "Server::handleCgiOutput");
-		CgiState *cgiState = _cgiStates[pipeReadFd];
-		HttpResponse response;
-		response.setVersion("HTTP/1.1");
-		response.setStatusCode(std::to_string(200));
-		response.setStatusMessage("OK");
-		response.setBody(cgiState->_cgiResponseMessage);
-		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-		response.setHeader("Content-Type", "text/plain");
-		response.setHeader("Server", "Nginx 2.0");
-		response.setHeader("Connection", "keep-alive");
-		ResponseState *responseState = new ResponseState(response.buildResponse());
-		_clients[cgiState->_clientSocket]->resetClientState();
-		_responses[cgiState->_clientSocket] = responseState;
-		_kq.registerEvent(cgiState->_clientSocket, EVFILT_WRITE);
-		_kq.unregisterEvent(pipeReadFd, EVFILT_READ);
-		_cgiStates.erase(pipeReadFd);
-		close(pipeReadFd);
-		delete cgiState;
-	}
-	else {
-		CgiState *cgiState = _cgiStates[pipeReadFd];
-		cgiState->_cgiResponseMessage += std::string(buffer, bytesRead);
-		if (cgiState->_cgiResponseMessage.length() > CGI_MAX_OUTPUT_SIZE)
-		{
-			Logger::log(Logger::WARN, "CGI response size exceeded the maximum limit", "Server::handleCgiOutput");
+// 	char	buffer[BUFFER_SIZE];
+// 	ssize_t	bytesRead = read(pipeReadFd, buffer, BUFFER_SIZE);
+// 	if (bytesRead < 0)
+// 	{
+// 		Logger::log(Logger::ERROR, "Error reading from CGI pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
+// 		return ;
+// 	}
+// 	else if (bytesRead == 0)
+// 	{
+// 		Logger::log(Logger::INFO, "Finished reading from CGI pipe", "Server::handleCgiOutput");
+// 		CgiState *cgiState = _cgiStates[pipeReadFd];
+// 		HttpResponse response;
+// 		response.setVersion("HTTP/1.1");
+// 		response.setStatusCode(std::to_string(200));
+// 		response.setStatusMessage("OK");
+// 		response.setBody(cgiState->_cgiResponseMessage);
+// 		response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+// 		response.setHeader("Content-Type", "text/plain");
+// 		response.setHeader("Server", "Nginx 2.0");
+// 		response.setHeader("Connection", "keep-alive");
+// 		ResponseState *responseState = new ResponseState(response.buildResponse());
+// 		_clients[cgiState->_clientSocket]->resetClientState();
+// 		_responses[cgiState->_clientSocket] = responseState;
+// 		_kq.registerEvent(cgiState->_clientSocket, EVFILT_WRITE);
+// 		_kq.unregisterEvent(pipeReadFd, EVFILT_READ);
+// 		_cgiStates.erase(pipeReadFd);
+// 		close(pipeReadFd);
+// 		delete cgiState;
+// 	}
+// 	else {
+// 		CgiState *cgiState = _cgiStates[pipeReadFd];
+// 		cgiState->_cgiResponseMessage += std::string(buffer, bytesRead);
+// 		if (cgiState->_cgiResponseMessage.length() > CGI_MAX_OUTPUT_SIZE)
+// 		{
+// 			Logger::log(Logger::WARN, "CGI response size exceeded the maximum limit", "Server::handleCgiOutput");
 
-			_kq.unregisterEvent(pipeReadFd, EVFILT_READ);
-			handleInvalidRequest(cgiState->_clientSocket, 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
-			kill(cgiState->_pid, SIGKILL);
-			_cgiStates.erase(pipeReadFd);
-			close(pipeReadFd);
-			delete cgiState;
-		}
-	}
-}
+// 			_kq.unregisterEvent(pipeReadFd, EVFILT_READ);
+// 			handleInvalidRequest(cgiState->_clientSocket, 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
+// 			kill(cgiState->_pid, SIGKILL);
+// 			_cgiStates.erase(pipeReadFd);
+// 			close(pipeReadFd);
+// 			delete cgiState;
+// 		}
+// 	}
+// }
 
-void	Server::handleCgiRequest(int clientSocket, HttpRequest &request)
-{
-	pid_t	pid;
-	int		pipeFd[2];
-	char	**params;
+// void	Server::handleCgiRequest(int clientSocket, HttpRequest &request)
+// {
+// 	pid_t	pid;
+// 	int		pipeFd[2];
+// 	char	**params;
 
-	params = new char *[2];
-	params[0] = strdup((_config.root + request.getUri()).c_str());
-	params[1] = NULL;
+// 	params = new char *[2];
+// 	params[0] = strdup((_config.root + request.getUri()).c_str());
+// 	params[1] = NULL;
 
-	if (pipe(pipeFd) < 0)
-	{
-		Logger::log(Logger::ERROR, "Pipe Error", "Server::handleCgiRequest");
-		return ;
-	}
+// 	if (pipe(pipeFd) < 0)
+// 	{
+// 		Logger::log(Logger::ERROR, "Pipe Error", "Server::handleCgiRequest");
+// 		return ;
+// 	}
 
-	pid = fork();
-	if (pid < 0)
-	{
-		Logger::log(Logger::ERROR, "Fork Error", "Server::handleCgiRequest");
-		return ;
-	}
-	else if (pid == 0)
-	{
-		close(pipeFd[0]);
-		dup2(pipeFd[1], STDOUT_FILENO);
-		close(pipeFd[1]);
+// 	pid = fork();
+// 	if (pid < 0)
+// 	{
+// 		Logger::log(Logger::ERROR, "Fork Error", "Server::handleCgiRequest");
+// 		return ;
+// 	}
+// 	else if (pid == 0)
+// 	{
+// 		close(pipeFd[0]);
+// 		dup2(pipeFd[1], STDOUT_FILENO);
+// 		close(pipeFd[1]);
 
-		if (execve(params[0], params, NULL) < 0)
-		{
-			Logger::log(Logger::ERROR, "Execve Error", "Server::handleCgiRequest");
-			delete params[0];
-			delete [] params;
-			exit(EXIT_FAILURE);
-		}
-		exit(EXIT_SUCCESS);
-	}
-	else
-	{
-		close(pipeFd[1]);
-		if (fcntl(pipeFd[0], F_SETFL, O_NONBLOCK) < 0)
-		{
-			Logger::log(Logger::ERROR, "Fcntl Error", "Server::handleCgiRequest");
-			return ;
-		}
-		Logger::log(Logger::DEBUG, "Registering CGI read end of the pipe fd " + std::to_string(pipeFd[0]) + " for read events", "Server::handleCgiRequest");
-		_kq.registerEvent(pipeFd[0], EVFILT_READ);
-		CgiState *cgiState = new CgiState(pid, pipeFd[0], clientSocket);
-		_cgiStates[pipeFd[0]] = cgiState;
+// 		if (execve(params[0], params, NULL) < 0)
+// 		{
+// 			Logger::log(Logger::ERROR, "Execve Error", "Server::handleCgiRequest");
+// 			delete params[0];
+// 			delete [] params;
+// 			exit(EXIT_FAILURE);
+// 		}
+// 		exit(EXIT_SUCCESS);
+// 	}
+// 	else
+// 	{
+// 		close(pipeFd[1]);
+// 		if (fcntl(pipeFd[0], F_SETFL, O_NONBLOCK) < 0)
+// 		{
+// 			Logger::log(Logger::ERROR, "Fcntl Error", "Server::handleCgiRequest");
+// 			return ;
+// 		}
+// 		Logger::log(Logger::DEBUG, "Registering CGI read end of the pipe fd " + std::to_string(pipeFd[0]) + " for read events", "Server::handleCgiRequest");
+// 		_kq.registerEvent(pipeFd[0], EVFILT_READ);
+// 		CgiState *cgiState = new CgiState(pid, pipeFd[0], clientSocket);
+// 		_cgiStates[pipeFd[0]] = cgiState;
 
-		delete params[0];
-		delete [] params;
-	}
+// 		delete params[0];
+// 		delete [] params;
+// 	}
 	
 
-}
+// }
 
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
 	{
-			// Logger::log(Logger::ERROR, "Here", "1");
-			// std::cout << "Valid Cgi" << std::endl;
-			// CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq);
-			// _cgi[clientSocket] = cgiDirective;
-		Logger::log(Logger::INFO, "Handling 'CGI GET' request", "Server::processGetRequest");
-		handleCgiRequest(clientSocket, request);
+			Logger::log(Logger::ERROR, "Here", "1");
+			std::cout << "Valid Cgi" << std::endl;
+			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket, "");
+			std::cout << "cgiDirective->getCgiReadFd() = " << cgiDirective->getCgiReadFd() << std::endl;
+			_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
 	else
 	{
@@ -364,12 +364,48 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	}
 }
 
+void	Server::cgiOutput(int cgiOutputFile)
+{
+	char	s[BUFFER_SIZE];
+	std::string	toSend;
+	std::memset(s, 0, BUFFER_SIZE);
+	size_t len = read(cgiOutputFile, s, BUFFER_SIZE);
+	if (len < 0)
+	{
+		std::cerr << "Read Error" << std::endl;
+	}
+	if (len == 0)
+	{
+		CgiHandler *cgi = _cgi[cgiOutputFile];
+		HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
+		ResponseState *responseState;
+		responseState = new ResponseState(cgiResponse.buildResponse());
+		_clients[cgi->getCgiClientSocket()]->resetClientState();
+		_responses[cgi->getCgiClientSocket()] = responseState;
+		_kq.registerEvent(cgi->getCgiClientSocket() , EVFILT_WRITE);
+		_kq.unregisterEvent(cgi->getCgiReadFd(), EVFILT_READ);
+		// delete _cgi[_cgi.begin()->first];
+		_cgi.begin()->second->closeCgiPipe();
+		_cgi.erase(cgi->getCgiReadFd());
+		delete cgi;
+	}
+	else
+	{
+		_cgi[cgiOutputFile]->setCgiResponseMessage(_cgi[cgiOutputFile]->getCgiResponseMessage() + s);
+	}
+}
+
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
 
-	if (validCgiRequest(request, _config))
+	// _clients[clientSocket].
+	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
 	{
-		std::cout << "Valid Cgi" << std::endl;
+			Logger::log(Logger::ERROR, "Here", "1");
+			std::cout << "Valid Cgi" << std::endl;
+			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
+			std::cout << "cgiDirective->getCgiReadFd() = " << cgiDirective->getCgiReadFd() << std::endl;
+			_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
 	else
 	{
@@ -617,27 +653,27 @@ void	Server::checkForTimeouts()
 	}
 }
 
-void	Server::checkForCgiTimeouts()
-{
-	std::map<int, CgiState *>::iterator it = _cgiStates.begin();
-	while (it != _cgiStates.end())
-	{
-		if (it->second->isTimedOut(CGI_TIMEOUT))
-		{
-			Logger::log(Logger::INFO, "Cgi with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForCgiTimeouts");
+// void	Server::checkForCgiTimeouts()
+// {
+// 	std::map<int, CgiState *>::iterator it = _cgiStates.begin();
+// 	while (it != _cgiStates.end())
+// 	{
+// 		if (it->second->isTimedOut(CGI_TIMEOUT))
+// 		{
+// 			Logger::log(Logger::INFO, "Cgi with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForCgiTimeouts");
 
-			_kq.unregisterEvent(it->first, EVFILT_READ);
-			close(it->first);
-			kill(it->second->_pid, SIGKILL);
-			handleInvalidRequest(it->second->_clientSocket, 504, "The CGI script failed to complete in a timely manner. Please try again later.");
-			delete it->second;
-			it = _cgiStates.erase(it);
+// 			_kq.unregisterEvent(it->first, EVFILT_READ);
+// 			close(it->first);
+// 			kill(it->second->_pid, SIGKILL);
+// 			handleInvalidRequest(it->second->_clientSocket, 504, "The CGI script failed to complete in a timely manner. Please try again later.");
+// 			delete it->second;
+// 			it = _cgiStates.erase(it);
 			
-		}
-		else
-			it++;
-	}
-}
+// 		}
+// 		else
+// 			it++;
+// 	}
+// }
 
 void	Server::removeClient(int clientSocket)
 {

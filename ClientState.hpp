@@ -2,6 +2,7 @@
 
 
 #pragma once
+#include <string>
 #ifndef CLIENTSTATE_HPP
 #define CLIENTSTATE_HPP
 
@@ -48,6 +49,7 @@ public:
 	int					getFd() const;
 	const std::string	&getClientIpAddr() const;
 	int					getRequestCount() const;
+	const std::string			&getPostRequestFileName();
 	bool				isTimedOut(size_t keepalive_timeout) const;
 };
 
