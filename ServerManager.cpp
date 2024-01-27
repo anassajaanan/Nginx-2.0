@@ -71,6 +71,7 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 					servers[i]->handleClientDisconnection(event.ident);
 				else
 					servers[i]->handleClientRequest(event.ident);
+				std::cout << "handling handleClientRequest" << std::endl;
 			}
 			else
 			{
@@ -88,6 +89,7 @@ void	ServerManager::processWriteEvent(const struct kevent &event)
 		if (servers[i]->_responses.count(event.ident) > 0)
 		{
 			servers[i]->handleClientResponse(event.ident);
+			std::cout << "handleClientResponse" << std::endl;
 			break;
 		}
 	}

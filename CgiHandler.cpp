@@ -1,8 +1,7 @@
 #include "CgiHandler.hpp"
 
-CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath)
+CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath) : cgiClientSocket(cgiSocket)
 {
-	cgiClientSocket = cgiSocket;
 	handleCgiDirective(request, serverConfig, kq, postPath);
 }
 
@@ -91,7 +90,6 @@ void	CgiHandler::closeCgiPipe()
 
 void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath)
 {
-	int		pid;
 	char	**parameters;
 	char	**envp;
 
@@ -113,8 +111,8 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 			std::cout << "Error While Opening The Body File" << std::endl;
 		}
 	// }
-	pid = fork();
-	if (pid == 0)
+	_pid = fork();
+	if (_pid == 0)
 	{
 		close(this->pipeFd[0]);
 		if (dup2(this->pipeFd[1], STDOUT_FILENO) < 0)
@@ -152,9 +150,16 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 	}
 	this->delete2dArray(parameters);
 	this->delete2dArray(envp);
+	std::cout << "doe cgi" << std::endl;
 }
 
-void					CgiHandler::setCgiResponseMessage(const std::string &messageValue)
+int				CgiHandler::getChildPid()
+{
+	return (this->_pid);
+}
+
+
+void			CgiHandler::setCgiResponseMessage(const std::string &messageValue)
 {
 	this->cgiResponseMessage = messageValue;
 }
@@ -166,5 +171,4 @@ const std::string		&CgiHandler::getCgiResponseMessage() const
 
 CgiHandler::~CgiHandler()
 {
-	std::cout << "out" << std::endl;
 }

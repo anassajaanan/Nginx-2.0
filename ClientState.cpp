@@ -58,6 +58,7 @@ void	ClientState::processHeaders(Server &server, const char *buffer, size_t byte
 		areHeaderComplete = true;
 		Logger::log(Logger::DEBUG, "Headers completed for fd " + std::to_string(fd), "ClientState::processHeaders");
 		parseHeaders(server);
+		std::cout << "parseHeaders" << std::endl;
 	}
 	else
 		Logger::log(Logger::DEBUG, "Received partial headers for fd " + std::to_string(fd), "ClientState::processHeaders");
@@ -86,7 +87,6 @@ void	ClientState::parseHeaders(Server &server)
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handleGetRequest(server);
 	}
-
 	else if (request.getMethod() == "POST")
 	{
 		std::ostringstream logStream;
@@ -109,7 +109,10 @@ void	ClientState::handleGetRequest(Server &server)
 	if (!requestBody.empty() || !request.getHeader("Content-Length").empty() || request.getHeader("Transfer-Encoding") == "chunked")
 		server.handleInvalidGetRequest(fd);
 	else
+	{
 		server.processGetRequest(fd, request);
+		std::cout << "processGetRequest" << std::endl;
+	}
 }
 
 

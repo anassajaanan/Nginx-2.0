@@ -68,7 +68,8 @@ bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 			replaceUri(token, "%20", " ");
 			if (!this->validateUri(token))
 				return (this->setStatus(400), false);
-			token = token.substr(0, token.find('?'));
+			if (token.find('?') != std::string::npos)
+				token = token.substr(0, token.find('?'));
 			// std::cout << "token = " << token << std::endl;
 			this->setUri(token);
 		}
@@ -115,7 +116,9 @@ std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uriVal
 	std::stringstream	ss;
 	std::string			queryString;
 
+	// std::cout << "here" << std::endl;
 	queryString = uriValue.substr(uriValue.find('?') + 1, uriValue.length());
+	std::cout << "que =  " << queryString << std::endl;
 	ss << queryString;
 	while (std::getline(ss, queryString, '&'))
 	{
@@ -133,7 +136,7 @@ bool	HttpRequest::validateUri(const std::string &str)
 	// if (str.length() >= MAX_URL_LENGTH)
 	// 	return (this->setStatus(414), false);
 	// replaceUri()
-	if (str.find('?') != std::string::npos)
+	if (str.find('?') != std::string::npos && str.find('?') != str.length())
 		this->queries = parseQueryString(str);
 	return (true);
 }

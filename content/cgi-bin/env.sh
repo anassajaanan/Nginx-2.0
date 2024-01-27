@@ -13,5 +13,5 @@ echo "CONTENT_TYPE = $CONTENT_TYPE"
 echo "CONTENT_LENGHT = $CONTENT_LENGHT"
 
 echo hi
-sleep 10
+# sleep 10
 echo hi

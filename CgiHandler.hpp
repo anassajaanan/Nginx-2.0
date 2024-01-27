@@ -15,6 +15,7 @@ class CgiHandler
 		int			pipeFd[2];
 		std::string	cgiResponseMessage;
 		int		cgiClientSocket;
+		int 	_pid;
 	public:
 		CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket,  const std::string &postPath);
 		HttpResponse			serveCgiOutput(const std::string &message);
@@ -26,6 +27,7 @@ class CgiHandler
 		int						getCgiReadFd()const;
 		int						getCgiWriteFd()const;
 		int						getCgiClientSocket()const;
+		int						getChildPid();
 		// void					setCgiResponseMessage(const std::string &str);
 
 		//utilities
