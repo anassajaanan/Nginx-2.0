@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/event.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -35,6 +36,11 @@
 #define MAX_URI_SIZE 4096 // 4 KB
 
 #define TEMP_FILE_DIRECTORY "./uploads/"
+
+#define CGI_TIMEOUT 5 // 10 seconds
+
+// define max size of cgi output
+#define CGI_MAX_OUTPUT_SIZE 2097152 // 2 MB in bytes
 
 
 class ClientState;
@@ -89,6 +95,7 @@ public:
 
 	// Timeout and Cleanup
 	void		checkForTimeouts();
+	void		checkForCgiTimeouts();
 	void		removeClient(int clientSocket);
 
 	// Utility
@@ -121,6 +128,10 @@ public:
 	int			_pipeReadFd;
 	int			_clientSocket;
 	std::string	_cgiResponseMessage;
+	std::chrono::time_point<std::chrono::steady_clock> _startTime;
+
+
+	bool		isTimedOut(size_t timeout) const;
 
 };
 
