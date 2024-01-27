@@ -1,0 +1,395 @@
+2024/01/27 18:08:17 [INFO ] [Server::createServerSocket] Server socket created successfully
+2024/01/27 18:08:17 [INFO ] [Server::setSocketOptions] Socket options set successfully
+2024/01/27 18:08:17 [INFO ] [Server::setSocketToNonBlocking] Socket set to non-blocking mode successfully
+2024/01/27 18:08:17 [INFO ] [Server::bindAndListen] Socket bound successfully
+2024/01/27 18:08:17 [INFO ] [Server::bindAndListen] Server is now listening on socket
+2024/01/27 18:08:17 [INFO ] [ServerManager::initializeServers] Server is created and it is listening on port: 9000
+2024/01/27 18:08:17 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 5: EVFILT_READ
+2024/01/27 18:08:17 [DEBUG] [main] Starting server manager
+2024/01/27 18:08:17 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:22 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:08:22 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:27 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:08:27 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:29 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/27 18:08:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/27 18:08:29 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:29 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 6
+2024/01/27 18:08:29 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/27 18:08:29 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/27 18:08:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/27 18:08:29 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:29 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 7
+2024/01/27 18:08:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/27 18:08:29 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:29 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/27 18:08:29 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/27 18:08:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/27 18:08:29 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:29 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 6
+2024/01/27 18:08:29 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/27 18:08:29 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/27 18:08:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/27 18:08:29 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:29 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:29 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/27 18:08:29 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/27 18:08:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/27 18:08:29 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:31 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 6
+2024/01/27 18:08:31 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/27 18:08:31 [INFO ] [ClientState::parseHeaders] Received a GET request for '/cgi-bin/env.sh' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/27 18:08:31 [ERROR] [1] Here
+2024/01/27 18:08:31 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 8: EVFILT_READ
+2024/01/27 18:08:31 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:31 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:33 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:33 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:33 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:34 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:34 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [Server::handleClientRequest] Received new request from client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 7
+2024/01/27 18:08:35 [INFO ] [ClientState::parseHeaders] Received a GET request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:35 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 7
+2024/01/27 18:08:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_WRITE
+2024/01/27 18:08:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:38 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 7
+2024/01/27 18:08:38 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/27 18:08:38 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:41 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:41 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/27 18:08:41 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 8: EVFILT_READ
+2024/01/27 18:08:41 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:41 [DEBUG] [1] zooooooooo6
+2024/01/27 18:08:41 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/27 18:08:41 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/27 18:08:41 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/27 18:08:41 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:43 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/27 18:08:43 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/27 18:08:43 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:48 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:08:48 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:53 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:08:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:08:58 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:08:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:03 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:08 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:08 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:13 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:13 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:18 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:18 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:23 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:23 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:28 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:28 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:33 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:38 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:38 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:43 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:43 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:09:48 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:09:48 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:24:01 [DEBUG] [EventLoop] No events to process at this time
+2024/01/27 18:24:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/27 18:24:05 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 5: EVFILT_READ

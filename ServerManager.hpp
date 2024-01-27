@@ -16,8 +16,8 @@ class ServerManager
 {
 private:
 	KqueueManager							kqueue;
-	std::vector<Server *>					servers;
 	std::chrono::steady_clock::time_point	lastTimeoutCheck;
+	std::vector<Server *>					servers;
 
 
 public:

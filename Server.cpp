@@ -2,6 +2,7 @@
 #include "CgiHandler.hpp"
 #include "ClientState.hpp"
 #include "HttpResponse.hpp"
+#include <cstddef>
 
 // -----------------------------------
 // Constructor and Destructor
@@ -245,8 +246,9 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	{
 			Logger::log(Logger::ERROR, "Here", "1");
 			std::cout << "Valid Cgi" << std::endl;
-			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq);
-			_cgi[clientSocket] = cgiDirective;
+			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket, "");
+			std::cout << "cgiDirective->getCgiReadFd() = " << cgiDirective->getCgiReadFd() << std::endl;
+			_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
 	else
 	{
@@ -266,12 +268,48 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	}
 }
 
+void	Server::cgiOutput(int cgiOutputFile)
+{
+	char	s[BUFFER_SIZE];
+	std::string	toSend;
+	std::memset(s, 0, BUFFER_SIZE);
+	size_t len = read(cgiOutputFile, s, BUFFER_SIZE);
+	if (len < 0)
+	{
+		std::cerr << "Read Error" << std::endl;
+	}
+	if (len == 0)
+	{
+		CgiHandler *cgi = _cgi[cgiOutputFile];
+		HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
+		ResponseState *responseState;
+		responseState = new ResponseState(cgiResponse.buildResponse());
+		_clients[cgi->getCgiClientSocket()]->resetClientState();
+		_responses[cgi->getCgiClientSocket()] = responseState;
+		_kq.registerEvent(cgi->getCgiClientSocket() , EVFILT_WRITE);
+		_kq.unregisterEvent(cgi->getCgiReadFd(), EVFILT_READ);
+		// delete _cgi[_cgi.begin()->first];
+		_cgi.begin()->second->closeCgiPipe();
+		_cgi.erase(cgi->getCgiReadFd());
+		delete cgi;
+	}
+	else
+	{
+		_cgi[cgiOutputFile]->setCgiResponseMessage(_cgi[cgiOutputFile]->getCgiResponseMessage() + s);
+	}
+}
+
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
 
-	if (validCgiRequest(request, _config))
+	// _clients[clientSocket].
+	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
 	{
-		std::cout << "Valid Cgi" << std::endl;
+			Logger::log(Logger::ERROR, "Here", "1");
+			std::cout << "Valid Cgi" << std::endl;
+			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
+			std::cout << "cgiDirective->getCgiReadFd() = " << cgiDirective->getCgiReadFd() << std::endl;
+			_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
 	else
 	{

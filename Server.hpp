@@ -94,6 +94,7 @@ public:
 	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
 	bool			validateFileExtension(HttpRequest &request);
 	bool			fileExists(const std::string &path);
+	void			cgiOutput(int cgiOutputFile);
 
 
 };

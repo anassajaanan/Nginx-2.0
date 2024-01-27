@@ -215,6 +215,11 @@ int		ClientState::getRequestCount() const
 	return requestCount;
 }
 
+const std::string			&ClientState::getPostRequestFileName()
+{
+	return (requestBodyFilePath);
+}
+
 bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 {
 	std::chrono::seconds timeoutDuration(keepalive_timeout);

@@ -1,4 +1,5 @@
 #include "ServerManager.hpp"
+#include "CgiHandler.hpp"
 #include "HttpResponse.hpp"
 #include "Logger.hpp"
 #include "Server.hpp"
@@ -52,9 +53,7 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		// if ()
-		// int nevents = kevent(kqueue, NULL, 0, kqueue.events, 1, NULL);
-		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.size() > 0)
+		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.count((int)event.ident) > 0)
 		{
 			
 			if ((int)event.ident == servers[i]->_socket)
@@ -66,28 +65,9 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 				else
 					servers[i]->handleClientRequest(event.ident);
 			}
-			else if (servers[i]->_cgi.size() > 0 && (int)event.ident == servers[i]->_cgi.begin()->second->getCgiReadFd())
+			else
 			{
-
-				//README:
-
-				// anas if u know when its done to read from and  add it to the condition as i tried.
-
-				
-				std::string responseMessage = readCgiResponse(event.ident);
-				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.size()), "1");
-				Logger::log(Logger::ERROR, std::to_string(servers[i]->_cgi.begin()->first), "1");
-				HttpResponse	cgiResponse = servers[i]->_cgi.begin()->second->serveCgiOutput(responseMessage);
-				std::cout << "response = " << cgiResponse.getBody() << std::endl;
-				ResponseState *responseState;
-				responseState = new ResponseState(cgiResponse.buildResponse());
-				servers[i]->_responses[servers[i]->_clients.begin()->first] = responseState;
-				kqueue.registerEvent(servers[i]->_clients.begin()->first , EVFILT_WRITE);
-				// delete servers[i]->_cgi[servers[i]->_cgi.begin()->first];
-				servers[i]->_cgi.erase(servers[i]->_cgi.begin());
-				// delete responseState;
-				// delete servers[i]->_cgi->second;
-				// servers[i]->_cgi.erase()
+				servers[i]->cgiOutput((int)event.ident);
 			}
 			break;
 		}
