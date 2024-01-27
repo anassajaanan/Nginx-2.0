@@ -2,7 +2,8 @@
 
 
 #pragma once
-#include "CgiHandler.hpp"
+#include "HttpRequest.hpp"
+#include <sys/_types/_pid_t.h>
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -11,11 +12,13 @@
 #include "MimeTypeParser.hpp"
 #include "RequestHandler.hpp"
 #include "ResponseState.hpp"
+#include "CgiHandler.hpp"
 
 
 #include <fcntl.h>
 #include <fstream>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/event.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -34,8 +37,15 @@
 
 #define TEMP_FILE_DIRECTORY "./uploads/"
 
+#define CGI_TIMEOUT 5 // 10 seconds
+
+// define max size of cgi output
+#define CGI_MAX_OUTPUT_SIZE 2097152 // 2 MB in bytes
+
 
 class ClientState;
+
+class CgiState;
 
 class Server
 {
@@ -50,8 +60,8 @@ public:
 	int									_socket;
 	struct sockaddr_in					_serverAddr;
 	std::map<int, ClientState *>		_clients;
-	std::map<int, CgiHandler *>			_cgi;
 	std::map<int, ResponseState *>		_responses;
+	std::map<int, CgiHandler *>			_cgi;
 
 	// Server Creation
 	void		createServerSocket();
@@ -85,6 +95,7 @@ public:
 
 	// Timeout and Cleanup
 	void		checkForTimeouts();
+	// void		checkForCgiTimeouts();
 	void		removeClient(int clientSocket);
 
 	// Utility
@@ -95,7 +106,35 @@ public:
 	bool			validateFileExtension(HttpRequest &request);
 	bool			fileExists(const std::string &path);
 	void			cgiOutput(int cgiOutputFile);
+	// void			cgiOutput(int cgiOutputFile);
 
+
+
+
+	void	handleCgiRequest(int clientSocket, HttpRequest &request);
+	// void	handleCgiOutput(int pipeReadFd);
+
+
+};
+
+
+class CgiState
+{
+
+private:
+
+
+public:
+	CgiState(pid_t childPid, int pipeReadFd, int clientSocket);
+	
+	pid_t		_pid;
+	int			_pipeReadFd;
+	int			_clientSocket;
+	std::string	_cgiResponseMessage;
+	std::chrono::time_point<std::chrono::steady_clock> _startTime;
+
+
+	bool		isTimedOut(size_t timeout) const;
 
 };
 

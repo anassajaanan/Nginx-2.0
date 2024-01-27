@@ -8,6 +8,7 @@
 #include <iterator>
 #include <ostream>
 #include <string>
+#include <sys/errno.h>
 #include <unistd.h>
 
 
@@ -47,6 +48,12 @@ void	ServerManager::checkTimeouts()
 			servers[i]->checkForTimeouts();
 		lastTimeoutCheck = now;
 	}
+	// if (std::chrono::duration_cast<std::chrono::seconds>(now - lastCgiTimeoutCheck) > std::chrono::seconds(CGI_TIMEOUT_CHECK_INTERVAL))
+	// {
+	// 	for (size_t i = 0; i < servers.size(); i++)
+	// 		servers[i]->checkForCgiTimeouts();
+	// 	lastCgiTimeoutCheck = now;
+	// }
 }
 
 void	ServerManager::processReadEvent(const struct kevent &event)
@@ -74,29 +81,12 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 	}
 }
 
-std::string	ServerManager::readCgiResponse(int fd)
-{
-	char	s[1000];
-	std::string	toSend;
-	std::memset(s, 0, 1000);
-	while (read(fd, s, 100))
-	{
-		toSend += s;
-		std::memset(s, 0, 1000);
-	}
-	return toSend;
-}
-
 void	ServerManager::processWriteEvent(const struct kevent &event)
 {
-	Logger::log(Logger::DEBUG, "zooooooooo6", "1");
-	// std::cout << servers.size() << std::endl; 
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		// std::cout << "i = " << i << std::endl;
 		if (servers[i]->_responses.count(event.ident) > 0)
 		{
-			std::cout << "fjkdjf" << std::endl;
 			servers[i]->handleClientResponse(event.ident);
 			break;
 		}
@@ -106,6 +96,7 @@ void	ServerManager::processWriteEvent(const struct kevent &event)
 void	ServerManager::start()
 {
 	this->lastTimeoutCheck = std::chrono::steady_clock::now();
+	// this->lastCgiTimeoutCheck = std::chrono::steady_clock::now();
 
 	while (running)
 	{
@@ -117,9 +108,15 @@ void	ServerManager::start()
 		if (!running)
 			break;
 
+		Logger::log(Logger::DEBUG, "Received " + std::to_string(nev) + " events", "EventLoop");
 
 		if (nev < 0)
 		{
+			if (errno == EINTR)
+			{
+				Logger::log(Logger::DEBUG, "Interrupted by signal", "EventLoop");
+				continue;
+			}
 			Logger::log(Logger::ERROR, "Error in kqueue: " + std::string(strerror(errno)), "EventLoop");
 			continue;
 		}

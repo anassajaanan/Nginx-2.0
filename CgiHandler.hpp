@@ -1,4 +1,5 @@
 
+#pragma once
 #ifndef CGI_HANDLER_HPP
 #define CGI_HANDLER_HPP
 
@@ -11,7 +12,7 @@
 class CgiHandler
 {
 	private:
-		int		pipeFd[2];
+		int			pipeFd[2];
 		std::string	cgiResponseMessage;
 		int		cgiClientSocket;
 	public:

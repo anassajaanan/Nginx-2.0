@@ -1,9 +1,4 @@
 #include "CgiHandler.hpp"
-#include "HttpResponse.hpp"
-#include "KqueueManager.hpp"
-#include "ServerConfig.hpp"
-#include <sys/event.h>
-#include <unistd.h>
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath)
 {
