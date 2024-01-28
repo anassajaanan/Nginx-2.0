@@ -1,56 +1,563 @@
-2024/01/28 13:54:15 [INFO ] [Server::createServerSocket] Server socket created successfully
-2024/01/28 13:54:15 [INFO ] [Server::setSocketOptions] Socket options set successfully
-2024/01/28 13:54:15 [INFO ] [Server::setSocketToNonBlocking] Socket set to non-blocking mode successfully
-2024/01/28 13:54:15 [INFO ] [Server::bindAndListen] Socket bound successfully
-2024/01/28 13:54:15 [INFO ] [Server::bindAndListen] Server is now listening on socket
-2024/01/28 13:54:15 [INFO ] [ServerManager::initializeServers] Server is created and it is listening on port: 9000
-2024/01/28 13:54:15 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 5: EVFILT_READ
-2024/01/28 13:54:15 [DEBUG] [main] Starting server manager
-2024/01/28 13:54:15 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:18 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 13:54:18 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 13:54:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:18 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 13:54:18 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/get_cgi.html' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 13:54:18 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 13:54:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:18 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 13:54:18 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 13:54:18 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 13:54:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:23 [DEBUG] [EventLoop] Received 0 events
-2024/01/28 13:54:23 [DEBUG] [EventLoop] No events to process at this time
-2024/01/28 13:54:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:28 [DEBUG] [EventLoop] Received 0 events
-2024/01/28 13:54:28 [DEBUG] [EventLoop] No events to process at this time
-2024/01/28 13:54:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:32 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 13:54:32 [INFO ] [ClientState::parseHeaders] Received a 'POST' request for '/cgi-bin/form_data_handler.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 13:54:32 [DEBUG] [ClientState::initializeBodyStorage] Temporary file for POST body created: ./uploads/post_body_1706435672145172_6.tmp
-2024/01/28 13:54:32 [DEBUG] [ClientState::initializeBodyStorage] POST request body is complete from the first read for client with socket fd 6
-2024/01/28 13:54:32 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:32 [DEBUG] [signalHandler] Child process 60515 exited with status 0
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:32 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 13:54:32 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:32 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 13:54:32 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 13:54:32 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 13:54:32 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 13:54:32 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 13:54:32 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:37 [DEBUG] [EventLoop] Received 0 events
-2024/01/28 13:54:37 [DEBUG] [EventLoop] No events to process at this time
-2024/01/28 13:54:37 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 13:54:39 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 5: EVFILT_READ
+2024/01/28 13:58:46 [INFO ] [Server::createServerSocket] Server socket created successfully
+2024/01/28 13:58:46 [INFO ] [Server::setSocketOptions] Socket options set successfully
+2024/01/28 13:58:46 [INFO ] [Server::setSocketToNonBlocking] Socket set to non-blocking mode successfully
+2024/01/28 13:58:46 [INFO ] [Server::bindAndListen] Socket bound successfully
+2024/01/28 13:58:46 [INFO ] [Server::bindAndListen] Server is now listening on socket
+2024/01/28 13:58:46 [INFO ] [ServerManager::initializeServers] Server is created and it is listening on port: 9000
+2024/01/28 13:58:46 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 5: EVFILT_READ
+2024/01/28 13:58:46 [DEBUG] [main] Starting server manager
+2024/01/28 13:58:46 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:49 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:49 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:49 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:49 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:49 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:49 [DEBUG] [signalHandler] Child process 61500 exited with status 0
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:49 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:49 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:49 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:49 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:49 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:49 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:49 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:50 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:50 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:50 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:50 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:50 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:50 [DEBUG] [signalHandler] Child process 61505 exited with status 0
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:50 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:50 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:50 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:50 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:50 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:50 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:50 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:50 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:51 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:51 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:51 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:51 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:51 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:51 [DEBUG] [signalHandler] Child process 61506 exited with status 0
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:51 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:51 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:51 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:51 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:51 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:51 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:51 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:51 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:52 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [signalHandler] Child process 61507 exited with status 0
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:52 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:52 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [signalHandler] Child process 61509 exited with status 0
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:52 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:52 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:52 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:52 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:53 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:53 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:53 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:53 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:53 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:53 [DEBUG] [signalHandler] Child process 61510 exited with status 0
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:53 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:53 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:53 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:53 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:53 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:53 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:53 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:53 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:54 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [signalHandler] Child process 61511 exited with status 0
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:54 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:54 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:54 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:54 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [signalHandler] Child process 61513 exited with status 0
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:55 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:55 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [signalHandler] Child process 61516 exited with status 0
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:55 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:55 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:55 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:55 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:56 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:56 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:56 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:56 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:56 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:56 [DEBUG] [signalHandler] Child process 61518 exited with status 0
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:56 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:56 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:56 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:56 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:56 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:56 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:56 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:56 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:57 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [signalHandler] Child process 61519 exited with status 0
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:57 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:57 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [signalHandler] Child process 61520 exited with status 0
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:57 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:57 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:57 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:58 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:58 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:58 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:58 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:58 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:58 [DEBUG] [signalHandler] Child process 61521 exited with status 0
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:58 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:58 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:58 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:58 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:58 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:58 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:58 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:58 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:59 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [signalHandler] Child process 61526 exited with status 0
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:59 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:58:59 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [signalHandler] Child process 61527 exited with status 0
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:58:59 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:58:59 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:58:59 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:58:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:00 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [signalHandler] Child process 61528 exited with status 0
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:00 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:00 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [signalHandler] Child process 61532 exited with status 0
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:00 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:00 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:00 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:00 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:01 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:01 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:01 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:01 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:01 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:01 [DEBUG] [signalHandler] Child process 61533 exited with status 0
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:01 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:01 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:01 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:01 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:01 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:01 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:01 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:01 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:02 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:02 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:02 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:02 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:02 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:02 [DEBUG] [signalHandler] Child process 61535 exited with status 0
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:02 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:02 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:02 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:02 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:02 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:02 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:02 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:02 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:03 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [signalHandler] Child process 61536 exited with status 0
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:03 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:03 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [signalHandler] Child process 61537 exited with status 0
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:03 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:03 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:03 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:03 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:04 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 13:59:04 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:04 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 13:59:04 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/hashed_password.py' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 13:59:04 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:04 [DEBUG] [signalHandler] Child process 61538 exited with status 0
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:04 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:04 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:04 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 13:59:04 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 13:59:04 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 13:59:04 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
+2024/01/28 13:59:04 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 13:59:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:09 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 13:59:09 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 13:59:09 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 13:59:11 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 5: EVFILT_READ

@@ -11,4 +11,12 @@ def generate_password(length=12):
 if __name__ == "__main__":
     password_length = 16  # You can change the length if desired
     generated_password = generate_password(password_length)
-    print("Generated Password:", generated_password)
+    # print("Generated Password:", generated_password)
+    response = ""
+    response += "<html><body>"
+    response += "<h2>Generated Password:</h2>"
+    response += f"<p><strong>{generated_password}</strong></p>"
+    response += "</body></html>"
+    print("Content-Length: " + str(len(response)))
+    print("Content-Type: text/html\r\n\r\n")
+    print(response)
