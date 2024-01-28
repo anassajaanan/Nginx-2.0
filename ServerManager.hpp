@@ -19,7 +19,7 @@ class ServerManager
 private:
 	KqueueManager							kqueue;
 	std::chrono::steady_clock::time_point	lastTimeoutCheck;
-	// std::chrono::steady_clock::time_point	lastCgiTimeoutCheck;
+	std::chrono::steady_clock::time_point	lastCgiTimeoutCheck;
 	std::vector<Server *>					servers;
 
 

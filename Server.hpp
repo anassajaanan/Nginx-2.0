@@ -45,8 +45,6 @@
 
 class ClientState;
 
-class CgiState;
-
 class Server
 {
 
@@ -95,7 +93,7 @@ public:
 
 	// Timeout and Cleanup
 	void		checkForTimeouts();
-	// void		checkForCgiTimeouts();
+	void		checkForCgiTimeouts();
 	void		removeClient(int clientSocket);
 
 	// Utility
@@ -118,25 +116,25 @@ public:
 };
 
 
-class CgiState
-{
+// class CgiState
+// {
 
-private:
+// private:
 
 
-public:
-	CgiState(pid_t childPid, int pipeReadFd, int clientSocket);
+// public:
+// 	CgiState(pid_t childPid, int pipeReadFd, int clientSocket);
 	
-	pid_t		_pid;
-	int			_pipeReadFd;
-	int			_clientSocket;
-	std::string	_cgiResponseMessage;
-	std::chrono::time_point<std::chrono::steady_clock> _startTime;
+// 	pid_t		_pid;
+// 	int			_pipeReadFd;
+// 	int			_clientSocket;
+// 	std::string	_cgiResponseMessage;
+// 	std::chrono::time_point<std::chrono::steady_clock> _startTime;
 
 
-	bool		isTimedOut(size_t timeout) const;
+// 	bool		isTimedOut(size_t timeout) const;
 
-};
+// };
 
 
 #endif /* SERVER_HPP */

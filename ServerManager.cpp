@@ -48,12 +48,12 @@ void	ServerManager::checkTimeouts()
 			servers[i]->checkForTimeouts();
 		lastTimeoutCheck = now;
 	}
-	// if (std::chrono::duration_cast<std::chrono::seconds>(now - lastCgiTimeoutCheck) > std::chrono::seconds(CGI_TIMEOUT_CHECK_INTERVAL))
-	// {
-	// 	for (size_t i = 0; i < servers.size(); i++)
-	// 		servers[i]->checkForCgiTimeouts();
-	// 	lastCgiTimeoutCheck = now;
-	// }
+	if (std::chrono::duration_cast<std::chrono::seconds>(now - lastCgiTimeoutCheck) > std::chrono::seconds(CGI_TIMEOUT_CHECK_INTERVAL))
+	{
+		for (size_t i = 0; i < servers.size(); i++)
+			servers[i]->checkForCgiTimeouts();
+		lastCgiTimeoutCheck = now;
+	}
 }
 
 void	ServerManager::processReadEvent(const struct kevent &event)
@@ -71,7 +71,6 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 					servers[i]->handleClientDisconnection(event.ident);
 				else
 					servers[i]->handleClientRequest(event.ident);
-				std::cout << "handling handleClientRequest" << std::endl;
 			}
 			else
 			{
@@ -98,7 +97,7 @@ void	ServerManager::processWriteEvent(const struct kevent &event)
 void	ServerManager::start()
 {
 	this->lastTimeoutCheck = std::chrono::steady_clock::now();
-	// this->lastCgiTimeoutCheck = std::chrono::steady_clock::now();
+	this->lastCgiTimeoutCheck = std::chrono::steady_clock::now();
 
 	while (running)
 	{

@@ -2,6 +2,7 @@
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath) : cgiClientSocket(cgiSocket)
 {
+	this->startTime = std::chrono::steady_clock::now();
 	handleCgiDirective(request, serverConfig, kq, postPath);
 }
 
@@ -103,16 +104,16 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 	parameters = new char *[2];
 	parameters[0] = strdup((serverConfig.root + request.getUri()).c_str());
 	parameters[1] = NULL;
-	// if (request.getMethod() == "POST")
-	// {
-		int postBodyFd = open(postPath.c_str(), O_RDONLY);
+	if (request.getMethod() == "POST")
+	{
+		postBodyFd = open(postPath.c_str(), O_RDONLY);
 		if (postBodyFd < 0)
 		{
 			std::cout << "Error While Opening The Body File" << std::endl;
 		}
-	// }
-	_pid = fork();
-	if (_pid == 0)
+	}
+	pid = fork();
+	if (pid == 0)
 	{
 		close(this->pipeFd[0]);
 		if (dup2(this->pipeFd[1], STDOUT_FILENO) < 0)
@@ -155,7 +156,7 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 
 int				CgiHandler::getChildPid()
 {
-	return (this->_pid);
+	return (this->pid);
 }
 
 
@@ -164,11 +165,22 @@ void			CgiHandler::setCgiResponseMessage(const std::string &messageValue)
 	this->cgiResponseMessage = messageValue;
 }
 
+void	CgiHandler::addCgiResponseMessage(const std::string &messageValue)
+{
+	this->cgiResponseMessage += messageValue;
+}
+
 const std::string		&CgiHandler::getCgiResponseMessage() const
 {
 	return (this->cgiResponseMessage);
 }
 
-CgiHandler::~CgiHandler()
+CgiHandler::~CgiHandler() { }
+
+bool	CgiHandler::isTimedOut(size_t timeout) const
 {
+	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+	if (std::chrono::duration_cast<std::chrono::seconds>(now - startTime) > std::chrono::seconds(timeout))
+		return true;
+	return false;
 }

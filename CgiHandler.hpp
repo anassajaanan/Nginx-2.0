@@ -12,15 +12,18 @@
 class CgiHandler
 {
 	private:
-		int			pipeFd[2];
-		std::string	cgiResponseMessage;
-		int		cgiClientSocket;
-		int 	_pid;
+		int 												pid;
+		int													pipeFd[2];
+		int													postBodyFd;
+		int													cgiClientSocket;
+		std::string											cgiResponseMessage;
+		std::chrono::time_point<std::chrono::steady_clock>	startTime;
 	public:
-		CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket,  const std::string &postPath);
+		CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket,  const std::string &postPath = "");
 		HttpResponse			serveCgiOutput(const std::string &message);
 		void					delete2dArray(char **str);
 		void					setCgiResponseMessage(const std::string &messageValue);
+		void					addCgiResponseMessage(const std::string &messageValue);
 		const std::string		&getCgiResponseMessage() const;
 		char					**initiateEnvVariables(HttpRequest &request, ServerConfig &serverConfig);
 		void					handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath);
@@ -33,6 +36,9 @@ class CgiHandler
 		//utilities
 		void					closeCgiPipe();
 		~CgiHandler();
+
+
+		bool		isTimedOut(size_t timeout) const;
 
 
 };
