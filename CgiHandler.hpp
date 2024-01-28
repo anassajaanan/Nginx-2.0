@@ -20,7 +20,8 @@ class CgiHandler
 		std::chrono::time_point<std::chrono::steady_clock>	startTime;
 	public:
 		CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket,  const std::string &postPath = "");
-		HttpResponse			serveCgiOutput(const std::string &message);
+		// HttpResponse			serveCgiOutput(const std::string &message);
+		std::string	getCgiResponse();
 		void					delete2dArray(char **str);
 		void					setCgiResponseMessage(const std::string &messageValue);
 		void					addCgiResponseMessage(const std::string &messageValue);

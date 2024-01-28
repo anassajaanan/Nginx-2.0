@@ -37,7 +37,7 @@
 
 #define TEMP_FILE_DIRECTORY "./uploads/"
 
-#define CGI_TIMEOUT 5 // 10 seconds
+#define CGI_TIMEOUT 10 // 10 seconds
 
 // define max size of cgi output
 #define CGI_MAX_OUTPUT_SIZE 2097152 // 2 MB in bytes

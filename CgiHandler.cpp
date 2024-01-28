@@ -1,4 +1,5 @@
 #include "CgiHandler.hpp"
+#include <string>
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath) : cgiClientSocket(cgiSocket)
 {
@@ -6,20 +7,67 @@ CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueM
 	handleCgiDirective(request, serverConfig, kq, postPath);
 }
 
-HttpResponse	CgiHandler::serveCgiOutput(const std::string &message)
-{
-	HttpResponse response;
+// HttpResponse	CgiHandler::serveCgiOutput(const std::string &message)
+// {
+// 	HttpResponse response;
 
-	response.setVersion("HTTP/1.1");
-	response.setStatusCode(std::to_string(200));
-	response.setStatusMessage("OK");
-	response.setBody(message);
-	/*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	// if (message.find("Content-Type") == std::string::npos)
-	/*2*/ response.setHeader("Content-Type", "text/plain");
-	response.setHeader("Server", "Nginx 2.0");
-	response.setHeader("Connection", "keep-alive");
+// 	response.setVersion("HTTP/1.1");
+// 	response.setStatusCode(std::to_string(200));
+// 	response.setStatusMessage("OK");
+// 	response.setBody(message);
+// 	// /*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+// 	// // if (message.find("Content-Type") == std::string::npos)
+// 	// /*2*/ response.setHeader("Content-Type", "text/plain");
+// 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+// 	response.setHeader("Content-Type", "text/html");
+// 	response.setHeader("Server", "Nginx 2.0");
+// 	response.setHeader("Connection", "keep-alive");
+// 	return (response);
+// }
+
+std::string	CgiHandler::getCgiResponse()
+{
+	std::string	response;
+
+
+
+	response += "HTTP/1.1 200 OK\r\n";
+	response += "Server: Nginx 2.0\r\n";
+	response += "Connection: keep-alive\r\n";
+
+
+	response += cgiResponseMessage;
 	return (response);
+	// std::string responseHeaders;
+    // std::string responseBody;
+
+    // // Find the end of headers in the CGI response
+    // std::size_t headerEnd = cgiResponseMessage.find("\r\n\r\n");
+    // if (headerEnd != std::string::npos) {
+    //     // Extract headers and body from CGI response
+	// 	std::cerr << "It is containing headers" << std::endl;
+    //     responseHeaders = cgiResponseMessage.substr(0, headerEnd + 2); // Include trailing \r\n
+    //     responseBody = cgiResponseMessage.substr(headerEnd + 4); // Skip \r\n\r\n
+    // } else {
+    //     // No headers found, treat everything as the body
+	// 	std::cerr << "It is not containing headers" << std::endl;
+    //     responseBody = cgiResponseMessage;
+    // }
+
+    // // Add or modify the necessary headers
+    // std::ostringstream modifiedHeaders;
+	// modifiedHeaders << "HTTP/1.1 200 OK\r\n";
+    // modifiedHeaders << responseHeaders;
+    // modifiedHeaders << "Server: Nginx 2.0\r\n";
+    // modifiedHeaders << "Connection: keep-alive\r\n";
+
+    // // Calculate the length of the response body and add Content-Length header
+    // std::size_t contentLength = responseBody.size();
+    // modifiedHeaders << "Content-Length: " << contentLength << "\r\n";
+
+    // // Combine headers and body
+    // std::string response = modifiedHeaders.str() + "\r\n" + responseBody;
+    // return response;
 }
 
 int		CgiHandler::getCgiReadFd()const
@@ -51,7 +99,7 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 	if (!request.getQueries().empty())
 		envVector.insert(envVector.end(), request.getQueries().begin(), request.getQueries().end());
 	envVector.push_back("CONTENT_TYPE=" + request.getHeader("content-type"));
-	envVector.push_back("CONTENT_LENGHT=" + request.getHeader("content-length"));
+	envVector.push_back("CONTENT_LENGTH=" + request.getHeader("content-length"));
 	envVector.push_back("HTTP_COOKIE=" + request.getHeader("Cookie"));
 	std::string	fullQuery;
 	// int i = 0;

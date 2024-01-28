@@ -21,6 +21,10 @@ void	ClientState::resetClientState()
 	requestBody.clear();
 	if (requestBodyFile.is_open())
 		requestBodyFile.close();
+	if (requestBodyFilePath.size() > 0)
+	{
+		remove(requestBodyFilePath.c_str());
+	}
 	requestBodySize = 0;
 	requestBodyFilePath.clear();
 	areHeaderComplete = false;
@@ -132,7 +136,6 @@ void	ClientState::handlePostRequest(Server &server)
 	}
 
 	requestBodySize = std::stoull(request.getHeader("Content-Length"));
-	std::cerr << "content length = " << request.getHeader("Content-Length") << std::endl;
 	if (requestBodySize > server._config.clientMaxBodySize)
 	{
 		Logger::log(Logger::WARN, "Body size of POST request exceeds client max body size for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");

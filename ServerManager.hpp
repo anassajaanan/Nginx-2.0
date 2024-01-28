@@ -12,7 +12,7 @@
 
 #define SERVER_TIMEOUT_CHECK_INTERVAL 5 // 5 seconds
 // define cgi timeout interval if cgi has infinite loop or takes too long to respond
-#define CGI_TIMEOUT_CHECK_INTERVAL 5 // 10 seconds
+#define CGI_TIMEOUT_CHECK_INTERVAL 10 // 10 seconds
 
 class ServerManager
 {

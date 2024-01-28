@@ -3,6 +3,7 @@
 #include "ClientState.hpp"
 #include "HttpResponse.hpp"
 #include "Logger.hpp"
+#include "ResponseState.hpp"
 #include <cstdlib>
 #include <sys/_types/_pid_t.h>
 #include <sys/event.h>
@@ -263,8 +264,9 @@ void	Server::cgiOutput(int cgiOutputFile)
 	if (len == 0)
 	{
 		CgiHandler *cgi = _cgi[cgiOutputFile];
-		HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
-		ResponseState *responseState = new ResponseState(cgiResponse.buildResponse());
+		// HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
+		// ResponseState *responseState = new ResponseState(cgiResponse.buildResponse());
+		ResponseState *responseState = new ResponseState(cgi->getCgiResponse());
 		if (_clients.count(cgi->getCgiClientSocket()) > 0)
 			_clients[cgi->getCgiClientSocket()]->resetClientState();
 		_responses[cgi->getCgiClientSocket()] = responseState;
@@ -312,6 +314,7 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 		_responses[clientSocket] = responseState;
 		_kq.registerEvent(clientSocket, EVFILT_WRITE);
+
 	}
 }
 
