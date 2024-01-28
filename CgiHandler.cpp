@@ -2,8 +2,31 @@
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath) : cgiClientSocket(cgiSocket)
 {
+	this->pid = -1;
+	this->postBodyFd = -1;
+	this->pipeFd[0] = -1;
+	this->pipeFd[1] = -1;
 	this->startTime = std::chrono::steady_clock::now();
 	handleCgiDirective(request, serverConfig, kq, postPath);
+}
+
+CgiHandler::~CgiHandler()
+{
+	if (pipeFd[0] != -1)
+	{
+		close(pipeFd[0]);
+		pipeFd[0] = -1;
+	}
+	if (pipeFd[1] != -1)
+	{
+		close(pipeFd[1]);
+		pipeFd[1] = -1;
+	}
+	if (postBodyFd != -1)
+	{
+		close(postBodyFd);
+		postBodyFd = -1;
+	}
 }
 
 std::string	CgiHandler::buildCgiResponse()
@@ -193,7 +216,7 @@ const std::string		&CgiHandler::getCgiResponseMessage() const
 	return (this->cgiResponseMessage);
 }
 
-CgiHandler::~CgiHandler() { }
+
 
 bool	CgiHandler::isTimedOut(size_t timeout) const
 {

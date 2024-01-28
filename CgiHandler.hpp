@@ -44,8 +44,6 @@ public:
 
 
 	bool					isTimedOut(size_t timeout) const;
-
-
 };
 
 
