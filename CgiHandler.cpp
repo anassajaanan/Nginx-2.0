@@ -1,5 +1,4 @@
 #include "CgiHandler.hpp"
-#include <string>
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket, const std::string &postPath) : cgiClientSocket(cgiSocket)
 {
@@ -33,7 +32,7 @@ std::string	CgiHandler::getCgiResponse()
 
 	response += "HTTP/1.1 200 OK\r\n";
 	response += "Server: Nginx 2.0\r\n";
-	response += "Connection: keep-alive\r\n";
+	response += "Connection: close\r\n";
 
 
 	response += cgiResponseMessage;

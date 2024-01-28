@@ -21,7 +21,7 @@ static void	signalHandler(int signum)
 		pid_t pid;
 		while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
 		{
-			Logger::log(Logger::DEBUG, "Child process " + std::to_string(pid) + " exited with status " + std::to_string(status), "signalHandler");
+			
 		}
 	}
 }
