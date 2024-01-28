@@ -17,6 +17,4 @@ if __name__ == "__main__":
     response += "<h2>Generated Password:</h2>"
     response += f"<p><strong>{generated_password}</strong></p>"
     response += "</body></html>"
-    print("Content-Length: " + str(len(response)))
-    print("Content-Type: text/html\r\n\r\n")
     print(response)

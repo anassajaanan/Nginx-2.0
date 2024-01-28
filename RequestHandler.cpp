@@ -422,30 +422,6 @@ HttpResponse	RequestHandler::servePath(HttpRequest &request, BaseConfig *config)
 		return (handleErrorPage(request, config, 404));
 }
 
-// bool			RequestHandler::validateFileExtension(HttpRequest &request)
-// {
-// 	std::vector<std::string>	cgiExten = serverConfig.cgiExtension.getExtensions();
-// 	std::string					uri = request.getUri();
-
-// 	// std::cout << "uri cgi = " << uri.substr(uri.find('.'), uri.length()) << std::endl;
-// 	std::vector<std::string>::iterator it = cgiExten.begin();
-// 	for (; it != cgiExten.end(); it++)
-// 		std::cout << "{" << *it << "}" << std::endl;
-// 	if (uri.find('.') == std::string::npos ||
-// 	std::find(cgiExten.begin(), cgiExten.end(),
-// 	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
-// 		return false;
-// 	return true;
-// }
-
-// bool			RequestHandler::validCgiRequest(HttpRequest &request, ServerConfig &config)
-// {
-// 	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
-// 	|| !this->fileExists(config.root + request.getUri()) || !validateFileExtension(request))
-// 		return false;
-// 	return true;
-// }
-
 HttpResponse	RequestHandler::handleReturnDirective(HttpRequest &request, BaseConfig *config)
 {
 	HttpResponse	response;

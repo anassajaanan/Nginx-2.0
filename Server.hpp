@@ -99,42 +99,8 @@ public:
 	// Utility
 	std::string	getStatusMessage(int statusCode);
 
-	//cgi Utility
-	bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
-	bool			validateFileExtension(HttpRequest &request);
-	bool			fileExists(const std::string &path);
-	void			cgiOutput(int cgiOutputFile);
-	// void			cgiOutput(int cgiOutputFile);
-
-
-
-
-	void	handleCgiRequest(int clientSocket, HttpRequest &request);
-	// void	handleCgiOutput(int pipeReadFd);
-
-
+	//cgi
+	void		handleCgiOutput(int cgiOutputFile);
 };
-
-
-// class CgiState
-// {
-
-// private:
-
-
-// public:
-// 	CgiState(pid_t childPid, int pipeReadFd, int clientSocket);
-	
-// 	pid_t		_pid;
-// 	int			_pipeReadFd;
-// 	int			_clientSocket;
-// 	std::string	_cgiResponseMessage;
-// 	std::chrono::time_point<std::chrono::steady_clock> _startTime;
-
-
-// 	bool		isTimedOut(size_t timeout) const;
-
-// };
-
 
 #endif /* SERVER_HPP */

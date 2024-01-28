@@ -60,22 +60,22 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if ((int)event.ident == servers[i]->_socket || servers[i]->_clients.count(event.ident) > 0 || servers[i]->_cgi.count((int)event.ident) > 0)
+		if ((int)event.ident == servers[i]->_socket)
 		{
-			
-			if ((int)event.ident == servers[i]->_socket)
-				servers[i]->acceptNewConnection();
-			else if (servers[i]->_clients.count(event.ident) > 0)
-			{
-				if (event.flags & EV_EOF)
-					servers[i]->handleClientDisconnection(event.ident);
-				else
-					servers[i]->handleClientRequest(event.ident);
-			}
+			servers[i]->acceptNewConnection();
+			break;
+		}
+		else if (servers[i]->_clients.count(event.ident) > 0)
+		{
+			if (event.flags & EV_EOF)
+				servers[i]->handleClientDisconnection(event.ident);
 			else
-			{
-				servers[i]->cgiOutput((int)event.ident);
-			}
+				servers[i]->handleClientRequest(event.ident);
+			break;
+		}
+		else if (servers[i]->_cgi.count((int)event.ident) > 0)
+		{
+			servers[i]->handleCgiOutput((int)event.ident);
 			break;
 		}
 	}
@@ -88,7 +88,6 @@ void	ServerManager::processWriteEvent(const struct kevent &event)
 		if (servers[i]->_responses.count(event.ident) > 0)
 		{
 			servers[i]->handleClientResponse(event.ident);
-			std::cout << "handleClientResponse" << std::endl;
 			break;
 		}
 	}

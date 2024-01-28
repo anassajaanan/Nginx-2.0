@@ -197,40 +197,12 @@ void	Server::handleClientRequest(int clientSocket)
 	}
 }
 
-bool			Server::validateFileExtension(HttpRequest &request)
-{
-	std::vector<std::string>	cgiExten = _config.cgiExtension.getExtensions();
-	std::string					uri = request.getUri();
 
-	if (uri.find('.') == std::string::npos ||
-	std::find(cgiExten.begin(), cgiExten.end(),
-	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
-		return false;
-	return true;
-}
-
-bool	Server::fileExists(const std::string &path)
-{
-	struct stat fileStat;
-
-	if (stat(path.c_str(), &fileStat) == 0)
-		return (true);
-	return (false);
-}
-
-bool			Server::validCgiRequest(HttpRequest &request, ServerConfig &config)
-{
-	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
-	|| !this->fileExists(config.root + request.getUri()) || !validateFileExtension(request))
-		return false;
-	return true;
-}
 
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
-	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
+	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		std::cout << "Parsed successfully" <<std::endl;
 		CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket);
 		_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
@@ -251,22 +223,25 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	}
 }
 
-void	Server::cgiOutput(int cgiOutputFile)
+void	Server::handleCgiOutput(int cgiOutputFile)
 {
-	char	s[BUFFER_SIZE];
-	// std::memset(s, 0, BUFFER_SIZE);
-	size_t len = read(cgiOutputFile, s, BUFFER_SIZE);
-	if (len < 0)
+	char		buffer[BUFFER_SIZE];
+	CgiHandler	*cgi = _cgi[cgiOutputFile];
+	ssize_t 	bytesRead = read(cgiOutputFile, buffer, BUFFER_SIZE);
+	if (bytesRead < 0)
 	{
-		std::cerr << "Read Error" << std::endl;
-		return ;
+		Logger::log(Logger::ERROR, "Error reading CGI output from pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
+		_kq.unregisterEvent(cgiOutputFile, EVFILT_READ);
+		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
+		kill(cgi->getChildPid(), SIGKILL);
+		_cgi.erase(cgiOutputFile);
+		close(cgiOutputFile);
+		delete cgi;
 	}
-	if (len == 0)
+	if (bytesRead == 0)
 	{
-		CgiHandler *cgi = _cgi[cgiOutputFile];
 		// HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
-		// ResponseState *responseState = new ResponseState(cgiResponse.buildResponse());
-		ResponseState *responseState = new ResponseState(cgi->getCgiResponse());
+		ResponseState *responseState = new ResponseState(cgi->buildCgiResponse());
 		if (_clients.count(cgi->getCgiClientSocket()) > 0)
 			_clients[cgi->getCgiClientSocket()]->resetClientState();
 		_responses[cgi->getCgiClientSocket()] = responseState;
@@ -279,11 +254,8 @@ void	Server::cgiOutput(int cgiOutputFile)
 	}
 	else
 	{
- 		// _cgi[cgiOutputFile]->setCgiResponseMessage(_cgi[cgiOutputFile]->getCgiResponseMessage() + s); //wrong
-		_cgi[cgiOutputFile]->addCgiResponseMessage(std::string(s, len));
-		CgiHandler *cgi = _cgi[cgiOutputFile];
-		// HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
-		if (_cgi[cgiOutputFile]->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
+		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
+		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
 		{
 			_kq.unregisterEvent(cgiOutputFile, EVFILT_READ);
 			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
@@ -298,8 +270,9 @@ void	Server::cgiOutput(int cgiOutputFile)
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
 
-	if (_config.cgiExtension.isEnabled() && validCgiRequest(request, _config))
+	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
+		// check ig cgiDrective failed then you have to free the allocation
 			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
 			_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
@@ -606,19 +579,3 @@ std::string	Server::getStatusMessage(int statusCode)
 		return "";
 	return statusCodeMessages[statusCode];
 }
-
-
-// ----------------------------------- CGI_STATE -----------------------------------
-// CgiState::CgiState(pid_t pid, int readFd, int clientSocket)
-// 	: _pid(pid), _pipeReadFd(readFd), _clientSocket(clientSocket)
-// {
-// 	this->_startTime = std::chrono::steady_clock::now();
-// }
-
-// bool	CgiState::isTimedOut(size_t timeout) const
-// {
-// 	std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-// 	if (std::chrono::duration_cast<std::chrono::seconds>(now - _startTime) > std::chrono::seconds(timeout))
-// 		return true;
-// 	return false;
-// }

@@ -6,77 +6,57 @@ CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueM
 	handleCgiDirective(request, serverConfig, kq, postPath);
 }
 
-// HttpResponse	CgiHandler::serveCgiOutput(const std::string &message)
-// {
-// 	HttpResponse response;
-
-// 	response.setVersion("HTTP/1.1");
-// 	response.setStatusCode(std::to_string(200));
-// 	response.setStatusMessage("OK");
-// 	response.setBody(message);
-// 	// /*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-// 	// // if (message.find("Content-Type") == std::string::npos)
-// 	// /*2*/ response.setHeader("Content-Type", "text/plain");
-// 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-// 	response.setHeader("Content-Type", "text/html");
-// 	response.setHeader("Server", "Nginx 2.0");
-// 	response.setHeader("Connection", "keep-alive");
-// 	return (response);
-// }
-
-std::string	CgiHandler::getCgiResponse()
+std::string	CgiHandler::buildCgiResponse()
 {
-	std::string	response;
+	HttpResponse response;
 
+	response.setVersion("HTTP/1.1");
+	response.setStatusCode(std::to_string(200));
+	response.setStatusMessage("OK");
+	response.setBody(this->cgiResponseMessage);
+	// /*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	// // if (message.find("Content-Type") == std::string::npos)
+	// /*2*/ response.setHeader("Content-Type", "text/plain");
+	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
+	response.setHeader("Content-Type", "text/html");
+	response.setHeader("Server", "Nginx 2.0");
+	response.setHeader("Connection", "keep-alive");
 
+	return (response.buildResponse());
+}
 
-	response += "HTTP/1.1 200 OK\r\n";
-	response += "Server: Nginx 2.0\r\n";
-	response += "Connection: close\r\n";
+bool	CgiHandler::fileExists(const std::string &path)
+{
+	struct stat fileStat;
 
+	if (stat(path.c_str(), &fileStat) == 0)
+		return (true);
+	return (false);
+}
 
-	response += cgiResponseMessage;
-	return (response);
-	// std::string responseHeaders;
-    // std::string responseBody;
+bool	CgiHandler::validCgiRequest(HttpRequest &request, ServerConfig &config)
+{
+	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
+	|| !fileExists(config.root + request.getUri()) || !validateFileExtension(request, config))
+		return false;
+	return true;
+}
 
-    // // Find the end of headers in the CGI response
-    // std::size_t headerEnd = cgiResponseMessage.find("\r\n\r\n");
-    // if (headerEnd != std::string::npos) {
-    //     // Extract headers and body from CGI response
-	// 	std::cerr << "It is containing headers" << std::endl;
-    //     responseHeaders = cgiResponseMessage.substr(0, headerEnd + 2); // Include trailing \r\n
-    //     responseBody = cgiResponseMessage.substr(headerEnd + 4); // Skip \r\n\r\n
-    // } else {
-    //     // No headers found, treat everything as the body
-	// 	std::cerr << "It is not containing headers" << std::endl;
-    //     responseBody = cgiResponseMessage;
-    // }
+bool	CgiHandler::validateFileExtension(HttpRequest &request, ServerConfig &config)
+{
+	std::vector<std::string>	cgiExten = config.cgiExtension.getExtensions();
+	std::string					uri = request.getUri();
 
-    // // Add or modify the necessary headers
-    // std::ostringstream modifiedHeaders;
-	// modifiedHeaders << "HTTP/1.1 200 OK\r\n";
-    // modifiedHeaders << responseHeaders;
-    // modifiedHeaders << "Server: Nginx 2.0\r\n";
-    // modifiedHeaders << "Connection: keep-alive\r\n";
-
-    // // Calculate the length of the response body and add Content-Length header
-    // std::size_t contentLength = responseBody.size();
-    // modifiedHeaders << "Content-Length: " << contentLength << "\r\n";
-
-    // // Combine headers and body
-    // std::string response = modifiedHeaders.str() + "\r\n" + responseBody;
-    // return response;
+	if (uri.find('.') == std::string::npos ||
+	std::find(cgiExten.begin(), cgiExten.end(),
+	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
+		return false;
+	return true;
 }
 
 int		CgiHandler::getCgiReadFd()const
 {
 	return (this->pipeFd[0]);
-}
-
-int		CgiHandler::getCgiWriteFd()const
-{
-	return (this->pipeFd[1]);
 }
 
 int		CgiHandler::getCgiClientSocket() const
@@ -109,9 +89,7 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 		else
 			fullQuery += request.getQueries()[i];
 	}
-	std::cout << "fall = " << fullQuery << std::endl;
 	envVector.push_back("QUERY_STRING=" + fullQuery);
-	std::cout << "user agent = " <<  request.getHeader("user-agent") << std::endl;
 	envVector.push_back("HTTP_USER_AGENT= \"" + request.getHeader("user-agent") + "\"");
 	envVector.push_back("REQUEST_METHOD=" + request.getMethod());
 	envVector.push_back("SERVER_NAME=\"Nginx 2.0\"");
@@ -198,7 +176,6 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 	}
 	this->delete2dArray(parameters);
 	this->delete2dArray(envp);
-	std::cout << "doe cgi" << std::endl;
 }
 
 int				CgiHandler::getChildPid()
@@ -206,15 +183,9 @@ int				CgiHandler::getChildPid()
 	return (this->pid);
 }
 
-
-void			CgiHandler::setCgiResponseMessage(const std::string &messageValue)
+void	CgiHandler::addCgiResponseMessage(const std::string &cgiOutput)
 {
-	this->cgiResponseMessage = messageValue;
-}
-
-void	CgiHandler::addCgiResponseMessage(const std::string &messageValue)
-{
-	this->cgiResponseMessage += messageValue;
+	this->cgiResponseMessage += cgiOutput;
 }
 
 const std::string		&CgiHandler::getCgiResponseMessage() const

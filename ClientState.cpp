@@ -62,7 +62,6 @@ void	ClientState::processHeaders(Server &server, const char *buffer, size_t byte
 		areHeaderComplete = true;
 		Logger::log(Logger::DEBUG, "Headers completed for fd " + std::to_string(fd), "ClientState::processHeaders");
 		parseHeaders(server);
-		std::cout << "parseHeaders" << std::endl;
 	}
 	else
 		Logger::log(Logger::DEBUG, "Received partial headers for fd " + std::to_string(fd), "ClientState::processHeaders");

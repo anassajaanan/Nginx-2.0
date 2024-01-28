@@ -1,394 +1,110 @@
-2024/01/28 15:46:15 [INFO ] [Server::createServerSocket] Server socket created successfully
-2024/01/28 15:46:15 [INFO ] [Server::setSocketOptions] Socket options set successfully
-2024/01/28 15:46:15 [INFO ] [Server::setSocketToNonBlocking] Socket set to non-blocking mode successfully
-2024/01/28 15:46:15 [INFO ] [Server::bindAndListen] Socket bound successfully
-2024/01/28 15:46:15 [INFO ] [Server::bindAndListen] Server is now listening on socket
-2024/01/28 15:46:15 [INFO ] [ServerManager::initializeServers] Server is created and it is listening on port: 9000
-2024/01/28 15:46:15 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 5: EVFILT_READ
-2024/01/28 15:46:15 [DEBUG] [main] Starting server manager
-2024/01/28 15:46:15 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:16 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:16 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:16 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:16 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:16 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:16 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:17 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:17 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:17 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:17 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:17 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:17 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:18 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:18 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:18 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:18 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:18 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:18 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:18 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:18 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:18 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:18 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:18 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:18 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:18 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:19 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:19 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:19 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:19 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:19 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:19 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:19 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:20 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:20 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:20 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:20 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:20 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:20 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:20 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:20 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:20 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:20 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:20 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:20 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:20 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:22 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:22 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:22 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:22 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:22 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:22 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:22 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:22 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:22 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:22 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:22 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:22 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:22 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:23 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:23 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:23 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:23 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:23 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:23 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:23 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:23 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:23 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:23 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:23 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:23 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:23 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:26 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:26 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:26 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:26 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:26 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:26 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:26 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:26 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:26 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:26 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:26 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:26 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:26 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:27 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:27 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:27 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:27 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:27 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:27 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:27 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:27 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:27 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:27 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:27 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:27 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:27 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:28 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:28 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:28 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:28 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:28 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:28 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:29 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:29 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:29 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:29 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:29 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:29 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:30 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:30 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
-2024/01/28 15:46:30 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/cgi-bin/random_video_generator.py' from IP '127.0.0.1', processing on socket descriptor 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 7: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 7: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
-2024/01/28 15:46:30 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Received 1 events
-2024/01/28 15:46:30 [INFO ] [Server::handleClientDisconnection] Handling disconnection of client with socket fd 6
-2024/01/28 15:46:30 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
-2024/01/28 15:46:30 [DEBUG] [EventLoop] Waiting for events
-2024/01/28 15:46:32 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 5: EVFILT_READ
+2024/01/28 18:03:33 [INFO ] [Server::createServerSocket] Server socket created successfully
+2024/01/28 18:03:33 [INFO ] [Server::setSocketOptions] Socket options set successfully
+2024/01/28 18:03:33 [INFO ] [Server::setSocketToNonBlocking] Socket set to non-blocking mode successfully
+2024/01/28 18:03:33 [INFO ] [Server::bindAndListen] Socket bound successfully
+2024/01/28 18:03:33 [INFO ] [Server::bindAndListen] Server is now listening on socket
+2024/01/28 18:03:33 [INFO ] [ServerManager::initializeServers] Server is created and it is listening on port: 9000
+2024/01/28 18:03:33 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 5: EVFILT_READ
+2024/01/28 18:03:33 [DEBUG] [main] Starting server manager
+2024/01/28 18:03:33 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:34 [INFO ] [Server::acceptNewConnection] Accepted new connection on socket fd 6
+2024/01/28 18:03:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_READ
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 18:03:34 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/get_cgi.html' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 18:03:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 18:03:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 18:03:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:34 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 18:03:34 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 18:03:34 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:34 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 18:03:34 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 18:03:34 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 18:03:35 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/get_cgi.html' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 18:03:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 18:03:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 18:03:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:35 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 18:03:35 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/favicon.ico' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 18:03:35 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:35 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 18:03:35 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 18:03:35 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:35 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:39 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:39 [DEBUG] [ClientState::processHeaders] Headers completed for fd 6
+2024/01/28 18:03:39 [INFO ] [ClientState::parseHeaders] Received a 'GET' request for '/' from IP '127.0.0.1', processing on socket descriptor 6
+2024/01/28 18:03:39 [DEBUG] [KqueueManager::registerEvent] Registered a new event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:39 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:39 [DEBUG] [EventLoop] Received 1 events
+2024/01/28 18:03:39 [DEBUG] [Server::sendSmallResponse] Sending small response to client with socket fd 6
+2024/01/28 18:03:39 [DEBUG] [Server::sendSmallResponse] Small response sent completely to client with socket fd 6
+2024/01/28 18:03:39 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_WRITE
+2024/01/28 18:03:39 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:44 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:03:44 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:03:44 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:49 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:03:49 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:03:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:54 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:03:54 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:03:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:03:59 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:03:59 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:03:59 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:04 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:04 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:04 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:09 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:09 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:09 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:14 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:14 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:14 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:19 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:19 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:19 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:24 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:24 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:24 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:29 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:29 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:29 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:34 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:34 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:34 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:39 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:39 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:39 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:44 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:44 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:44 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:49 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:49 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:49 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:54 [DEBUG] [EventLoop] Received 0 events
+2024/01/28 18:04:54 [DEBUG] [EventLoop] No events to process at this time
+2024/01/28 18:04:54 [DEBUG] [EventLoop] Waiting for events
+2024/01/28 18:04:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 6: EVFILT_READ
+2024/01/28 18:04:57 [DEBUG] [KqueueManager::unregisterEvent] Unregistered the event for fd 5: EVFILT_READ
