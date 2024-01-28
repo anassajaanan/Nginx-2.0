@@ -185,16 +185,14 @@ void	Server::handleClientRequest(int clientSocket)
 		close(clientSocket);
 	}
 
-	if (bytesRead > 0)
+	if (bytesRead >= 0)
 	{
 		ClientState *client = _clients[clientSocket];
 
 		client->updateLastRequestTime();
 		client->incrementRequestCount();
 
-		Logger::log(Logger::DEBUG, "Received new request from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");
 		client->processIncomingData(*this, buffer, bytesRead);
-		std::cout << "done processIncomingData" << std::endl;
 	}
 }
 

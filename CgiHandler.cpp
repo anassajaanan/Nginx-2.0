@@ -131,7 +131,7 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 			close(postBodyFd);
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
-			std::cerr << "Failed To Execute" << std::endl;
+			// std::cerr << "Failed To Execute" << std::endl;
 			this->delete2dArray(parameters);
 			this->delete2dArray(envp);
 			exit(0);

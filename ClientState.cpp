@@ -82,7 +82,7 @@ void	ClientState::parseHeaders(Server &server)
 	{
 		
 		std::ostringstream logStream;
-		logStream << "Received a GET request for '" << request.getUri() << "' from IP '"
+		logStream << "Received a 'GET' request for '" << request.getUri() << "' from IP '"
 				<< clientIpAddr << "', processing on socket descriptor " << fd;
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handleGetRequest(server);
@@ -90,7 +90,7 @@ void	ClientState::parseHeaders(Server &server)
 	else if (request.getMethod() == "POST")
 	{
 		std::ostringstream logStream;
-		logStream << "Received a POST request for '" << request.getUri() << "' from IP '"
+		logStream << "Received a 'POST' request for '" << request.getUri() << "' from IP '"
 				<< clientIpAddr << "', processing on socket descriptor " << fd;
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handlePostRequest(server);
@@ -111,7 +111,6 @@ void	ClientState::handleGetRequest(Server &server)
 	else
 	{
 		server.processGetRequest(fd, request);
-		std::cout << "processGetRequest" << std::endl;
 	}
 }
 
@@ -133,6 +132,7 @@ void	ClientState::handlePostRequest(Server &server)
 	}
 
 	requestBodySize = std::stoull(request.getHeader("Content-Length"));
+	std::cerr << "content length = " << request.getHeader("Content-Length") << std::endl;
 	if (requestBodySize > server._config.clientMaxBodySize)
 	{
 		Logger::log(Logger::WARN, "Body size of POST request exceeds client max body size for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");
@@ -144,7 +144,6 @@ void	ClientState::handlePostRequest(Server &server)
 
 void	ClientState::initializeBodyStorage(Server &server)
 {
-	std::string	b = "body";
 	std::string filename = "post_body_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + "_" + std::to_string(fd) + ".tmp";
 	requestBodyFilePath = TEMP_FILE_DIRECTORY + filename;
 
@@ -171,6 +170,11 @@ void	ClientState::initializeBodyStorage(Server &server)
 		Logger::log(Logger::WARN, "POST request body exceeds the declared content length for client with socket fd " + std::to_string(fd), "ClientState::initializeBodyStorage");
 		requestBodyFile.close();
 		server.handleInvalidRequest(fd, 400, "Request Body Exceeds Content-Length");
+	}
+	else
+	{
+		Logger::log(Logger::DEBUG, "POST request body is incomplete from the first read for client with socket fd " + std::to_string(fd), "ClientState::initializeBodyStorage");
+		requestBodyFile << requestBody;
 	}
 }
 
