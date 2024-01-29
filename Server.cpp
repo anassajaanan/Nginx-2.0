@@ -1,6 +1,5 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
-#include "HttpRequest.hpp"
 
 
 // -----------------------------------
@@ -36,6 +35,15 @@ Server::~Server()
 		response++;
 	}
 	_responses.clear();
+
+	std::map<int, CgiHandler *>::iterator cgi = _cgi.begin();
+	while (cgi != _cgi.end())
+	{
+		_kq.unregisterEvent(cgi->first, EVFILT_READ);
+		delete cgi->second;
+		cgi++;
+	}
+	_cgi.clear();
 
 	if (_socket != -1)
 	{
@@ -172,7 +180,7 @@ void	Server::handleClientDisconnection(int clientSocket)
 void	Server::handleClientRequest(int clientSocket)
 {
 	char buffer[BUFFER_SIZE];
-	size_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
+	ssize_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
 	{
 		Logger::log(Logger::ERROR, "Error receiving data from client with socket fd " + std::to_string(clientSocket), "Server::handleClientRequest");

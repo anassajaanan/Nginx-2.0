@@ -62,7 +62,7 @@ int main()
 	sigaction(SIGCHLD, &sa, NULL);
 
 
-	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
+	Logger::init(Logger::ERROR, "./logs/WebServer.log");
 
 	ServerManager serverManager(serverConfigs, mimeTypeConfig);
 	Logger::log(Logger::DEBUG, "Starting server manager", "main");
