@@ -1,15 +1,4 @@
 #include "ServerManager.hpp"
-#include "CgiHandler.hpp"
-#include "HttpResponse.hpp"
-#include "Logger.hpp"
-#include "Server.hpp"
-#include <atomic>
-#include <iostream>
-#include <iterator>
-#include <ostream>
-#include <string>
-#include <sys/errno.h>
-#include <unistd.h>
 
 
 int	ServerManager::running = 1;
@@ -63,7 +52,7 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 		if ((int)event.ident == servers[i]->_socket)
 		{
 			servers[i]->acceptNewConnection();
-			break;
+			return;
 		}
 		else if (servers[i]->_clients.count(event.ident) > 0)
 		{
@@ -71,12 +60,12 @@ void	ServerManager::processReadEvent(const struct kevent &event)
 				servers[i]->handleClientDisconnection(event.ident);
 			else
 				servers[i]->handleClientRequest(event.ident);
-			break;
+			return;
 		}
 		else if (servers[i]->_cgi.count((int)event.ident) > 0)
 		{
 			servers[i]->handleCgiOutput((int)event.ident);
-			break;
+			return;
 		}
 	}
 }
@@ -88,7 +77,7 @@ void	ServerManager::processWriteEvent(const struct kevent &event)
 		if (servers[i]->_responses.count(event.ident) > 0)
 		{
 			servers[i]->handleClientResponse(event.ident);
-			break;
+			return;
 		}
 	}
 }

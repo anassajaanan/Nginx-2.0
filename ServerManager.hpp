@@ -1,9 +1,8 @@
 
 
-
 #pragma once
-#ifndef SERVERMANAGER_HPP
-#define SERVERMANAGER_HPP
+#ifndef SERVER_MANAGER_HPP
+#define SERVER_MANAGER_HPP
 
 #include "Server.hpp"
 #include "ServerConfig.hpp"
@@ -44,4 +43,4 @@ public:
 };
 
 
-#endif /* SERVERMANAGER_HPP */
+#endif /* SERVER_MANAGER_HPP */

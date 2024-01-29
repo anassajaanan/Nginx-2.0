@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "CgiDirective.hpp"
 #include "CgiHandler.hpp"
 #include "ClientState.hpp"
 #include "HttpResponse.hpp"
@@ -197,15 +198,18 @@ void	Server::handleClientRequest(int clientSocket)
 	}
 }
 
-
-
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		// check ig cgiDrective failed then you have to free the allocation
-		CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket);
-		_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
+		CgiHandler *cgi = new CgiHandler(request, _config, _kq, clientSocket);
+		if (cgi->isValidCgi())
+			_cgi[cgi->getCgiReadFd()] = cgi;
+		else
+		{
+			handleInvalidRequest(clientSocket, 500, "Failed to execute CGI script.");
+			delete cgi;
+		}
 	}
 	else
 	{
@@ -230,9 +234,14 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		// check ig cgiDrective failed then you have to free the allocation
-			CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
-			_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
+		CgiHandler *cgi = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
+		if (cgi->isValidCgi())
+			_cgi[cgi->getCgiReadFd()] = cgi;
+		else
+		{
+			handleInvalidRequest(clientSocket, 500, "Failed to execute CGI script.");
+			delete cgi;
+		}
 	}
 	else
 	{
@@ -246,7 +255,6 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 		_responses[clientSocket] = responseState;
 		_kq.registerEvent(clientSocket, EVFILT_WRITE);
-
 	}
 }
 

@@ -4,8 +4,7 @@
 #include "MimeTypeConfig.hpp"
 #include "ServerManager.hpp"
 #include "Logger.hpp"
-#include <signal.h>
-#include <sys/signal.h>
+
 
 
 

@@ -2,8 +2,6 @@
 
 
 #pragma once
-#include "HttpRequest.hpp"
-#include <sys/_types/_pid_t.h>
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
@@ -19,6 +17,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <signal.h>
+#include <sys/signal.h>
 #include <sys/event.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

@@ -3,11 +3,10 @@
 #ifndef CGI_HANDLER_HPP
 #define CGI_HANDLER_HPP
 
-#include "HttpRequest.hpp"
 #include "RequestHandler.hpp"
 #include "ServerConfig.hpp"
-#include <string>
 #include "KqueueManager.hpp"
+
 
 class CgiHandler
 {
@@ -18,16 +17,18 @@ private:
 	int													cgiClientSocket;
 	std::string											cgiResponseMessage;
 	std::chrono::time_point<std::chrono::steady_clock>	startTime;
+
+	bool												isValid;
 	
 public:
-	CgiHandler(HttpRequest &request, ServerConfig &serverConfig, KqueueManager	&kq, int cgiSocket,  const std::string &postPath = "");
+	CgiHandler(HttpRequest &request, ServerConfig &config, KqueueManager	&kq, int clientSocket,  const std::string &postPath = "");
 	~CgiHandler();
 	
 	std::string				buildCgiResponse();
-	void					delete2dArray(char **str);
 	void					addCgiResponseMessage(const std::string &cgiOutput);
 	char					**initiateEnvVariables(HttpRequest &request, ServerConfig &serverConfig);
 	void					handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath);
+	void					delete2dArray(char **str);
 
 
 	int						getChildPid();
@@ -38,6 +39,7 @@ public:
 	//utilities
 	// void					closeCgiPipe();
 
+	bool					isValidCgi() const;
 	bool					isTimedOut(size_t timeout) const;
 
 	static bool				fileExists(const std::string &path);
