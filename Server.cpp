@@ -149,6 +149,19 @@ void	Server::acceptNewConnection()
 		return;
 	}
 	Logger::log(Logger::INFO, "Accepted new connection on socket fd " + std::to_string(clientSocket), "Server::acceptNewConnection");
+	int flags = fcntl(clientSocket, F_GETFL, 0);
+	if (flags < 0)
+	{
+		Logger::log(Logger::ERROR, "fcntl(F_GETFL) failed: " + std::string(strerror(errno)), "Server::acceptNewConnection");
+		close(clientSocket);
+		return;
+	}
+	if (fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK) < 0)
+	{
+		Logger::log(Logger::ERROR, "fcntl(F_SETFL) failed: " + std::string(strerror(errno)), "Server::acceptNewConnection");
+		close(clientSocket);
+		return;
+	}
 	ClientState *clientState = new ClientState(clientSocket, inet_ntoa(clientAddr.sin_addr));
 	_clients[clientSocket] = clientState;
 	_kq.registerEvent(clientSocket, EVFILT_READ);

@@ -30,13 +30,7 @@ void	ConfigParser::readConfigFile()
 		throw std::runtime_error("Error: Unable to open the configuration file ('"
 		+ configFileName + "') for reading. Please check file permissions and try again.");
 	while (std::getline(file, line))
-	{
-		if (line == "events { worker_connections  1024; }")
-			continue;
-		if (line == "		listen 9999;")
-			line = "		listen 9000;";
 		configFileContent += line + "\n";
-	}
 	file.close();
 }
 
