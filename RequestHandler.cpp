@@ -1,4 +1,5 @@
 #include "RequestHandler.hpp"
+#include "BaseConfig.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
@@ -422,6 +423,22 @@ HttpResponse	RequestHandler::servePath(HttpRequest &request, BaseConfig *config)
 		return (handleErrorPage(request, config, 404));
 }
 
+HttpResponse	RequestHandler::deletePath(HttpRequest &request, BaseConfig *config)
+{
+	std::string path = config->root + request.getUri();
+	if (path.back() == '/' || isDirectory(path))
+		return handleErrorPage(request, config, 403);
+	else if (fileExists(path))
+	{
+		if (remove(path.c_str()) != 0)
+			return handleErrorPage(request, config, 500);
+		else
+			return serveError(204);
+	}
+	else
+		return handleErrorPage(request, config, 404);
+}
+
 HttpResponse	RequestHandler::handleReturnDirective(HttpRequest &request, BaseConfig *config)
 {
 	HttpResponse	response;
@@ -542,27 +559,27 @@ HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 	return (response);
 }
 
-// HttpResponse	RequestHandler::handleDeleteRequest(HttpRequest &request)
-// {
-// 	if (serverConfig.returnDirective.isEnabled())
-// 		return handleReturnDirective(request, &serverConfig);
+HttpResponse	RequestHandler::handleDeleteRequest(HttpRequest &request)
+{
+	if (serverConfig.returnDirective.isEnabled())
+		return handleReturnDirective(request, &serverConfig);
 
-// 	BaseConfig		*config = &serverConfig;
-// 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
+	BaseConfig		*config = &serverConfig;
+	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 
-// 	if (locationConfig)
-// 	{
-// 		config = locationConfig;
-// 		if (locationConfig->isMethodAllowed(request.getMethod()) == false)
-// 			return (serveError(405));
-// 	}
+	if (locationConfig)
+	{
+		config = locationConfig;
+		if (locationConfig->isMethodAllowed(request.getMethod()) == false)
+			return (serveError(405));
+	}
 
-// 	if (config->returnDirective.isEnabled())
-// 			return handleReturnDirective(request, config);
+	if (config->returnDirective.isEnabled())
+			return handleReturnDirective(request, config);
 
-	
+	return (deletePath(request, config));
 
-// }
+}
 
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
@@ -573,8 +590,8 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return (handleGetRequest(request));
 	else if (request.getMethod() == "POST")
 		return (handlePostRequest(request));
-	// else if (request.getMethod() == "DELETE")
-	// 	return (handleDeleteRequest(request));
+	else if (request.getMethod() == "DELETE")
+		return (handleDeleteRequest(request));
 	else
 		return (serveError(405));
 }

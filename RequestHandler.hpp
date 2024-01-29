@@ -70,6 +70,7 @@ public:
 	HttpResponse	handleDirectory(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	servePath(HttpRequest &request, BaseConfig *config);
+	HttpResponse	deletePath(HttpRequest &request, BaseConfig *config);
 
 	HttpResponse	handleReturnDirective(HttpRequest &request, BaseConfig *config);
 
