@@ -23,6 +23,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <chrono>
+#include <fcntl.h>
 
 
 
@@ -76,6 +77,7 @@ public:
 	void		handleClientRequest(int clientSocket);
 	void		processGetRequest(int clientSocket, HttpRequest &request);
 	void		processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection = false);
+	void		processDeleteRequest(int clientSocket, HttpRequest &request);
 
 	// Response Handling
 	void		handleClientResponse(int clientSocket);

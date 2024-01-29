@@ -1,14 +1,7 @@
 #include "Server.hpp"
-#include "CgiDirective.hpp"
-#include "CgiHandler.hpp"
 #include "ClientState.hpp"
-#include "HttpResponse.hpp"
-#include "Logger.hpp"
-#include "ResponseState.hpp"
-#include <cstdlib>
-#include <sys/_types/_pid_t.h>
-#include <sys/event.h>
-#include <cstddef>
+#include "HttpRequest.hpp"
+
 
 // -----------------------------------
 // Constructor and Destructor
@@ -256,6 +249,20 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 		_responses[clientSocket] = responseState;
 		_kq.registerEvent(clientSocket, EVFILT_WRITE);
 	}
+}
+
+void	Server::processDeleteRequest(int clientSocket, HttpRequest &request)
+{
+	ResponseState *responseState;
+	RequestHandler handler(_config, _mimeTypes);
+	HttpResponse response = handler.handleRequest(request);
+	if (_clients.count(clientSocket) > 0)
+		_clients[clientSocket]->resetClientState();
+	
+	responseState = new ResponseState(response.buildResponse());
+
+	_responses[clientSocket] = responseState;
+	_kq.registerEvent(clientSocket, EVFILT_WRITE);
 }
 
 // ----------------------------- Handle CGI Output -----------------------------

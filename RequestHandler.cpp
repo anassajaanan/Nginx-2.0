@@ -1,6 +1,6 @@
 #include "RequestHandler.hpp"
-#include "CgiHandler.hpp"
-#include <sys/wait.h>
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 
 RequestHandler::RequestHandler(ServerConfig &serverConfig, MimeTypeConfig &mimeTypeConfig)
 	: serverConfig(serverConfig), mimeTypeConfig(mimeTypeConfig) { }
@@ -505,15 +505,6 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 	if (serverConfig.returnDirective.isEnabled())
 		return handleReturnDirective(request, &serverConfig);
 
-	if (serverConfig.cgiExtension.isEnabled())
-	{
-		// if (validCgiRequest(request, serverConfig))
-		// {
-		// 	CgiHandler		cgiDirective(request, serverConfig);
-		// 	return (cgiDirective.serveCgiOutput(request));
-		// }
-	}
-	
 	BaseConfig		*config = &serverConfig;
 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
 
@@ -531,20 +522,11 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 		return (handleTryFilesDirective(request, config));
 
 	return (servePath(request, config));
-	
 }
 
 HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 {
 	(void)request;
-	// if (serverConfig.cgiExtension.isEnabled())
-	// {
-	// 	if (validCgiRequest(request, serverConfig))
-	// 	{
-	// 		CgiHandler		cgiDirective(request, serverConfig);
-	// 		return (cgiDirective.serveCgiOutput(request));
-	// 	}
-	// }
 	HttpResponse response;
 
 	response.setVersion("HTTP/1.1");
@@ -560,6 +542,28 @@ HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 	return (response);
 }
 
+// HttpResponse	RequestHandler::handleDeleteRequest(HttpRequest &request)
+// {
+// 	if (serverConfig.returnDirective.isEnabled())
+// 		return handleReturnDirective(request, &serverConfig);
+
+// 	BaseConfig		*config = &serverConfig;
+// 	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
+
+// 	if (locationConfig)
+// 	{
+// 		config = locationConfig;
+// 		if (locationConfig->isMethodAllowed(request.getMethod()) == false)
+// 			return (serveError(405));
+// 	}
+
+// 	if (config->returnDirective.isEnabled())
+// 			return handleReturnDirective(request, config);
+
+	
+
+// }
+
 HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 {
 	if (request.getStatus() != 200)
@@ -569,6 +573,8 @@ HttpResponse	RequestHandler::handleRequest(HttpRequest &request)
 		return (handleGetRequest(request));
 	else if (request.getMethod() == "POST")
 		return (handlePostRequest(request));
+	// else if (request.getMethod() == "DELETE")
+	// 	return (handleDeleteRequest(request));
 	else
 		return (serveError(405));
 }

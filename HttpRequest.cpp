@@ -442,20 +442,30 @@ void	HttpRequest::normalizeUri()
 	std::string	normalizedUri;
 	bool	lastWasSlash = false;
 
-	for (size_t i = 0; i < uri.size(); i++)
-	{
-		if (uri[i] == '/')
-		{
-			if (!lastWasSlash)
-			{
-				normalizedUri += uri[i];
-				lastWasSlash = true;
-			}
-		}
-		else {
-			normalizedUri += uri[i];
-			lastWasSlash = false;
-		}
-	}
-	uri = normalizedUri;
+
+	for (size_t i = 0; i < uri.size(); ++i)
+    {
+        // Skip over ".." sequences to prevent directory traversal
+        if (i + 1 < uri.size() && uri[i] == '.' && uri[i + 1] == '.')
+        {
+            i++;
+            continue;
+        }
+
+        if (uri[i] == '/')
+        {
+            if (!lastWasSlash)
+            {
+                normalizedUri += uri[i];
+                lastWasSlash = true;
+            }
+        }
+        else
+        {
+            normalizedUri += uri[i];
+            lastWasSlash = false;
+        }
+    }
+
+    uri = normalizedUri;
 }

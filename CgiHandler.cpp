@@ -1,4 +1,5 @@
 #include "CgiHandler.hpp"
+#include "Server.hpp"
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &config, KqueueManager &kq, int clientSocket, const std::string &postPath)
 	: pid(-1), postBodyFd(-1), cgiClientSocket(clientSocket), isValid(true)
@@ -161,9 +162,9 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &config,
 
 void	CgiHandler::delete2dArray(char **str)
 {
-	for (int i = 0; str[i]; i++)
-		delete [] str[i];
-	delete [] str;
+	for (size_t i = 0; str[i]; i++)
+		delete[] str[i];
+	delete[] str;
 }
 
 int		CgiHandler::getChildPid()

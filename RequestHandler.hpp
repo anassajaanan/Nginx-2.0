@@ -1,8 +1,8 @@
 
 
 #pragma once
-#ifndef REQUESTHANDLER_HPP
-#define REQUESTHANDLER_HPP
+#ifndef REQUEST_HANDLER_HPP
+#define REQUEST_HANDLER_HPP
 
 #include "ServerConfig.hpp"
 #include "LocationConfig.hpp"
@@ -10,11 +10,10 @@
 #include "HttpResponse.hpp"
 #include "MimeTypeParser.hpp"
 #include "Logger.hpp"
+
 #include <sys/stat.h>
 #include <dirent.h>
-#include <unistd.h>
-#include <fcntl.h>
-// #include "C"
+
 
 
 #define SMALL_FILE_THRESHOLD 2097152 // 2 MB
@@ -79,28 +78,9 @@ public:
 	HttpResponse	handleRequest(HttpRequest &request);
 	HttpResponse	handleGetRequest(HttpRequest &request);
 	HttpResponse	handlePostRequest(HttpRequest &request);
-
-
-	// void			delete2dArray(char **str);
-	// HttpResponse	serveCgiOutput(HttpRequest &request, const std::string &message);
-	// bool			validCgiRequest(HttpRequest &request, ServerConfig &config);
-	// // HttpResponse	handleCgiDirective(HttpRequest &request);
-	// bool			validateFileExtension(HttpRequest &request);
-	// char			**initiateEnvVariables(HttpRequest &request);
-
+	HttpResponse	handleDeleteRequest(HttpRequest &request);
 };
 
 	
 
-
-
-
-
-
-
-
-
-
-
-
-#endif /* REQUESTHANDLER_HPP */
+#endif /* REQUEST_HANDLER_HPP */

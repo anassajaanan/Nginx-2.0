@@ -1,7 +1,4 @@
 #include "ClientState.hpp"
-#include "Logger.hpp"
-#include <sstream>
-#include <string>
 
 ClientState::ClientState(int fd, const std::string &clientIpAddr)
 	: fd(fd), clientIpAddr(clientIpAddr), requestCount(0), areHeaderComplete(false), isBodyComplete(false)
@@ -97,6 +94,14 @@ void	ClientState::parseHeaders(Server &server)
 				<< clientIpAddr << "', processing on socket descriptor " << fd;
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handlePostRequest(server);
+	}
+	else if (request.getMethod() == "DELETE")
+	{
+		std::ostringstream logStream;
+		logStream << "Received a 'DELETE' request for '" << request.getUri() << "' from IP '"
+				<< clientIpAddr << "', processing on socket descriptor " << fd;
+		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
+		server.processDeleteRequest(fd, request);
 	}
 	else
 	{
