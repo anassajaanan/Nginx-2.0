@@ -148,7 +148,14 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &config,
 	else
 	{
 		close(this->pipeFd[1]);
-		if (fcntl(pipeFd[0], F_SETFL, O_NONBLOCK) < 0)
+		int flags = fcntl(this->pipeFd[0], F_GETFL, 0);
+		if (flags < 0)
+		{
+			Logger::log(Logger::ERROR, "Failed To Get ReadEnd Of The Pipe Flags", "CgiHandler::handleCgiDirective");
+			this->isValid = false;
+			return ;
+		}
+		if (fcntl(pipeFd[0], F_SETFL, flags | O_NONBLOCK) < 0)
 		{
 			Logger::log(Logger::ERROR, "Failed To Set ReadEnd Of The Pipe To Non Blocking", "CgiHandler::handleCgiDirective");
 			this->isValid = false;
