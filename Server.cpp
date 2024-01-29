@@ -203,6 +203,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
+		// check ig cgiDrective failed then you have to free the allocation
 		CgiHandler	*cgiDirective = new CgiHandler(request, _config, _kq, clientSocket);
 		_cgi[cgiDirective->getCgiReadFd()] = cgiDirective;
 	}
@@ -211,7 +212,8 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 		ResponseState *responseState;
 		RequestHandler handler(_config, _mimeTypes);
 		HttpResponse response = handler.handleRequest(request);
-		_clients[clientSocket]->resetClientState();
+		if (_clients.count(clientSocket) > 0)
+			_clients[clientSocket]->resetClientState();
 		
 		if (response.getType() == SMALL_RESPONSE)
 			responseState = new ResponseState(response.buildResponse());
@@ -220,50 +222,6 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 
 		_responses[clientSocket] = responseState;
 		_kq.registerEvent(clientSocket, EVFILT_WRITE);
-	}
-}
-
-void	Server::handleCgiOutput(int cgiOutputFile)
-{
-	char		buffer[BUFFER_SIZE];
-	CgiHandler	*cgi = _cgi[cgiOutputFile];
-	ssize_t 	bytesRead = read(cgiOutputFile, buffer, BUFFER_SIZE);
-	if (bytesRead < 0)
-	{
-		Logger::log(Logger::ERROR, "Error reading CGI output from pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
-		_kq.unregisterEvent(cgiOutputFile, EVFILT_READ);
-		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
-		kill(cgi->getChildPid(), SIGKILL);
-		_cgi.erase(cgiOutputFile);
-		close(cgiOutputFile);
-		delete cgi;
-	}
-	if (bytesRead == 0)
-	{
-		// HttpResponse	cgiResponse = cgi->serveCgiOutput(_cgi[cgiOutputFile]->getCgiResponseMessage());
-		ResponseState *responseState = new ResponseState(cgi->buildCgiResponse());
-		if (_clients.count(cgi->getCgiClientSocket()) > 0)
-			_clients[cgi->getCgiClientSocket()]->resetClientState();
-		_responses[cgi->getCgiClientSocket()] = responseState;
-		_kq.registerEvent(cgi->getCgiClientSocket() , EVFILT_WRITE);
-		_kq.unregisterEvent(cgi->getCgiReadFd(), EVFILT_READ);
-		// _cgi.begin()->second->closeCgiPipe(); // why this line ?
-		_cgi.erase(cgi->getCgiReadFd());
-		close(cgi->getCgiReadFd());
-		delete cgi;
-	}
-	else
-	{
-		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
-		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
-		{
-			_kq.unregisterEvent(cgiOutputFile, EVFILT_READ);
-			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
-			kill(cgi->getChildPid(), SIGKILL);
-			_cgi.erase(cgiOutputFile);
-			close(cgiOutputFile);
-			delete cgi;
-		}
 	}
 }
 
@@ -281,13 +239,55 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 		ResponseState *responseState;
 		RequestHandler handler(_config, _mimeTypes);
 		HttpResponse response = handler.handleRequest(request);
-		_clients[clientSocket]->resetClientState();
+		if (_clients.count(clientSocket) > 0)
+			_clients[clientSocket]->resetClientState();
 		
 		responseState = new ResponseState(response.buildResponse(), closeConnection);
 
 		_responses[clientSocket] = responseState;
 		_kq.registerEvent(clientSocket, EVFILT_WRITE);
 
+	}
+}
+
+// ----------------------------- Handle CGI Output -----------------------------
+
+void	Server::handleCgiOutput(int cgiReadFd)
+{
+	char		buffer[BUFFER_SIZE];
+	CgiHandler	*cgi = _cgi[cgiReadFd];
+	ssize_t 	bytesRead = read(cgiReadFd, buffer, BUFFER_SIZE);
+	if (bytesRead < 0)
+	{
+		Logger::log(Logger::ERROR, "Error reading CGI output from pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
+		_kq.unregisterEvent(cgiReadFd, EVFILT_READ);
+		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
+		kill(cgi->getChildPid(), SIGKILL);
+		_cgi.erase(cgiReadFd);
+		delete cgi;
+	}
+	if (bytesRead == 0)
+	{
+		ResponseState *responseState = new ResponseState(cgi->buildCgiResponse());
+		if (_clients.count(cgi->getCgiClientSocket()) > 0)
+			_clients[cgi->getCgiClientSocket()]->resetClientState();
+		_responses[cgi->getCgiClientSocket()] = responseState;
+		_kq.registerEvent(cgi->getCgiClientSocket() , EVFILT_WRITE);
+		_kq.unregisterEvent(cgi->getCgiReadFd(), EVFILT_READ);
+		_cgi.erase(cgi->getCgiReadFd());
+		delete cgi;
+	}
+	else
+	{
+		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
+		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
+		{
+			_kq.unregisterEvent(cgiReadFd, EVFILT_READ);
+			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
+			kill(cgi->getChildPid(), SIGKILL);
+			_cgi.erase(cgiReadFd);
+			delete cgi;
+		}
 	}
 }
 

@@ -28,10 +28,6 @@ public:
 	void					addCgiResponseMessage(const std::string &cgiOutput);
 	char					**initiateEnvVariables(HttpRequest &request, ServerConfig &serverConfig);
 	void					handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath);
-	
-	static bool				fileExists(const std::string &path);
-	static bool				validateFileExtension(HttpRequest &request, ServerConfig &config);
-	static bool				validCgiRequest(HttpRequest &request, ServerConfig &config);
 
 
 	int						getChildPid();
@@ -40,10 +36,13 @@ public:
 	const std::string		&getCgiResponseMessage() const;
 
 	//utilities
-	void					closeCgiPipe();
-
+	// void					closeCgiPipe();
 
 	bool					isTimedOut(size_t timeout) const;
+
+	static bool				fileExists(const std::string &path);
+	static bool				validateFileExtension(HttpRequest &request, ServerConfig &config);
+	static bool				validCgiRequest(HttpRequest &request, ServerConfig &config);
 };
 
 

@@ -99,8 +99,8 @@ public:
 	// Utility
 	std::string	getStatusMessage(int statusCode);
 
-	//cgi
-	void		handleCgiOutput(int cgiOutputFile);
+	// Handle Cgi
+	void		handleCgiOutput(int cgiReadFd);
 };
 
 #endif /* SERVER_HPP */

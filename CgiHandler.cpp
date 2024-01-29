@@ -48,54 +48,22 @@ std::string	CgiHandler::buildCgiResponse()
 	return (response.buildResponse());
 }
 
-bool	CgiHandler::fileExists(const std::string &path)
+void	CgiHandler::addCgiResponseMessage(const std::string &cgiOutput)
 {
-	struct stat fileStat;
-
-	if (stat(path.c_str(), &fileStat) == 0)
-		return (true);
-	return (false);
+	this->cgiResponseMessage += cgiOutput;
 }
 
-bool	CgiHandler::validCgiRequest(HttpRequest &request, ServerConfig &config)
-{
-	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
-	|| !fileExists(config.root + request.getUri()) || !validateFileExtension(request, config))
-		return false;
-	return true;
-}
-
-bool	CgiHandler::validateFileExtension(HttpRequest &request, ServerConfig &config)
-{
-	std::vector<std::string>	cgiExten = config.cgiExtension.getExtensions();
-	std::string					uri = request.getUri();
-
-	if (uri.find('.') == std::string::npos ||
-	std::find(cgiExten.begin(), cgiExten.end(),
-	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
-		return false;
-	return true;
-}
-
-int		CgiHandler::getCgiReadFd()const
-{
-	return (this->pipeFd[0]);
-}
-
-int		CgiHandler::getCgiClientSocket() const
-{
-	return (this->cgiClientSocket);
-}
-
-void			CgiHandler::delete2dArray(char **str)
+void	CgiHandler::delete2dArray(char **str)
 {
 	for (int i = 0; str[i]; i++)
 		delete str[i];
-	delete str;
+	delete [] str;
+
 }
 
 char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &serverConfig)
 {
+	std::string	fullQuery;
 	std::vector<std::string>	envVector;
 
 	if (!request.getQueries().empty())
@@ -103,8 +71,6 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 	envVector.push_back("CONTENT_TYPE=" + request.getHeader("content-type"));
 	envVector.push_back("CONTENT_LENGTH=" + request.getHeader("content-length"));
 	envVector.push_back("HTTP_COOKIE=" + request.getHeader("Cookie"));
-	std::string	fullQuery;
-	// int i = 0;
 	for (size_t i = 0; i < request.getQueries().size(); i++)
 	{
 		if (i != 0)
@@ -120,7 +86,7 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 	envVector.push_back("SCRIPT_FILENAME=" + serverConfig.root + request.getUri());
 	envVector.push_back("SERVER_NAME=" + request.getHeader("host"));
 	//ADD PATH_INFO
-	char	**envArray = new char * [envVector.size() + 1];
+	char	**envArray = new char *[envVector.size() + 1];
 	size_t		counter = 0;
 	for (; counter < envVector.size(); counter++)
 		envArray[counter] = strdup(envVector[counter].c_str());
@@ -128,14 +94,14 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &ser
 	return (envArray);
 }
 
-void	CgiHandler::closeCgiPipe()
-{
-	if (this->pipeFd[0] > 0)
-		close(pipeFd[0]);
-	if (this->pipeFd[1] > 0)
-		close(pipeFd[1]);
-	
-}
+// we are closing in the destructor
+// void	CgiHandler::closeCgiPipe()
+// {
+// 	if (this->pipeFd[0] > 0)
+// 		close(pipeFd[0]);
+// 	if (this->pipeFd[1] > 0)
+// 		close(pipeFd[1]);
+// }
 
 void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath)
 {
@@ -152,6 +118,7 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 	parameters = new char *[2];
 	parameters[0] = strdup((serverConfig.root + request.getUri()).c_str());
 	parameters[1] = NULL;
+
 	if (request.getMethod() == "POST")
 	{
 		postBodyFd = open(postPath.c_str(), O_RDONLY);
@@ -201,21 +168,25 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &serverC
 	this->delete2dArray(envp);
 }
 
-int				CgiHandler::getChildPid()
+int		CgiHandler::getChildPid()
 {
 	return (this->pid);
 }
 
-void	CgiHandler::addCgiResponseMessage(const std::string &cgiOutput)
+int		CgiHandler::getCgiClientSocket() const
 {
-	this->cgiResponseMessage += cgiOutput;
+	return (this->cgiClientSocket);
 }
 
-const std::string		&CgiHandler::getCgiResponseMessage() const
+int		CgiHandler::getCgiReadFd()const
+{
+	return (this->pipeFd[0]);
+}
+
+const std::string	&CgiHandler::getCgiResponseMessage() const
 {
 	return (this->cgiResponseMessage);
 }
-
 
 
 bool	CgiHandler::isTimedOut(size_t timeout) const
@@ -224,4 +195,33 @@ bool	CgiHandler::isTimedOut(size_t timeout) const
 	if (std::chrono::duration_cast<std::chrono::seconds>(now - startTime) > std::chrono::seconds(timeout))
 		return true;
 	return false;
+}
+
+bool	CgiHandler::fileExists(const std::string &path)
+{
+	struct stat fileStat;
+
+	if (stat(path.c_str(), &fileStat) == 0)
+		return (true);
+	return (false);
+}
+
+bool	CgiHandler::validCgiRequest(HttpRequest &request, ServerConfig &config)
+{
+	if (((config.root).find("/cgi-bin") == std::string::npos && (config.root + request.getUri()).find("/cgi-bin") == std::string::npos)
+	|| !fileExists(config.root + request.getUri()) || !validateFileExtension(request, config))
+		return false;
+	return true;
+}
+
+bool	CgiHandler::validateFileExtension(HttpRequest &request, ServerConfig &config)
+{
+	std::vector<std::string>	cgiExten = config.cgiExtension.getExtensions();
+	std::string					uri = request.getUri();
+
+	if (uri.find('.') == std::string::npos ||
+	std::find(cgiExten.begin(), cgiExten.end(),
+	uri.substr(uri.find('.'), uri.length())) == cgiExten.end())
+		return false;
+	return true;
 }

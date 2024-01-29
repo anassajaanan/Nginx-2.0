@@ -8,3 +8,4 @@ tmp.cpp
 content/dist/*
 webserver
 content/
+uploads/
