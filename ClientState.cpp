@@ -1,4 +1,5 @@
 #include "ClientState.hpp"
+#include <string>
 
 ClientState::ClientState(int fd, const std::string &clientIpAddr)
 	: fd(fd), clientIpAddr(clientIpAddr), requestCount(0), areHeaderComplete(false), isBodyComplete(false)
@@ -49,6 +50,8 @@ void	ClientState::processIncomingData(Server &server, const char *buffer, size_t
 void	ClientState::processHeaders(Server &server, const char *buffer, size_t bytesRead)
 {
 	requestHeaders.append(buffer, bytesRead);
+	std::cout << "request header= " << requestHeaders << std::endl;
+	std::cout << "buffer = " << buffer << std::endl;
 	if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
 	{
 		server.handleHeaderSizeExceeded(fd);
@@ -243,5 +246,12 @@ bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 
 bool	ClientState::headersCompleted(const char *buffer) const
 {
-	return (strstr(buffer, "\r\n\r\n") != NULL);
+	std::cout << "buffer = " <<  buffer << std::endl;
+	if (!buffer)
+		return false;
+	std::string	bufferStr(buffer);
+	if (bufferStr.empty() || bufferStr.find("\r\n\r\n") == std::string::npos)
+		return false;
+	return true;
+	// return (strstr(buffer, "\r\n\r\n") != NULL);
 }

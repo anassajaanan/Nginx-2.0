@@ -17,6 +17,7 @@ HttpRequest::HttpRequest(const std::string &requestStr)
 	this->recursionDepth = 0;
 	this->requestTokenizer(requestStr);
 	this->normalizeUri();
+	std::cout << requestStr << std::endl;
 }
 
 bool HttpRequest::requestTokenizer(const std::string &requestString)
