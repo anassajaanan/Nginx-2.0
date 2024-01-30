@@ -161,7 +161,7 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &config,
 			this->isValid = false;
 			return ;
 		}
-		kq.registerEvent(this->pipeFd[0], EVFILT_READ);
+		kq.registerEvent(this->pipeFd[0], READ);
 		this->delete2dArray(parameters);
 		this->delete2dArray(envp);
 	}

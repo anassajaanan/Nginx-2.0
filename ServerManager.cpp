@@ -23,7 +23,7 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 			continue;
 		}
 		Logger::log(Logger::INFO, "Server is created and it is listening on port: " + std::to_string(server->_config.port), "ServerManager::initializeServers");
-		kqueue.registerEvent(server->_socket, EVFILT_READ);
+		kqueue.registerEvent(server->_socket, READ);
 		servers.push_back(server);
 	}
 }

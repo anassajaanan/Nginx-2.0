@@ -14,7 +14,7 @@ KqueueManager::~KqueueManager()
 
 void	KqueueManager::registerEvent(int fd, EventType event)
 {
-	int16_t			filter;
+	int16_t			filter = 0;
 	struct kevent	newEvent;
 
 	std::string		filterType = "UNKNOWN EVENT";
@@ -39,7 +39,7 @@ void	KqueueManager::registerEvent(int fd, EventType event)
 
 void	KqueueManager::unregisterEvent(int fd, EventType event)
 {
-	int16_t			filter;
+	int16_t			filter = 0;
 	struct kevent	eventStruct;
 
 	std::string		filterType = "UNKNOWN EVENT";

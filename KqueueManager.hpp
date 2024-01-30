@@ -17,22 +17,6 @@
 #define KEVENT_TIMEOUT_SEC 5
 
 
-// class KqueueManager
-// {
-// public:
-// 	KqueueManager();
-// 	~KqueueManager();
-
-
-// 	int				kq;
-// 	struct kevent	events[MAX_EVENTS];
-
-// 	void			registerEvent(int fd, int16_t filter);
-// 	void			unregisterEvent(int fd, int16_t filter);
-// 	int				waitForEvents();
-
-// };
-
 class KqueueManager : public EventPoller
 {
 public:
