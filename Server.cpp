@@ -200,8 +200,11 @@ void	Server::handleClientRequest(int clientSocket)
 		removeClient(clientSocket);
 		close(clientSocket);
 	}
-
-	if (bytesRead >= 0)
+	else if (bytesRead == 0)
+	{
+		handleClientDisconnection(clientSocket);
+	}
+	else
 	{
 		ClientState *client = _clients[clientSocket];
 
