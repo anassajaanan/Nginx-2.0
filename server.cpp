@@ -1,37 +1,35 @@
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <string.h>
 #include <sys/poll.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <fcntl.h>
-#include <vector>
 #include <sys/select.h>
 #include <poll.h>
-#include <errno.h>
 #include <sys/types.h>
-#include <sys/event.h>
-#include <sys/time.h>
+#include <sys/epoll.h>
+
 
 #define MAX_EVENTS 64
 
 int main()
 {
+	struct sockaddr_in			server_addr;
+	struct epoll_event			events[MAX_EVENTS];
 
 	try
 	{
-		struct sockaddr_in			server_addr;
-		struct kevent				events[MAX_EVENTS];
-
-		int kq = kqueue();
-		if (kq < 0)
+		int epfd = epoll_create1(0);
+		if (epfd < 0)
 		{
-			throw std::runtime_error("Failed to create kqueue");
+			throw std::runtime_error("Failed to create epoll");
 		}
-
 
 		int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 		if (server_fd < 0)
@@ -65,28 +63,32 @@ int main()
 			throw std::runtime_error("Failed to listen on socket");
 		}
 
-		struct kevent server_event;
-		EV_SET(&server_event, server_fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-		if (kevent(kq, &server_event, 1, NULL, 0, NULL) < 0)
+		// register server socket to read
+		struct epoll_event ev;
+		ev.events = EPOLLIN;
+		ev.data.fd = server_fd;
+		if (epoll_ctl(epfd, EPOLL_CTL_ADD, server_fd, &ev) < 0)
 		{
-			throw std::runtime_error("Failed to add server socket to kqueue");
+			throw std::runtime_error("epoll_ctl failed");
 		}
 
-
-		while (1)
+		while(1)
 		{
-			// int activity = poll(clientSockets.data(), clientSockets.size(), 3000);
-			int nev = kevent(kq, NULL, 0, events, MAX_EVENTS, NULL);
-			std::cout << "nev: " << nev << std::endl;
+			int nev = epoll_wait(epfd, events, MAX_EVENTS, 5000);
+			std::cout << "nev is : " << nev << std::endl;
 			if (nev < 0)
 			{
-				throw std::runtime_error("Failed to check for events");
+				throw std::runtime_error("epoll_wait failed");
 			}
-			for (int i = 0; i < nev; i++)
+			else if (nev == 0)
 			{
-				if (events[i].filter == EVFILT_READ)
+				std::cout << "No event" << std::endl;
+			}
+			else
+			{
+				for (int ev = 0; ev < nev; ev++)
 				{
-					if (events[i].ident == server_fd)
+					if (events[ev].data.fd == server_fd)
 					{
 						//new connection
 						std::cout << "New connection" << std::endl;
@@ -99,48 +101,45 @@ int main()
 							throw std::runtime_error("Failed to accept connection");
 						}
 
-						// register new client
-						struct kevent new_client_event;
-						EV_SET(&new_client_event, client_fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-						if (kevent(kq, &new_client_event, 1, NULL, 0, NULL) < 0)
+						struct epoll_event client_event;
+						client_event.events = EPOLLIN;
+						client_event.data.fd = client_fd;
+						if (epoll_ctl(epfd, EPOLL_CTL_ADD, client_fd, &client_event) < 0)
 						{
-							throw std::runtime_error("Failed to add new client to kqueue");
+							throw std::runtime_error("epoll_ctl failed");
 						}
-
 					}
-					else {
-						// read from client
+					else
+					{
+						std::cout << "Read request from client" << std::endl;
 						char buffer[1024];
-						int bytes_read = recv(events[i].ident, buffer, sizeof(buffer), 0);
+						int bytes_read = recv(events[ev].data.fd, buffer, 1024, 0);
 						if (bytes_read < 0)
 						{
 							throw std::runtime_error("Failed to read data from client");
 						}
 						else if (bytes_read == 0)
 						{
-							// client disconnected
-							std::cout << "Client disconnected" << std::endl;
-							// remove client from kqueue
-							struct kevent del_client_event;
-							EV_SET(&del_client_event, events[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-							if (kevent(kq, &del_client_event, 1, NULL, 0, NULL) < 0)
+							std::cout << "Client Disconnected" << std::endl;
+							// remove client from epoll
+							if (epoll_ctl(epfd, EPOLL_CTL_DEL, events[ev].data.fd, NULL) < 0)
 							{
-								throw std::runtime_error("Failed to delete client from kqueue");
+								throw std::runtime_error("epoll_ctl failed");
 							}
-							close(events[i].ident);
 						}
-						else
+						else {
 							std::cout << "Received: " << std::string(buffer, bytes_read) << std::endl;
-						
+						}
 					}
 				}
 			}
 
 		}
-		
 	}
-	catch (const std::exception& e)
+	catch (const std::exception &e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << e.what() << std::endl;
 	}
+
 }
+

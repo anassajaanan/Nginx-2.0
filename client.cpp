@@ -1,16 +1,12 @@
-#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <sys/_endian.h>
-#include <sys/_select.h>
-#include <sys/_types/_size_t.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <fcntl.h>
-#include <vector>
 #include <sys/select.h>
 #include <arpa/inet.h>
 
