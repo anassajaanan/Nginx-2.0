@@ -1,8 +1,10 @@
+#ifdef __linux__
+
 #include "EpollManager.hpp"
 
 EpollManager::EpollManager()
 {
-	epfd = epoll_create1(0);
+	epfd = epoll_create1(EPOLL_CLOEXEC);
 	if (epfd < 0)
 	{
 		throw std::runtime_error("epoll_create1() failed");
@@ -69,3 +71,5 @@ int	EpollManager::waitForEvents()
 	int nev = epoll_wait(epfd, this->events, MAX_EVENTS, EPOLL_TIMEOUT);
 	return nev;
 }
+
+#endif

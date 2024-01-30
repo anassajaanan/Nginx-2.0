@@ -2,11 +2,11 @@
 
 
 #pragma once
+#include "EventPoller.hpp"
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
 #include "ServerConfig.hpp"
-#include "KqueueManager.hpp"
 #include "MimeTypeParser.hpp"
 #include "RequestHandler.hpp"
 #include "ResponseState.hpp"
@@ -49,12 +49,12 @@ class Server
 {
 
 public:
-	Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq);
+	Server(ServerConfig &config, EventPoller *eventManager, MimeTypeConfig &mimeTypes);
 	~Server();
 
 	ServerConfig						&_config;
 	MimeTypeConfig						&_mimeTypes;
-	KqueueManager						&_kq;
+	EventPoller							*_eventManager;
 	int									_socket;
 	struct sockaddr_in					_serverAddr;
 	std::map<int, ClientState *>		_clients;

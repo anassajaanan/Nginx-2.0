@@ -1,3 +1,5 @@
+#if defined(__APPLE__) || defined(__FreeBSD__)
+
 #include "KqueueManager.hpp"
 
 KqueueManager::KqueueManager()
@@ -70,3 +72,5 @@ int	KqueueManager::waitForEvents()
 	int nev = kevent(this->kq, NULL, 0, this->events, MAX_EVENTS, &timeout);
 	return (nev);
 }
+
+#endif

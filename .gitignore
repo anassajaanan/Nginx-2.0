@@ -5,8 +5,8 @@ a.out.dSYM/
 objs/
 build/
 tmp.cpp
+content/*
 content/dist/*
 webserver
-content/
-uploads/
-logs/
+uploads/*
+logs/*

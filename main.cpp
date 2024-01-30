@@ -1,10 +1,10 @@
 
 #include "ConfigParser.hpp"
 #include "ConfigLoader.hpp"
+#include "EventPoller.hpp"
 #include "MimeTypeConfig.hpp"
 #include "ServerManager.hpp"
 #include "Logger.hpp"
-
 
 
 
@@ -29,6 +29,7 @@ int main()
 {
 	std::vector<ServerConfig>	serverConfigs;
 	MimeTypeConfig				mimeTypeConfig;
+	EventPoller					*eventManager;
 
     try
 	{
@@ -40,6 +41,8 @@ int main()
 
 		ConfigLoader loader(parser.getConfigTreeRoot());
 		loader.loadServers(serverConfigs);
+
+		eventManager = new EventManager();
 	
 	}
 	catch (const std::exception &e)
@@ -69,6 +72,8 @@ int main()
 	serverManager.start();
 
 	Logger::cleanup();
+
+	delete eventManager;
 
 	return 0;
 }

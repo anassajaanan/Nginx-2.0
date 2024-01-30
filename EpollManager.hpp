@@ -4,29 +4,34 @@
 #ifndef EPOLL_MANAGER_HPP
 #define EPOLL_MANAGER_HPP
 
-#include "Logger.hpp"
-#include "EventPoller.hpp"
+#ifdef __linux__
 
-#include <unistd.h>
-#include <sys/epoll.h>
+	#include "Logger.hpp"
+	#include "EventPoller.hpp"
 
-#define MAX_EVENTS 100
 
-#define EPOLL_TIMEOUT 5000
+	#include <unistd.h>
+	#include <sys/epoll.h>
 
-class EpollManager : public EventPoller
-{
-public:
-	EpollManager();
-	~EpollManager();
+	#define MAX_EVENTS 100
 
-	int					epfd;
-	struct epoll_event	events[MAX_EVENTS];
+	#define EPOLL_TIMEOUT 5000
 
-	void			registerEvent(int fd, EventType event);
-	void			unregisterEvent(int fd, EventType event);
-	int				waitForEvents();
-};
+	class EpollManager : public EventPoller
+	{
+	public:
+		EpollManager();
+		~EpollManager();
+
+		int					epfd;
+		struct epoll_event	events[MAX_EVENTS];
+
+		void			registerEvent(int fd, EventType event);
+		void			unregisterEvent(int fd, EventType event);
+		int				waitForEvents();
+	};
+
+#endif
 
 
 #endif /* EPOLL_MANAGER_HPP */

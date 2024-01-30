@@ -3,9 +3,10 @@
 
 int	ServerManager::running = 1;
 
-ServerManager::ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes)
+ServerManager::ServerManager(std::vector<ServerConfig> &_serverConfigs, EventPoller *_eventManager, MimeTypeConfig &_mimeTypes)
+	: eventManager(_eventManager)
 {
-	initializeServers(serverConfigs, mimeTypes);
+	initializeServers(_serverConfigs, _mimeTypes);
 }
 
 ServerManager::~ServerManager() { }

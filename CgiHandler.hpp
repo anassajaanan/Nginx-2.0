@@ -1,11 +1,11 @@
 
 #pragma once
+#include "EventPoller.hpp"
 #ifndef CGI_HANDLER_HPP
 #define CGI_HANDLER_HPP
 
 #include "RequestHandler.hpp"
 #include "ServerConfig.hpp"
-#include "KqueueManager.hpp"
 
 
 
@@ -22,13 +22,13 @@ private:
 	bool												isValid;
 	
 public:
-	CgiHandler(HttpRequest &request, ServerConfig &config, KqueueManager	&kq, int clientSocket,  const std::string &postPath = "");
+	CgiHandler(HttpRequest &request, ServerConfig &config, EventPoller *eventManager, int clientSocket,  const std::string &postPath = "");
 	~CgiHandler();
 	
 	std::string				buildCgiResponse();
 	void					addCgiResponseMessage(const std::string &cgiOutput);
 	char					**initiateEnvVariables(HttpRequest &request, ServerConfig &serverConfig);
-	void					handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, KqueueManager	&kq, const std::string &postPath);
+	void					handleCgiDirective(HttpRequest &request,  ServerConfig &serverConfig, EventPoller *eventManager, const std::string &postPath);
 	void					delete2dArray(char **str);
 
 
