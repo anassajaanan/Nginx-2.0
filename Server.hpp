@@ -2,7 +2,6 @@
 
 
 #pragma once
-#include "EventPoller.hpp"
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
