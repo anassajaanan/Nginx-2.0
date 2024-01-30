@@ -1,7 +1,6 @@
 
 
 #pragma once
-#include "EventPoller.hpp"
 #ifndef SERVER_MANAGER_HPP
 #define SERVER_MANAGER_HPP
 
@@ -42,8 +41,8 @@ public:
 
 	void				initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
 	void 				checkTimeouts();
-	void				processReadEvent(const struct kevent &event);
-	void				processWriteEvent(const struct kevent &event);
+	void				processReadEvent(EventInfo &event);
+	void				processWriteEvent(EventInfo &event);
 	std::string			readCgiResponse(int fd);
 
 

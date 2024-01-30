@@ -1,6 +1,7 @@
 #ifdef __linux__
 
 #include "EpollManager.hpp"
+#include "EventPoller.hpp"
 
 EpollManager::EpollManager()
 {
@@ -70,6 +71,14 @@ int	EpollManager::waitForEvents()
 {
 	int nev = epoll_wait(epfd, this->events, MAX_EVENTS, EPOLL_TIMEOUT);
 	return nev;
+}
+
+void	EpollManager::getNextEvent(int index, EventInfo &eventInfo)
+{
+	eventInfo.fd = events[index].data.fd;
+	eventInfo.isRead = (events[index].events & EPOLLIN);
+	eventInfo.isWrite = (events[index].events & EPOLLOUT);
+	eventInfo.isEOF = events[index].events & EPOLLHUP;
 }
 
 #endif

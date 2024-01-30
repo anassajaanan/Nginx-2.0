@@ -29,6 +29,8 @@
 		void			registerEvent(int fd, EventType event);
 		void			unregisterEvent(int fd, EventType event);
 		int				waitForEvents();
+
+		void			getNextEvent(int index, EventInfo &eventInfo);
 	};
 
 #endif

@@ -7,7 +7,7 @@
 // -----------------------------------
 
 Server::Server(ServerConfig &config, EventPoller *eventManager, MimeTypeConfig &mimeTypes)
-	: _config(config), _eventManager(eventManager), _mimeTypes(mimeTypes), _socket(-1)
+	: _config(config), _mimeTypes(mimeTypes), _eventManager(eventManager), _socket(-1)
 {
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_port = htons(_config.port);

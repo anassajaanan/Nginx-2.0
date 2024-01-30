@@ -73,4 +73,12 @@ int	KqueueManager::waitForEvents()
 	return (nev);
 }
 
+void	KqueueManager::getNextEvent(int index, EventInfo &eventInfo)
+{
+	eventInfo.fd = this->events[index].ident;
+	eventInfo.isRead = (this->events[index].filter == EVFILT_READ);
+	eventInfo.isWrite = (this->events[index].filter == EVFILT_WRITE);
+	eventInfo.isEOF = (this->events[index].flags & EV_EOF);
+}
+
 #endif
