@@ -246,12 +246,5 @@ bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 
 bool	ClientState::headersCompleted(const char *buffer) const
 {
-	std::cout << "buffer = " <<  buffer << std::endl;
-	if (!buffer)
-		return false;
-	std::string	bufferStr(buffer);
-	if (bufferStr.empty() || bufferStr.find("\r\n\r\n") == std::string::npos)
-		return false;
-	return true;
-	// return (strstr(buffer, "\r\n\r\n") != NULL);
+	return (strstr(buffer, "\r\n\r\n") != NULL);
 }

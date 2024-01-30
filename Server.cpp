@@ -194,7 +194,7 @@ void	Server::handleClientDisconnection(int clientSocket)
 
 void	Server::handleClientRequest(int clientSocket)
 {
-	char *buffer = new char[BUFFER_SIZE + 1];
+	char buffer[BUFFER_SIZE + 1];
 	memset(buffer, 0, BUFFER_SIZE + 1);
 	ssize_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
@@ -210,15 +210,9 @@ void	Server::handleClientRequest(int clientSocket)
 
 		client->updateLastRequestTime();
 		client->incrementRequestCount();
-
-		if (buffer)
-		{
-
-		}
 		// std::cout << "buffer when read = " << buffer << std::endl;
 		client->processIncomingData(*this, buffer, bytesRead);
 	}
-	delete []buffer;
 }
 
 void	Server::processGetRequest(int clientSocket, HttpRequest &request)
