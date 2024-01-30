@@ -18,6 +18,7 @@ void	KqueueManager::registerEvent(int fd, EventType event)
 {
 	int16_t			filter = 0;
 	struct kevent	newEvent;
+	memset(&newEvent, 0, sizeof(newEvent));
 
 	std::string		filterType = "UNKNOWN EVENT";
 	if (event == READ)
@@ -43,6 +44,7 @@ void	KqueueManager::unregisterEvent(int fd, EventType event)
 {
 	int16_t			filter = 0;
 	struct kevent	eventStruct;
+	memset(&eventStruct, 0, sizeof(eventStruct));
 
 	std::string		filterType = "UNKNOWN EVENT";
 	if (event == READ)

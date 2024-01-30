@@ -11,6 +11,7 @@
 
 
 	#include <unistd.h>
+	#include <string.h>
 	#include <sys/epoll.h>
 
 	#define MAX_EVENTS 100

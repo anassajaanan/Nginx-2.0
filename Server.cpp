@@ -193,7 +193,6 @@ void	Server::handleClientDisconnection(int clientSocket)
 void	Server::handleClientRequest(int clientSocket)
 {
 	char buffer[BUFFER_SIZE + 1];
-	memset(buffer, 0, BUFFER_SIZE + 1);
 	ssize_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
 	{
@@ -207,6 +206,7 @@ void	Server::handleClientRequest(int clientSocket)
 	}
 	else
 	{
+		buffer[bytesRead] = '\0';
 		ClientState *client = _clients[clientSocket];
 
 		client->updateLastRequestTime();
@@ -293,7 +293,7 @@ void	Server::processDeleteRequest(int clientSocket, HttpRequest &request)
 
 void	Server::handleCgiOutput(int cgiReadFd)
 {
-	char		buffer[BUFFER_SIZE];
+	char		buffer[BUFFER_SIZE + 1];
 	CgiHandler	*cgi = _cgi[cgiReadFd];
 	ssize_t 	bytesRead = read(cgiReadFd, buffer, BUFFER_SIZE);
 	if (bytesRead < 0)
@@ -318,6 +318,7 @@ void	Server::handleCgiOutput(int cgiReadFd)
 	}
 	else
 	{
+		buffer[bytesRead] = '\0';
 		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
 		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
 		{

@@ -20,6 +20,7 @@ EpollManager::~EpollManager()
 void	EpollManager::registerEvent(int fd, EventType event)
 {
 	struct epoll_event	epollEvent;
+	memset(&epollEvent, 0, sizeof(epollEvent));
 
 	epollEvent.events = 0;
 	epollEvent.data.fd = fd;
@@ -48,6 +49,7 @@ void	EpollManager::registerEvent(int fd, EventType event)
 void	EpollManager::unregisterEvent(int fd, EventType event)
 {
 	struct epoll_event	epollEvent;
+	memset(&epollEvent, 0, sizeof(epollEvent));
 
 	epollEvent.events = 0;
 	epollEvent.data.fd = fd;
