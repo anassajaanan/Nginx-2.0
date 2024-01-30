@@ -219,7 +219,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		CgiHandler *cgi = new CgiHandler(request, _config, _kq, clientSocket);
+		CgiHandler *cgi = new CgiHandler(request, _config, _eventManager, clientSocket);
 		if (cgi->isValidCgi())
 			_cgi[cgi->getCgiReadFd()] = cgi;
 		else
@@ -251,7 +251,7 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		CgiHandler *cgi = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
+		CgiHandler *cgi = new CgiHandler(request, _config, _eventManager, clientSocket, _clients[clientSocket]->getPostRequestFileName());
 		if (cgi->isValidCgi())
 			_cgi[cgi->getCgiReadFd()] = cgi;
 		else
