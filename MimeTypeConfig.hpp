@@ -7,6 +7,7 @@
 
 #include <map>
 #include <iostream>
+#include <algorithm>
 
 class MimeTypeConfig
 {

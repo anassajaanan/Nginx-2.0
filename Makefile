@@ -13,13 +13,13 @@ INCL_DIR = ./
 SRCS = 	BaseConfig.cpp CgiDirective.cpp ClientState.cpp ConfigLoader.cpp ConfigNode.cpp ConfigParser.cpp ConfigTokenizer.cpp ContextNode.cpp \
 		DirectiveNode.cpp HttpRequest.cpp HttpResponse.cpp KqueueManager.cpp LocationConfig.cpp Logger.cpp LogicValidator.cpp MimeTypeConfig.cpp \
 		MimeTypeParser.cpp RequestHandler.cpp ResponseState.cpp ReturnDirective.cpp Server.cpp ServerConfig.cpp ServerManager.cpp SyntaxValidator.cpp \
-		TreeBuilder.cpp TryFilesDirective.cpp CgiHandler.cpp main.cpp EventPoller.cpp
+		TreeBuilder.cpp TryFilesDirective.cpp CgiHandler.cpp main.cpp EventPoller.cpp EpollManager.cpp
 
 HEADERS = $(wildcard $(INCL_DIR)*.hpp)
 
 # Compiler and Common Flags
 CXX = clang++
-CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++98 -I$(INCL_DIR)
+CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++11 -I$(INCL_DIR)
 
 # Build Directories
 BUILD_DIR = build/

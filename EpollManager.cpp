@@ -24,6 +24,8 @@ void	EpollManager::registerEvent(int fd, EventType event)
 	epollEvent.events = 0;
 	epollEvent.data.fd = fd;
 
+	int op = EPOLL_CTL_ADD;
+
 	std::string		filterType = "UNKNOWN EVENT";
 	if (event == READ)
 	{
@@ -32,11 +34,12 @@ void	EpollManager::registerEvent(int fd, EventType event)
 	}
 	else if (event == WRITE)
 	{
+		op = EPOLL_CTL_MOD;
 		epollEvent.events = EPOLLOUT;
 		filterType = "WRITE EVENT";
 	}
 
-	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &epollEvent) < 0)
+	if (epoll_ctl(epfd, op, fd, &epollEvent) < 0)
 		Logger::log(Logger::ERROR, "Failed to register a new event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::registerEvent");
 	else
 		Logger::log(Logger::DEBUG, "Registered a new event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::registerEvent");
@@ -49,6 +52,8 @@ void	EpollManager::unregisterEvent(int fd, EventType event)
 	epollEvent.events = 0;
 	epollEvent.data.fd = fd;
 
+	int op = EPOLL_CTL_DEL;
+
 	std::string		filterType = "UNKNOWN EVENT";
 	if (event == READ)
 	{
@@ -57,11 +62,12 @@ void	EpollManager::unregisterEvent(int fd, EventType event)
 	}
 	else if (event == WRITE)
 	{
-		epollEvent.events = EPOLLOUT;
+		op = EPOLL_CTL_MOD;
+		epollEvent.events = EPOLLIN;
 		filterType = "WRITE EVENT";
 	}
 
-	if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &epollEvent) < 0)
+	if (epoll_ctl(epfd, op, fd, &epollEvent) < 0)
 		Logger::log(Logger::ERROR, "Failed to unregister the event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::unregisterEvent");
 	else
 		Logger::log(Logger::DEBUG, "Unregistered the event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::unregisterEvent");

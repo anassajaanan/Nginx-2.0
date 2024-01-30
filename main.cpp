@@ -5,6 +5,8 @@
 #include "MimeTypeConfig.hpp"
 #include "ServerManager.hpp"
 #include "Logger.hpp"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 

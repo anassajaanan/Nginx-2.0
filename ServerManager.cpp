@@ -101,6 +101,7 @@ void	ServerManager::start()
 
 		Logger::log(Logger::DEBUG, "Received " + std::to_string(nev) + " events", "EventLoop");
 
+		// update it for epoll
 		if (nev < 0)
 		{
 			if (errno == EINTR)

@@ -3,7 +3,6 @@
 #include "LocationConfig.hpp"
 #include <stdexcept>
 #include <string>
-#include <sys/_types/_size_t.h>
 
 ServerConfig::ServerConfig() { }
 

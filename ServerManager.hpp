@@ -6,7 +6,6 @@
 
 #include "Server.hpp"
 #include "ServerConfig.hpp"
-#include "MimeTypeParser.hpp"
 
 #ifdef __linux__
     // Linux-specific implementation
