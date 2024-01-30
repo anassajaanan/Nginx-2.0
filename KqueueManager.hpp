@@ -15,7 +15,7 @@
 #include <sys/time.h>
 
 
-#define MAX_EVENTS 64
+#define MAX_EVENTS 100
 
 
 class KqueueManager
