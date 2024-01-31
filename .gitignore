@@ -4,6 +4,7 @@ a.out.dSYM/
 .DS_Store
 objs/
 build/
+content/website/.*
 tmp.cpp
 content/dist/*
 webserver
