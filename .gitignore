@@ -6,8 +6,9 @@ objs/
 build/
 content/website/.*
 tmp.cpp
+content/*
 content/dist/*
 content/website/.Wit_ai
 webserver
-uploads/
-logs/
+uploads/*
+logs/*

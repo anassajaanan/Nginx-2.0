@@ -1,13 +1,13 @@
 #include "CgiHandler.hpp"
 #include "Server.hpp"
 
-CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &config, KqueueManager &kq, int clientSocket, const std::string &postPath)
+CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &config, EventPoller *eventManager, int clientSocket,  const std::string &postPath)
 	: pid(-1), postBodyFd(-1), cgiClientSocket(clientSocket), isValid(true)
 {
 	pipeFd[0] = -1;
 	pipeFd[1] = -1;
 	this->startTime = std::chrono::steady_clock::now();
-	handleCgiDirective(request, config, kq, postPath);
+	handleCgiDirective(request, config, eventManager, postPath);
 }
 
 CgiHandler::~CgiHandler()
@@ -90,7 +90,7 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &con
 	return (envArray);
 }
 
-void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &config, KqueueManager	&kq, const std::string &postPath)
+void	CgiHandler::handleCgiDirective(HttpRequest &request, ServerConfig &config, EventPoller *eventManager, const std::string &postPath)
 {
 	char	**parameters;
 	char	**envp;
@@ -162,7 +162,7 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request,  ServerConfig &config,
 			this->isValid = false;
 			return ;
 		}
-		kq.registerEvent(this->pipeFd[0], EVFILT_READ);
+		eventManager->registerEvent(this->pipeFd[0], READ);
 		this->delete2dArray(parameters);
 		this->delete2dArray(envp);
 	}

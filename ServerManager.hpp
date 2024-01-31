@@ -6,17 +6,25 @@
 
 #include "Server.hpp"
 #include "ServerConfig.hpp"
-#include "MimeTypeParser.hpp"
-#include "KqueueManager.hpp"
+
+#ifdef __linux__
+    // Linux-specific implementation
+    #include "EpollManager.hpp"
+    typedef EpollManager EventManager;
+#elif defined(__APPLE__) || defined(__FreeBSD__)
+    // macOS or FreeBSD-specific implementation
+    #include "KqueueManager.hpp"
+    typedef KqueueManager EventManager;
+#endif
+
 
 #define SERVER_TIMEOUT_CHECK_INTERVAL 5 // 5 seconds
-// define cgi timeout interval if cgi has infinite loop or takes too long to respond
 #define CGI_TIMEOUT_CHECK_INTERVAL 10 // 10 seconds
 
 class ServerManager
 {
 private:
-	KqueueManager							kqueue;
+	EventPoller								*eventManager;
 	std::chrono::steady_clock::time_point	lastTimeoutCheck;
 	std::chrono::steady_clock::time_point	lastCgiTimeoutCheck;
 	std::vector<Server *>					servers;
@@ -25,15 +33,15 @@ private:
 public:
 	static int								running;
 
-	ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
+	ServerManager(std::vector<ServerConfig> &_serverConfigs, EventPoller *_eventManager, MimeTypeConfig &_mimeTypes);
 	~ServerManager();
 	
 	
 
 	void				initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
 	void 				checkTimeouts();
-	void				processReadEvent(const struct kevent &event);
-	void				processWriteEvent(const struct kevent &event);
+	void				processReadEvent(EventInfo &event);
+	void				processWriteEvent(EventInfo &event);
 	std::string			readCgiResponse(int fd);
 
 

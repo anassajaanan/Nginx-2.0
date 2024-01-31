@@ -1,15 +1,13 @@
 #include "Server.hpp"
 #include "ClientState.hpp"
-#include <cstddef>
-#include <cstring>
 
 
 // -----------------------------------
 // Constructor and Destructor
 // -----------------------------------
 
-Server::Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq)
-	: _config(config), _mimeTypes(mimeTypes), _kq(kq), _socket(-1)
+Server::Server(ServerConfig &config, EventPoller *eventManager, MimeTypeConfig &mimeTypes)
+	: _config(config), _mimeTypes(mimeTypes), _eventManager(eventManager), _socket(-1)
 {
 	_serverAddr.sin_family = AF_INET;
 	_serverAddr.sin_port = htons(_config.port);
@@ -22,7 +20,7 @@ Server::~Server()
 	std::map<int, ClientState *>::iterator client = _clients.begin();
 	while (client != _clients.end())
 	{
-		_kq.unregisterEvent(client->first, EVFILT_READ);
+		_eventManager->unregisterEvent(client->first, READ);
 		delete client->second;
 		close(client->first);
 		client++;
@@ -32,7 +30,7 @@ Server::~Server()
 	std::map<int, ResponseState *>::iterator response = _responses.begin();
 	while (response != _responses.end())
 	{
-		_kq.unregisterEvent(response->first, EVFILT_WRITE);
+		_eventManager->unregisterEvent(response->first, WRITE);
 		delete response->second;
 		response++;
 	}
@@ -41,7 +39,7 @@ Server::~Server()
 	std::map<int, CgiHandler *>::iterator cgi = _cgi.begin();
 	while (cgi != _cgi.end())
 	{
-		_kq.unregisterEvent(cgi->first, EVFILT_READ);
+		_eventManager->unregisterEvent(cgi->first, READ);
 		delete cgi->second;
 		cgi++;
 	}
@@ -49,7 +47,7 @@ Server::~Server()
 
 	if (_socket != -1)
 	{
-		_kq.unregisterEvent(_socket, EVFILT_READ);
+		_eventManager->unregisterEvent(_socket, READ);
 		close(_socket);
 	}
 }
@@ -166,20 +164,20 @@ void	Server::acceptNewConnection()
 	}
 	ClientState *clientState = new ClientState(clientSocket, inet_ntoa(clientAddr.sin_addr));
 	_clients[clientSocket] = clientState;
-	_kq.registerEvent(clientSocket, EVFILT_READ);
+	_eventManager->registerEvent(clientSocket, READ);
 }
 
 void	Server::handleClientDisconnection(int clientSocket)
 {
 	Logger::log(Logger::INFO, "Handling disconnection of client with socket fd " + std::to_string(clientSocket), "Server::handleClientDisconnection");
 
-	_kq.unregisterEvent(clientSocket, EVFILT_READ);
+	_eventManager->unregisterEvent(clientSocket, READ);
 	ClientState *clientState = _clients[clientSocket];
 	_clients.erase(clientSocket);
 	delete clientState;
 	if (_responses.count(clientSocket) > 0)
 	{
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->unregisterEvent(clientSocket, WRITE);
 		ResponseState *responseState = _responses[clientSocket];
 		_responses.erase(clientSocket);
 		delete responseState;
@@ -195,7 +193,6 @@ void	Server::handleClientDisconnection(int clientSocket)
 void	Server::handleClientRequest(int clientSocket)
 {
 	char buffer[BUFFER_SIZE + 1];
-	memset(buffer, 0, BUFFER_SIZE + 1);
 	ssize_t bytesRead = recv(clientSocket, buffer, BUFFER_SIZE, 0);
 	if (bytesRead < 0)
 	{
@@ -203,14 +200,17 @@ void	Server::handleClientRequest(int clientSocket)
 		removeClient(clientSocket);
 		close(clientSocket);
 	}
-
-	if (bytesRead >= 0)
+	else if (bytesRead == 0)
 	{
+		handleClientDisconnection(clientSocket);
+	}
+	else
+	{
+		buffer[bytesRead] = '\0';
 		ClientState *client = _clients[clientSocket];
 
 		client->updateLastRequestTime();
 		client->incrementRequestCount();
-		// std::cout << "buffer when read = " << buffer << std::endl;
 		client->processIncomingData(*this, buffer, bytesRead);
 	}
 }
@@ -219,7 +219,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		CgiHandler *cgi = new CgiHandler(request, _config, _kq, clientSocket);
+		CgiHandler *cgi = new CgiHandler(request, _config, _eventManager, clientSocket);
 		if (cgi->isValidCgi())
 			_cgi[cgi->getCgiReadFd()] = cgi;
 		else
@@ -242,7 +242,7 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 			responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
 
 		_responses[clientSocket] = responseState;
-		_kq.registerEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->registerEvent(clientSocket, WRITE);
 	}
 }
 
@@ -251,7 +251,7 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
-		CgiHandler *cgi = new CgiHandler(request, _config, _kq, clientSocket, _clients[clientSocket]->getPostRequestFileName());
+		CgiHandler *cgi = new CgiHandler(request, _config, _eventManager, clientSocket, _clients[clientSocket]->getPostRequestFileName());
 		if (cgi->isValidCgi())
 			_cgi[cgi->getCgiReadFd()] = cgi;
 		else
@@ -271,7 +271,7 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 		responseState = new ResponseState(response.buildResponse(), closeConnection);
 
 		_responses[clientSocket] = responseState;
-		_kq.registerEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->registerEvent(clientSocket, WRITE);
 	}
 }
 
@@ -286,20 +286,20 @@ void	Server::processDeleteRequest(int clientSocket, HttpRequest &request)
 	responseState = new ResponseState(response.buildResponse());
 
 	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	_eventManager->registerEvent(clientSocket, WRITE);
 }
 
 // ----------------------------- Handle CGI Output -----------------------------
 
 void	Server::handleCgiOutput(int cgiReadFd)
 {
-	char		buffer[BUFFER_SIZE];
+	char		buffer[BUFFER_SIZE + 1];
 	CgiHandler	*cgi = _cgi[cgiReadFd];
 	ssize_t 	bytesRead = read(cgiReadFd, buffer, BUFFER_SIZE);
 	if (bytesRead < 0)
 	{
 		Logger::log(Logger::ERROR, "Error reading CGI output from pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
-		_kq.unregisterEvent(cgiReadFd, EVFILT_READ);
+		_eventManager->unregisterEvent(cgiReadFd, READ);
 		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
 		kill(cgi->getChildPid(), SIGKILL);
 		_cgi.erase(cgiReadFd);
@@ -311,17 +311,18 @@ void	Server::handleCgiOutput(int cgiReadFd)
 		if (_clients.count(cgi->getCgiClientSocket()) > 0)
 			_clients[cgi->getCgiClientSocket()]->resetClientState();
 		_responses[cgi->getCgiClientSocket()] = responseState;
-		_kq.registerEvent(cgi->getCgiClientSocket() , EVFILT_WRITE);
-		_kq.unregisterEvent(cgi->getCgiReadFd(), EVFILT_READ);
+		_eventManager->registerEvent(cgi->getCgiClientSocket() , WRITE);
+		_eventManager->unregisterEvent(cgi->getCgiReadFd(), READ);
 		_cgi.erase(cgi->getCgiReadFd());
 		delete cgi;
 	}
 	else
 	{
+		buffer[bytesRead] = '\0';
 		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
 		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
 		{
-			_kq.unregisterEvent(cgiReadFd, EVFILT_READ);
+			_eventManager->unregisterEvent(cgiReadFd, READ);
 			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
 			kill(cgi->getChildPid(), SIGKILL);
 			_cgi.erase(cgiReadFd);
@@ -340,7 +341,7 @@ void	Server::handleClientResponse(int clientSocket)
 	if (_responses.count(clientSocket) == 0)
 	{
 		Logger::log(Logger::ERROR, "No response state found for client socket " + std::to_string(clientSocket), "Server::handleClientResponse");
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->unregisterEvent(clientSocket, WRITE);
 		return;
 	}
 	ResponseState *responseState = _responses[clientSocket];
@@ -365,7 +366,7 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send small response to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendSmallResponse");
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->unregisterEvent(clientSocket, WRITE);
 		_responses.erase(clientSocket);
 		delete responseState;
 	}
@@ -375,7 +376,7 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 		if (responseState->isFinished())
 		{
 			Logger::log(Logger::DEBUG, "Small response sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
-			_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+			_eventManager->unregisterEvent(clientSocket, WRITE);
 			_responses.erase(clientSocket);
 			if (responseState->closeConnection)
 			{
@@ -410,7 +411,7 @@ void	Server::sendLargeResponseHeaders(int clientSocket, ResponseState *responseS
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send large response headers to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseHeaders");
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->unregisterEvent(clientSocket, WRITE);
 		_responses.erase(clientSocket);
 		delete responseState;
 	}
@@ -441,7 +442,7 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
-		_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+		_eventManager->unregisterEvent(clientSocket, WRITE);
 		_responses.erase(clientSocket);
 		delete responseState;
 	}
@@ -460,14 +461,14 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 				if (bytesSent < 0)
 				{
 					Logger::log(Logger::ERROR, "Failed to send end chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
-					_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+					_eventManager->unregisterEvent(clientSocket, WRITE);
 					_responses.erase(clientSocket);
 					delete responseState;
 				}
 				else
 				{
 					Logger::log(Logger::DEBUG, "End chunk sent completely to client with socket fd " + std::to_string(clientSocket), "Server::sendLargeResponseChunk");
-					_kq.unregisterEvent(clientSocket, EVFILT_WRITE);
+					_eventManager->unregisterEvent(clientSocket, WRITE);
 					_responses.erase(clientSocket);
 					delete responseState;
 				}
@@ -496,7 +497,7 @@ void	Server::handleHeaderSizeExceeded(int clientSocket)
 	response.generateStandardErrorResponse("400", "Bad Request", "400 Request Header Or Cookie Too Large", "Request Header Or Cookie Too Large");
 	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
 	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	_eventManager->registerEvent(clientSocket, WRITE);
 }
 
 void	Server::handleUriTooLarge(int clientSocket)
@@ -509,7 +510,7 @@ void	Server::handleUriTooLarge(int clientSocket)
 	response.generateStandardErrorResponse("414", "Request-URI Too Large", "414 Request-URI Too Large");
 	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
 	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	_eventManager->registerEvent(clientSocket, WRITE);
 }
 
 void	Server::handleInvalidGetRequest(int clientSocket)
@@ -522,7 +523,7 @@ void	Server::handleInvalidGetRequest(int clientSocket)
 	response.generateStandardErrorResponse("400", "Bad Request", "400 Invalid GET Request (with body indicators)", "Invalid GET Request (with body indicators)");
 	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
 	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	_eventManager->registerEvent(clientSocket, WRITE);
 }
 
 
@@ -536,7 +537,7 @@ void	Server::handleInvalidRequest(int clientSocket, int requestStatusCode, const
 	response.generateStandardErrorResponse(statusCode, statusMessage, statusCode + " " + statusMessage, detail);
 	ResponseState *responseState = new ResponseState(response.buildResponse(), true);
 	_responses[clientSocket] = responseState;
-	_kq.registerEvent(clientSocket, EVFILT_WRITE);
+	_eventManager->registerEvent(clientSocket, WRITE);
 }
 
 // -----------------------------------
@@ -552,7 +553,7 @@ void	Server::checkForTimeouts()
 		if (it->second->isTimedOut(this->_config.keepalive_timeout))
 		{
 			Logger::log(Logger::INFO, "Client with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForTimeouts");
-			_kq.unregisterEvent(it->first, EVFILT_READ);
+			_eventManager->unregisterEvent(it->first, READ);
 			close(it->first);
 			delete it->second;
 			it = _clients.erase(it);
@@ -571,7 +572,7 @@ void	Server::checkForCgiTimeouts()
 		{
 			Logger::log(Logger::INFO, "Cgi with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForCgiTimeouts");
 
-			_kq.unregisterEvent(it->first, EVFILT_READ);
+			_eventManager->unregisterEvent(it->first, READ);
 			close(it->first);
 			kill(it->second->getChildPid(), SIGKILL);
 			handleInvalidRequest(it->second->getCgiClientSocket(), 504, "The CGI script failed to complete in a timely manner. Please try again later.");
@@ -595,7 +596,7 @@ void	Server::removeClient(int clientSocket)
 	Logger::log(Logger::INFO, "Removing client with socket fd " + std::to_string(clientSocket), "Server::removeClient");
 
 	ClientState *clientState = _clients[clientSocket];
-	_kq.unregisterEvent(clientSocket, EVFILT_READ);
+	_eventManager->unregisterEvent(clientSocket, READ);
 	_clients.erase(clientSocket);
 	delete clientState;
 }

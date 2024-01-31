@@ -13,13 +13,13 @@ INCL_DIR = ./
 SRCS = 	BaseConfig.cpp CgiDirective.cpp ClientState.cpp ConfigLoader.cpp ConfigNode.cpp ConfigParser.cpp ConfigTokenizer.cpp ContextNode.cpp \
 		DirectiveNode.cpp HttpRequest.cpp HttpResponse.cpp KqueueManager.cpp LocationConfig.cpp Logger.cpp LogicValidator.cpp MimeTypeConfig.cpp \
 		MimeTypeParser.cpp RequestHandler.cpp ResponseState.cpp ReturnDirective.cpp Server.cpp ServerConfig.cpp ServerManager.cpp SyntaxValidator.cpp \
-		TreeBuilder.cpp TryFilesDirective.cpp CgiHandler.cpp main.cpp
+		TreeBuilder.cpp TryFilesDirective.cpp CgiHandler.cpp main.cpp EventPoller.cpp EpollManager.cpp
 
 HEADERS = $(wildcard $(INCL_DIR)*.hpp)
 
 # Compiler and Common Flags
 CXX = clang++
-CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++98 -I$(INCL_DIR)
+CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++11 -I$(INCL_DIR)
 
 # Build Directories
 BUILD_DIR = build/
@@ -34,9 +34,12 @@ OBJS_RELEASE = $(addprefix $(RELEASE_DIR), $(SRCS:.cpp=.o))
 DEPS_RELEASE = $(OBJS_RELEASE:.o=.d)
 
 # Development Flags
+# CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wcast-align -Wcast-qual -Wunused \
+# 			-Wmissing-prototypes -Woverloaded-virtual -Wmisleading-indentation -Wnon-virtual-dtor\
+# 			-fsanitize=address -fsanitize=undefined -fstack-protector-strong -fstrict-overflow
 CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wcast-align -Wcast-qual -Wunused \
 			-Wmissing-prototypes -Woverloaded-virtual -Wmisleading-indentation -Wnon-virtual-dtor\
-			-fsanitize=address -fsanitize=undefined -fstack-protector-strong -fstrict-overflow
+			-fstack-protector-strong -fstrict-overflow
 
 # Production Flags
 CXXFLAGS_PROD = $(CXXFLAGS_COMMON) -O3 -march=native -flto -fstack-protector-strong -D_FORTIFY_SOURCE=2

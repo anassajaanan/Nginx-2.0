@@ -1,11 +1,13 @@
 #include "ServerManager.hpp"
+#include "EventPoller.hpp"
 
 
 int	ServerManager::running = 1;
 
-ServerManager::ServerManager(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes)
+ServerManager::ServerManager(std::vector<ServerConfig> &_serverConfigs, EventPoller *_eventManager, MimeTypeConfig &_mimeTypes)
+	: eventManager(_eventManager)
 {
-	initializeServers(serverConfigs, mimeTypes);
+	initializeServers(_serverConfigs, _mimeTypes);
 }
 
 ServerManager::~ServerManager() { }
@@ -14,7 +16,7 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 {
 	for (size_t i = 0; i < serverConfigs.size(); i++)
 	{
-		Server *server = new Server(serverConfigs[i], mimeTypes, kqueue);
+		Server *server = new Server(serverConfigs[i], eventManager, mimeTypes);
 		server->run();
 		if (server->_socket == -1)
 		{
@@ -23,7 +25,7 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 			continue;
 		}
 		Logger::log(Logger::INFO, "Server is created and it is listening on port: " + std::to_string(server->_config.port), "ServerManager::initializeServers");
-		kqueue.registerEvent(server->_socket, EVFILT_READ);
+		eventManager->registerEvent(server->_socket, READ);
 		servers.push_back(server);
 	}
 }
@@ -45,38 +47,38 @@ void	ServerManager::checkTimeouts()
 	}
 }
 
-void	ServerManager::processReadEvent(const struct kevent &event)
+void	ServerManager::processReadEvent(EventInfo &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if ((int)event.ident == servers[i]->_socket)
+		if (event.fd == servers[i]->_socket)
 		{
 			servers[i]->acceptNewConnection();
 			return;
 		}
-		else if (servers[i]->_clients.count(event.ident) > 0)
+		else if (servers[i]->_clients.count(event.fd) > 0)
 		{
-			if (event.flags & EV_EOF)
-				servers[i]->handleClientDisconnection(event.ident);
+			if (event.isEOF)
+				servers[i]->handleClientDisconnection(event.fd);
 			else
-				servers[i]->handleClientRequest(event.ident);
+				servers[i]->handleClientRequest(event.fd);
 			return;
 		}
-		else if (servers[i]->_cgi.count((int)event.ident) > 0)
+		else if (servers[i]->_cgi.count(event.fd) > 0)
 		{
-			servers[i]->handleCgiOutput((int)event.ident);
+			servers[i]->handleCgiOutput(event.fd);
 			return;
 		}
 	}
 }
 
-void	ServerManager::processWriteEvent(const struct kevent &event)
+void	ServerManager::processWriteEvent(EventInfo &event)
 {
 	for (size_t i = 0; i < servers.size(); i++)
 	{
-		if (servers[i]->_responses.count(event.ident) > 0)
+		if (servers[i]->_responses.count(event.fd) > 0)
 		{
-			servers[i]->handleClientResponse(event.ident);
+			servers[i]->handleClientResponse(event.fd);
 			return;
 		}
 	}
@@ -93,12 +95,13 @@ void	ServerManager::start()
 
 		Logger::log(Logger::DEBUG, "Waiting for events", "EventLoop");
 
-		int nev = kqueue.waitForEvents();
+		int nev = eventManager->waitForEvents();
 		if (!running)
 			break;
 
 		Logger::log(Logger::DEBUG, "Received " + std::to_string(nev) + " events", "EventLoop");
 
+		// update it for epoll
 		if (nev < 0)
 		{
 			if (errno == EINTR)
@@ -118,15 +121,18 @@ void	ServerManager::start()
 
 		for (int ev = 0; ev < nev; ev++)
 		{
-			if (kqueue.events[ev].filter == EVFILT_READ)
-				processReadEvent(kqueue.events[ev]);
-
+			EventInfo event;
+			eventManager->getNextEvent(ev, event);
+			if (event.isRead)
+				processReadEvent(event);
 		}
 
 		for (int ev = 0; ev < nev; ev++)
 		{
-			if (kqueue.events[ev].filter == EVFILT_WRITE)
-				processWriteEvent(kqueue.events[ev]);
+			EventInfo event;
+			eventManager->getNextEvent(ev, event);
+			if (event.isWrite)
+				processWriteEvent(event);
 		}
 	}
 

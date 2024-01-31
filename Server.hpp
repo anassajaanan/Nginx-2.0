@@ -6,23 +6,16 @@
 #define SERVER_HPP
 
 #include "ServerConfig.hpp"
-#include "KqueueManager.hpp"
-#include "MimeTypeParser.hpp"
-#include "RequestHandler.hpp"
 #include "ResponseState.hpp"
 #include "CgiHandler.hpp"
 
 
 #include <fcntl.h>
-#include <fstream>
 #include <unistd.h>
-#include <signal.h>
 #include <sys/signal.h>
-#include <sys/event.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <chrono>
 #include <fcntl.h>
 
 
@@ -49,12 +42,12 @@ class Server
 {
 
 public:
-	Server(ServerConfig &config, MimeTypeConfig &mimeTypes, KqueueManager &kq);
+	Server(ServerConfig &config, EventPoller *eventManager, MimeTypeConfig &mimeTypes);
 	~Server();
 
 	ServerConfig						&_config;
 	MimeTypeConfig						&_mimeTypes;
-	KqueueManager						&_kq;
+	EventPoller							*_eventManager;
 	int									_socket;
 	struct sockaddr_in					_serverAddr;
 	std::map<int, ClientState *>		_clients;

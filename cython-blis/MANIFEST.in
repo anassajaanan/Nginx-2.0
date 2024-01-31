@@ -1,0 +1,7 @@
+include LICENSE
+include README.md
+exclude blis/cy.c
+exclude blis/py.c
+recursive-include blis/_src *.c
+recursive-include blis/_src *.h
+recursive-include blis/_src *.jsonl

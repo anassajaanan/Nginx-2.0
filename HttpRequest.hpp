@@ -14,6 +14,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 #define MAX_RECURSION_DEPTH 10
 

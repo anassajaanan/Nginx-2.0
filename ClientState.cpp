@@ -1,5 +1,4 @@
 #include "ClientState.hpp"
-#include <string>
 
 ClientState::ClientState(int fd, const std::string &clientIpAddr)
 	: fd(fd), clientIpAddr(clientIpAddr), requestCount(0), areHeaderComplete(false), isBodyComplete(false)
@@ -50,8 +49,6 @@ void	ClientState::processIncomingData(Server &server, const char *buffer, size_t
 void	ClientState::processHeaders(Server &server, const char *buffer, size_t bytesRead)
 {
 	requestHeaders.append(buffer, bytesRead);
-	std::cout << "request header= " << requestHeaders << std::endl;
-	std::cout << "buffer = " << buffer << std::endl;
 	if (requestHeaders.size() > MAX_REQUEST_HEADERS_SIZE)
 	{
 		server.handleHeaderSizeExceeded(fd);
