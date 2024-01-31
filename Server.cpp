@@ -573,9 +573,9 @@ void	Server::checkForCgiTimeouts()
 		{
 			Logger::log(Logger::INFO, "Cgi with socket fd " + std::to_string(it->first) + " timed out and is being disconnected", "Server::checkForCgiTimeouts");
 
+			kill(it->second->getChildPid(), SIGKILL);
 			_eventManager->unregisterEvent(it->first, READ);
 			close(it->first);
-			kill(it->second->getChildPid(), SIGKILL);
 			handleInvalidRequest(it->second->getCgiClientSocket(), 504, "The CGI script failed to complete in a timely manner. Please try again later.");
 			delete it->second;
 			it = _cgi.erase(it);
