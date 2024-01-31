@@ -18,8 +18,8 @@
 #endif
 
 
-#define SERVER_TIMEOUT_CHECK_INTERVAL 5 // 5 seconds
-#define CGI_TIMEOUT_CHECK_INTERVAL 10 // 10 seconds
+#define SERVER_TIMEOUT_CHECK_INTERVAL 20 // 5 seconds
+#define CGI_TIMEOUT_CHECK_INTERVAL 20 // 10 seconds
 
 class ServerManager
 {

@@ -9,7 +9,7 @@
 	#include "Logger.hpp"
 	#include "EventPoller.hpp"
 
-
+	#include <set>
 	#include <unistd.h>
 	#include <string.h>
 	#include <sys/epoll.h>
@@ -26,6 +26,7 @@
 
 		int					epfd;
 		struct epoll_event	events[MAX_EVENTS];
+		std::set<int>		registeredEvents;
 
 		void			registerEvent(int fd, EventType event);
 		void			unregisterEvent(int fd, EventType event);

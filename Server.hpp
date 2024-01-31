@@ -13,10 +13,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <fcntl.h>
 
 
 
@@ -30,7 +31,7 @@
 
 #define TEMP_FILE_DIRECTORY "./uploads/"
 
-#define CGI_TIMEOUT 10 // 10 seconds
+#define CGI_TIMEOUT 70 // 10 seconds
 
 // define max size of cgi output
 #define CGI_MAX_OUTPUT_SIZE 2097152 // 2 MB in bytes

@@ -136,12 +136,16 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request, ServerConfig &config, 
 			dup2(this->postBodyFd, STDIN_FILENO);
 			close(this->postBodyFd);
 		}
-
+		std::cout << "Executing Cgi Script" << std::endl;
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
-			Logger::log(Logger::ERROR, "Failed To Execute Cgi Script", "CgiHandler::handleCgiDirective");
+			// Logger::log(Logger::ERROR, "Failed To Execute Cgi Script", "CgiHandler::handleCgiDirective");
 			this->delete2dArray(parameters);
 			this->delete2dArray(envp);
+			// free everything in the child process
+			delete eventManager;
+			delete &config;
+			std::cout << "Filed Executing Cgi Script" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}

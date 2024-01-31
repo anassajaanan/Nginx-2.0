@@ -17,6 +17,15 @@ Server::Server(ServerConfig &config, EventPoller *eventManager, MimeTypeConfig &
 
 Server::~Server()
 {
+	std::map<int, ResponseState *>::iterator response = _responses.begin();
+	while (response != _responses.end())
+	{
+		_eventManager->unregisterEvent(response->first, WRITE);
+		delete response->second;
+		response++;
+	}
+	_responses.clear();
+
 	std::map<int, ClientState *>::iterator client = _clients.begin();
 	while (client != _clients.end())
 	{
@@ -26,15 +35,6 @@ Server::~Server()
 		client++;
 	}
 	_clients.clear();
-
-	std::map<int, ResponseState *>::iterator response = _responses.begin();
-	while (response != _responses.end())
-	{
-		_eventManager->unregisterEvent(response->first, WRITE);
-		delete response->second;
-		response++;
-	}
-	_responses.clear();
 
 	std::map<int, CgiHandler *>::iterator cgi = _cgi.begin();
 	while (cgi != _cgi.end())
@@ -171,10 +171,6 @@ void	Server::handleClientDisconnection(int clientSocket)
 {
 	Logger::log(Logger::INFO, "Handling disconnection of client with socket fd " + std::to_string(clientSocket), "Server::handleClientDisconnection");
 
-	_eventManager->unregisterEvent(clientSocket, READ);
-	ClientState *clientState = _clients[clientSocket];
-	_clients.erase(clientSocket);
-	delete clientState;
 	if (_responses.count(clientSocket) > 0)
 	{
 		_eventManager->unregisterEvent(clientSocket, WRITE);
@@ -182,6 +178,11 @@ void	Server::handleClientDisconnection(int clientSocket)
 		_responses.erase(clientSocket);
 		delete responseState;
 	}
+	_eventManager->unregisterEvent(clientSocket, READ);
+	ClientState *clientState = _clients[clientSocket];
+	_clients.erase(clientSocket);
+	delete clientState;
+	
 	close(clientSocket);
 }
 
@@ -293,19 +294,19 @@ void	Server::processDeleteRequest(int clientSocket, HttpRequest &request)
 
 void	Server::handleCgiOutput(int cgiReadFd)
 {
+	Logger::log(Logger::DEBUG, "Handling CGI output from pipe with fd " + std::to_string(cgiReadFd), "Server::handleCgiOutput");
 	char		buffer[BUFFER_SIZE + 1];
 	CgiHandler	*cgi = _cgi[cgiReadFd];
 	ssize_t 	bytesRead = read(cgiReadFd, buffer, BUFFER_SIZE);
 	if (bytesRead < 0)
 	{
-		Logger::log(Logger::ERROR, "Error reading CGI output from pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
+		kill(cgi->getChildPid(), SIGKILL);
 		_eventManager->unregisterEvent(cgiReadFd, READ);
 		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
-		kill(cgi->getChildPid(), SIGKILL);
 		_cgi.erase(cgiReadFd);
 		delete cgi;
 	}
-	if (bytesRead == 0)
+	else if (bytesRead == 0)
 	{
 		ResponseState *responseState = new ResponseState(cgi->buildCgiResponse());
 		if (_clients.count(cgi->getCgiClientSocket()) > 0)
@@ -322,9 +323,9 @@ void	Server::handleCgiOutput(int cgiReadFd)
 		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
 		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
 		{
+			kill(cgi->getChildPid(), SIGKILL);
 			_eventManager->unregisterEvent(cgiReadFd, READ);
 			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
-			kill(cgi->getChildPid(), SIGKILL);
 			_cgi.erase(cgiReadFd);
 			delete cgi;
 		}
