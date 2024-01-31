@@ -42,11 +42,11 @@
     input[type="button"] {
       background-color: #963619;
       color: #ffffff;
-      padding: 15px 30px; /* Adjusted padding to make the button bigger */
+      padding: 15px 30px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 18px; /* Adjusted font size */
+      font-size: 18px;
     }
 
     input[type="button"]:hover {
@@ -56,21 +56,20 @@
 </head>
 <body>
 
-  <form id="feedbackForm">
-    <label for="username">Your Name:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="feedback">Your Feedback:</label>
-    <textarea id="feedback" name="feedback" rows="4" required></textarea>
-    <br>
-    <input type="button" value="Submit Feedback" onclick="showAcknowledgment()">
-  </form>
+<form id="feedbackForm" action="/cgi-bin/Email_cgi.py" method="post">
+	<label for="email">Your Email:</label>
+    <input type="text" id="email" name="email" required>
+	<br>
+	<label for="feedback">Your Feedback:</label>
+	<textarea id="feedback" name="feedback" rows="4" required></textarea>
+	<br>
+	<input type="submit" value="Submit Feedback">
+	</form>
 
-  <script>
-    function showAcknowledgment() {
-      alert("Thank you for your feedback!");
-    }
-  </script>
+  <!-- Your HTML code -->
+  
+  <!-- Rest of your HTML code -->
+  
 
 </body>
 </html>

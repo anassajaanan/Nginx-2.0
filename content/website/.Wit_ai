@@ -1,0 +1,5 @@
+  -H "Authorization: Bearer 77JPZBPEVYBA2KBLH5OGXVG2W6UMZKFP" \
+  "https://api.wit.ai/message?v=20240131&q="
+
+
+  Rapid ===> "11f5917b0dmsh000bbec7fe7e1b0p1526bdjsn9c3813dffee0"

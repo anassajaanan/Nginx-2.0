@@ -77,6 +77,7 @@ char		**CgiHandler::initiateEnvVariables(HttpRequest &request, ServerConfig &con
 	envVector.push_back("SERVER_PROTOCOL=" + request.getVersion());
 	envVector.push_back("SCRIPT_FILENAME=" + config.root + request.getUri());
 	envVector.push_back("SERVER_NAME=" + request.getHeader("host"));
+	envVector.push_back("PATH=/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/homebrew/bin:/opt/homebrew/sbin");
 	//ADD PATH_INFO
 	char	**envArray = new char *[envVector.size() + 1];
 	size_t		counter = 0;
