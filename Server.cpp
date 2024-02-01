@@ -300,8 +300,8 @@ void	Server::handleCgiOutput(int cgiReadFd)
 	ssize_t 	bytesRead = read(cgiReadFd, buffer, BUFFER_SIZE);
 	if (bytesRead < 0)
 	{
-		kill(cgi->getChildPid(), SIGKILL);
 		_eventManager->unregisterEvent(cgiReadFd, READ);
+		kill(cgi->getChildPid(), SIGKILL);
 		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
 		_cgi.erase(cgiReadFd);
 		delete cgi;
@@ -323,8 +323,8 @@ void	Server::handleCgiOutput(int cgiReadFd)
 		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
 		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
 		{
-			kill(cgi->getChildPid(), SIGKILL);
 			_eventManager->unregisterEvent(cgiReadFd, READ);
+			kill(cgi->getChildPid(), SIGKILL);
 			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
 			_cgi.erase(cgiReadFd);
 			delete cgi;

@@ -55,19 +55,27 @@ void	ServerManager::processReadEvent(EventInfo &event)
 	{
 		if (event.fd == servers[i]->_socket)
 		{
+			Logger::log(Logger::DEBUG, "New connection on server socket", "EventLoop");
 			servers[i]->acceptNewConnection();
 			return;
 		}
 		else if (servers[i]->_clients.count(event.fd) > 0)
 		{
 			if (event.isEOF)
+			{
+				Logger::log(Logger::DEBUG, "Client disconnected", "EventLoop");
 				servers[i]->handleClientDisconnection(event.fd);
+			}
 			else
+			{
+				Logger::log(Logger::DEBUG, "Client sent data", "EventLoop");
 				servers[i]->handleClientRequest(event.fd);
+			}
 			return;
 		}
 		else if (servers[i]->_cgi.count(event.fd) > 0)
 		{
+			Logger::log(Logger::DEBUG, "Cgi sent data", "EventLoop");
 			servers[i]->handleCgiOutput(event.fd);
 			return;
 		}
@@ -80,6 +88,7 @@ void	ServerManager::processWriteEvent(EventInfo &event)
 	{
 		if (servers[i]->_responses.count(event.fd) > 0)
 		{
+			Logger::log(Logger::DEBUG, "Client is ready to receive data", "EventLoop");
 			servers[i]->handleClientResponse(event.fd);
 			return;
 		}
