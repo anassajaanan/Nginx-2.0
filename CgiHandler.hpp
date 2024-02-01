@@ -1,11 +1,11 @@
 
 #pragma once
-#include "EventPoller.hpp"
 #ifndef CGI_HANDLER_HPP
 #define CGI_HANDLER_HPP
 
 #include "RequestHandler.hpp"
 #include "ServerConfig.hpp"
+#include "EventPoller.hpp"
 
 
 

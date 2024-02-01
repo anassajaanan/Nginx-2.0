@@ -1,5 +1,7 @@
 #include "ServerManager.hpp"
+#include "EpollManager.hpp"
 #include "EventPoller.hpp"
+#include "Logger.hpp"
 
 
 int	ServerManager::running = 1;
@@ -117,13 +119,12 @@ void	ServerManager::start()
 			Logger::log(Logger::DEBUG, "No events to process at this time", "EventLoop");
 			continue;
 		}
-		
 
 		for (int ev = 0; ev < nev; ev++)
 		{
 			EventInfo event;
 			eventManager->getNextEvent(ev, event);
-			if (event.isRead)
+			if (event.isRead || event.isEOF)
 				processReadEvent(event);
 		}
 
