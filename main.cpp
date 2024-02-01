@@ -60,11 +60,11 @@ int main()
 	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = signalHandler;
-	sigemptyset(&sa.sa_mask);
+	// sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;	
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGTERM, &sa, NULL);
-	sigaction(SIGCHLD, &sa, NULL);
+	// sigaction(SIGINT, &sa, NULL);
+	// sigaction(SIGTERM, &sa, NULL);
+	// sigaction(SIGCHLD, &sa, NULL);
 
 
 	Logger::init(Logger::DEBUG, "./logs/WebServer.log");

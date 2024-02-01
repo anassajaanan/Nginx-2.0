@@ -301,7 +301,7 @@ void	Server::handleCgiOutput(int cgiReadFd)
 		Logger::log(Logger::ERROR, "Error reading CGI output from pipe: " + std::string(strerror(errno)), "Server::handleCgiOutput");
 		_eventManager->unregisterEvent(cgiReadFd, READ);
 		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
-		kill(cgi->getChildPid(), SIGKILL);
+		// kill(cgi->getChildPid(), SIGKILL);
 		_cgi.erase(cgiReadFd);
 		delete cgi;
 	}
@@ -324,7 +324,7 @@ void	Server::handleCgiOutput(int cgiReadFd)
 		{
 			_eventManager->unregisterEvent(cgiReadFd, READ);
 			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
-			kill(cgi->getChildPid(), SIGKILL);
+			// kill(cgi->getChildPid(), SIGKILL);
 			_cgi.erase(cgiReadFd);
 			delete cgi;
 		}
@@ -574,7 +574,7 @@ void	Server::checkForCgiTimeouts()
 
 			_eventManager->unregisterEvent(it->first, READ);
 			close(it->first);
-			kill(it->second->getChildPid(), SIGKILL);
+			// kill(it->second->getChildPid(), SIGKILL);
 			handleInvalidRequest(it->second->getCgiClientSocket(), 504, "The CGI script failed to complete in a timely manner. Please try again later.");
 			delete it->second;
 			it = _cgi.erase(it);
