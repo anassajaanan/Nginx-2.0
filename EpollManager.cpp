@@ -81,10 +81,10 @@ void	EpollManager::registerEvent(int fd, EventType event)
 		}
 	}
 	if (epoll_ctl(epfd, op, fd, &epollEvent) < 0)
-		Logger::log(Logger::ERROR, "Failed to register a new event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::registerEvent");
-	else
-		Logger::log(Logger::DEBUG, "Registered a new event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::registerEvent");
-}
+			Logger::log(Logger::ERROR, "Failed to register a new event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::registerEvent");
+		else
+	Logger::log(Logger::DEBUG, "Registered a new event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::registerEvent");
+	}
 
 void	EpollManager::unregisterEvent(int fd, EventType event)
 {
@@ -137,10 +137,10 @@ void	EpollManager::unregisterEvent(int fd, EventType event)
 	}
 
 	if (epoll_ctl(epfd, op, fd, &epollEvent) < 0)
-		Logger::log(Logger::ERROR, "Failed to unregister the event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::unregisterEvent");
+			Logger::log(Logger::ERROR, "Failed to unregister the event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::unregisterEvent");
 	else
-		Logger::log(Logger::DEBUG, "Unregistered the event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::unregisterEvent");
-
+	Logger::log(Logger::DEBUG, "Unregistered the event for fd " + std::to_string(fd) + ": " + filterType, "EpollManager::unregisterEvent");
+	
 }
 
 int	EpollManager::waitForEvents()

@@ -7,7 +7,7 @@ CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &config, EventPoller *
 	pipeFd[0] = -1;
 	pipeFd[1] = -1;
 	this->startTime = std::chrono::steady_clock::now();
-	handleCgiDirective(request, config, eventManager, postPath);
+		handleCgiDirective(request, config, eventManager, postPath);
 }
 
 CgiHandler::~CgiHandler()
@@ -16,11 +16,6 @@ CgiHandler::~CgiHandler()
 	{
 		close(pipeFd[0]);
 		pipeFd[0] = -1;
-	}
-	if (pipeFd[1] != -1)
-	{
-		close(pipeFd[1]);
-		pipeFd[1] = -1;
 	}
 	if (postBodyFd != -1)
 	{
@@ -100,7 +95,7 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request, ServerConfig &config, 
 		this->isValid = false;
 		return ;
 	}
-	
+		
 	envp = initiateEnvVariables(request, config);
 	parameters = new char *[2];
 	parameters[0] = new char[config.root.length() + request.getUri().length() + 1];
@@ -136,16 +131,11 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request, ServerConfig &config, 
 			dup2(this->postBodyFd, STDIN_FILENO);
 			close(this->postBodyFd);
 		}
-		std::cout << "Executing Cgi Script" << std::endl;
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
 			// Logger::log(Logger::ERROR, "Failed To Execute Cgi Script", "CgiHandler::handleCgiDirective");
 			this->delete2dArray(parameters);
 			this->delete2dArray(envp);
-			// free everything in the child process
-			delete eventManager;
-			delete &config;
-			std::cout << "Filed Executing Cgi Script" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}

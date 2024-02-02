@@ -153,13 +153,13 @@ void	Server::acceptNewConnection()
 	if (flags < 0)
 	{
 		Logger::log(Logger::ERROR, "fcntl(F_GETFL) failed: " + std::string(strerror(errno)), "Server::acceptNewConnection");
-		close(clientSocket);
+				close(clientSocket);
 		return;
 	}
 	if (fcntl(clientSocket, F_SETFL, flags | O_NONBLOCK) < 0)
 	{
 		Logger::log(Logger::ERROR, "fcntl(F_SETFL) failed: " + std::string(strerror(errno)), "Server::acceptNewConnection");
-		close(clientSocket);
+				close(clientSocket);
 		return;
 	}
 	ClientState *clientState = new ClientState(clientSocket, inet_ntoa(clientAddr.sin_addr));
@@ -220,6 +220,12 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 {
 	if (_config.cgiExtension.isEnabled() && CgiHandler::validCgiRequest(request, _config))
 	{
+		if (_cgi.size() > MAX_CONCURRENT_CGI_REQUESTS)
+		{
+			Logger::log(Logger::WARN, "Server is busy and cannot handle the request at the moment. Please try again later.", "Server::processGetRequest");
+			handleInvalidRequest(clientSocket, 503, "Server is busy and cannot handle the request at the moment. Please try again later.");
+			return;
+		}
 		CgiHandler *cgi = new CgiHandler(request, _config, _eventManager, clientSocket);
 		if (cgi->isValidCgi())
 			_cgi[cgi->getCgiReadFd()] = cgi;
@@ -300,21 +306,31 @@ void	Server::handleCgiOutput(int cgiReadFd)
 	ssize_t 	bytesRead = read(cgiReadFd, buffer, BUFFER_SIZE);
 	if (bytesRead < 0)
 	{
-		_eventManager->unregisterEvent(cgiReadFd, READ);
 		kill(cgi->getChildPid(), SIGKILL);
+		_eventManager->unregisterEvent(cgiReadFd, READ);
 		handleInvalidRequest(cgi->getCgiClientSocket(), 500, "Failed to read CGI output from pipe.");
 		_cgi.erase(cgiReadFd);
 		delete cgi;
 	}
 	else if (bytesRead == 0)
 	{
+
+		if (_clients.count(cgi->getCgiClientSocket()) == 0)
+		{
+			Logger::log(Logger::ERROR, "No client state found for CGI client with socket fd " + std::to_string(cgi->getCgiClientSocket()), "Server::handleCgiOutput");
+			_eventManager->unregisterEvent(cgiReadFd, READ);
+			_cgi.erase(cgiReadFd);
+			delete cgi;
+			return;
+		}
+
 		ResponseState *responseState = new ResponseState(cgi->buildCgiResponse());
 		if (_clients.count(cgi->getCgiClientSocket()) > 0)
 			_clients[cgi->getCgiClientSocket()]->resetClientState();
 		_responses[cgi->getCgiClientSocket()] = responseState;
 		_eventManager->registerEvent(cgi->getCgiClientSocket() , WRITE);
-		_eventManager->unregisterEvent(cgi->getCgiReadFd(), READ);
-		_cgi.erase(cgi->getCgiReadFd());
+		_eventManager->unregisterEvent(cgiReadFd, READ);
+		_cgi.erase(cgiReadFd);
 		delete cgi;
 	}
 	else
@@ -323,8 +339,8 @@ void	Server::handleCgiOutput(int cgiReadFd)
 		cgi->addCgiResponseMessage(std::string(buffer, bytesRead));
 		if (cgi->getCgiResponseMessage().length() >= CGI_MAX_OUTPUT_SIZE)
 		{
-			_eventManager->unregisterEvent(cgiReadFd, READ);
 			kill(cgi->getChildPid(), SIGKILL);
+			_eventManager->unregisterEvent(cgiReadFd, READ);
 			handleInvalidRequest(cgi->getCgiClientSocket(), 500, "The CGI script's output exceeded the maximum allowed size of 2 MB and was terminated.");
 			_cgi.erase(cgiReadFd);
 			delete cgi;
@@ -382,6 +398,7 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 			if (responseState->closeConnection)
 			{
 				Logger::log(Logger::INFO, "Closing connection after sending small response to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
+				_eventManager->unregisterEvent(clientSocket, READ);
 				close(clientSocket);
 			}
 			delete responseState;

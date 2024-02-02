@@ -13,6 +13,6 @@ if __name__ == "__main__":
     generated_password = generate_password(password_length)
     # print("Generated Password:", generated_password)
     response = ""
-    response += "<h2>Generated Password:</h2>"
-    response += "<p><strong>{generated_password}</strong></p>"
+    response += "Generated Password:  "
+    response += f"{generated_password}"
     print(response)

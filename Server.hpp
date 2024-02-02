@@ -12,13 +12,13 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <signal.h>
 #include <sys/signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <signal.h>
 
 
 
@@ -36,6 +36,8 @@
 
 // define max size of cgi output
 #define CGI_MAX_OUTPUT_SIZE 2097152 // 2 MB in bytes
+
+#define MAX_CONCURRENT_CGI_REQUESTS 15
 
 
 class ClientState;
@@ -97,6 +99,6 @@ public:
 
 	// Handle Cgi
 	void		handleCgiOutput(int cgiReadFd);
-};
+	};
 
 #endif /* SERVER_HPP */

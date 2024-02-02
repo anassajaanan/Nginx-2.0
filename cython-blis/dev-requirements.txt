@@ -1,4 +1,0 @@
-pytest
-cython
-hypothesis
-wheel
