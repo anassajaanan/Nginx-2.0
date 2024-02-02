@@ -3,6 +3,9 @@ NAME = webserver
 DEBUG_NAME = $(NAME)
 RELEASE_NAME = $(NAME)_release
 
+# Detect Operating System
+UNAME_S := $(shell uname -s)
+
 # Source and Include Directories
 # replace it later with src/
 SRCS_DIR = ./
@@ -36,12 +39,17 @@ OBJS_RELEASE = $(addprefix $(RELEASE_DIR), $(SRCS:.cpp=.o))
 DEPS_RELEASE = $(OBJS_RELEASE:.o=.d)
 
 # Development Flags
-# CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wcast-align -Wcast-qual -Wunused \
-# 			-Wmissing-prototypes -Woverloaded-virtual -Wmisleading-indentation -Wnon-virtual-dtor\
-# 			-fsanitize=address -fsanitize=undefined -fstack-protector-strong -fstrict-overflow
-CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wcast-align -Wcast-qual -Wunused \
-			-Wmissing-prototypes -Woverloaded-virtual -Wmisleading-indentation -Wnon-virtual-dtor\
-			-fstack-protector-strong -fstrict-overflow
+ifeq ($(UNAME_S),Linux)
+	CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wcast-align -Wcast-qual -Wunused \
+		-Wmissing-prototypes -Woverloaded-virtual -Wmisleading-indentation -Wnon-virtual-dtor\
+		-fstack-protector-strong -fstrict-overflow
+endif
+
+ifeq ($(UNAME_S),Darwin)
+	CXXFLAGS_DEV = $(CXXFLAGS_COMMON) -g3 -Wpedantic -Wshadow -Wcast-align -Wcast-qual -Wunused \
+		-Wmissing-prototypes -Woverloaded-virtual -Wmisleading-indentation -Wnon-virtual-dtor\
+		-fsanitize=address -fsanitize=undefined -fstack-protector-strong -fstrict-overflow
+endif
 
 # Production Flags
 CXXFLAGS_PROD = $(CXXFLAGS_COMMON) -O3 -march=native -flto -fstack-protector-strong -D_FORTIFY_SOURCE=2
@@ -92,7 +100,7 @@ re: fclean all
 
 # Valgrind Execution
 valgrind: debug
-	@if command -v valgrind >/dev/null 2>&1 && [ "$$(uname -s)" = "Linux" ]; then \
+	@if which valgrind valgrind >/dev/null 2>&1 && [ "$$(uname -s)" = "Linux" ]; then \
 		valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes ./$(DEBUG_NAME); \
 	else \
 		echo "Valgrind not found or not on Linux"; \
