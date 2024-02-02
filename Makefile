@@ -19,7 +19,9 @@ HEADERS = $(wildcard $(INCL_DIR)*.hpp)
 
 # Compiler and Common Flags
 CXX = clang++
-CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++11 -I$(INCL_DIR)
+# CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++11 -I$(INCL_DIR)
+
+CXXFLAGS_COMMON = -Wall -Wextra -Werror -I$(INCL_DIR)
 
 # Build Directories
 BUILD_DIR = build/
@@ -86,5 +88,14 @@ fclean: clean
 
 # Rebuild
 re: fclean all
+
+
+# Valgrind Execution
+valgrind: debug
+	@if command -v valgrind >/dev/null 2>&1 && [ "$$(uname -s)" = "Linux" ]; then \
+		valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --trace-children=yes ./$(DEBUG_NAME); \
+	else \
+		echo "Valgrind not found or not on Linux"; \
+	fi
 
 .PHONY: all debug prod clean fclean re
