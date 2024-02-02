@@ -57,6 +57,7 @@ public:
 	std::map<int, ClientState *>		_clients;
 	std::map<int, ResponseState *>		_responses;
 	std::map<int, CgiHandler *>			_cgi;
+	
 
 	// Server Creation
 	void		createServerSocket();
