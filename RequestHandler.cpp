@@ -543,6 +543,16 @@ HttpResponse	RequestHandler::handleGetRequest(HttpRequest &request)
 
 HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 {
+	BaseConfig		*config = &serverConfig;
+	LocationConfig	*locationConfig = serverConfig.matchLocation(request.getUri());
+
+	if (locationConfig)
+	{
+		config = locationConfig;
+		if (locationConfig->isMethodAllowed(request.getMethod()) == false)
+			return (serveError(405));
+	}
+	
 	(void)request;
 	HttpResponse response;
 

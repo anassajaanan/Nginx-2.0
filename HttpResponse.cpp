@@ -121,5 +121,6 @@ void	HttpResponse::generateStandardErrorResponse(const std::string &statusCodeVa
 	this->setBody(htmlBody);
 	this->setHeader("Content-Length", std::to_string(htmlBody.length()));
 	this->setHeader("Connection", "close");
+	this->setHeader("Server", "nginx 2.0");
 }
 

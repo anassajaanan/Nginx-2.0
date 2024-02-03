@@ -3,11 +3,7 @@ a.out
 a.out.dSYM/
 .DS_Store
 build/
-content/website/.*
 tmp.cpp
-content/*
-content/dist/*
-content/website/.Wit_ai
 webserver
 webserver_release
 uploads/*

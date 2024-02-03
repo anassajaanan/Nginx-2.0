@@ -39,8 +39,8 @@ void	ClientState::incrementRequestCount()
 }
 
 void	ClientState::processIncomingData(Server &server, const char *buffer, size_t bytesRead)
-{
-	if (!areHeaderComplete)
+{	
+		if (!areHeaderComplete)
 		processHeaders(server, buffer, bytesRead);
 	else
 		processBody(server, buffer, bytesRead);
@@ -54,7 +54,7 @@ void	ClientState::processHeaders(Server &server, const char *buffer, size_t byte
 		server.handleHeaderSizeExceeded(fd);
 		return;
 	}
-	if (headersCompleted(buffer))
+	if (requestHeaders.find("\r\n\r\n") != std::string::npos)
 	{
 		areHeaderComplete = true;
 		Logger::log(Logger::DEBUG, "Headers completed for fd " + std::to_string(fd), "ClientState::processHeaders");
@@ -86,6 +86,14 @@ void	ClientState::parseHeaders(Server &server)
 				<< clientIpAddr << "', processing on socket descriptor " << fd;
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handleGetRequest(server);
+	}
+	else if (request.getMethod() == "HEAD")
+	{
+		std::ostringstream logStream;
+		logStream << "Received a 'HEAD' request for '" << request.getUri() << "' from IP '"
+				<< clientIpAddr << "', processing on socket descriptor " << fd;
+		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
+		server.processHeadRequest(fd, request);
 	}
 	else if (request.getMethod() == "POST")
 	{
@@ -239,9 +247,4 @@ bool	ClientState::isTimedOut(size_t keepalive_timeout) const
 	std::chrono::seconds timeoutDuration(keepalive_timeout);
 	std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
 	return (std::chrono::duration_cast<std::chrono::seconds>(now - lastRequestTime) > timeoutDuration);
-}
-
-bool	ClientState::headersCompleted(const char *buffer) const
-{
-	return (strstr(buffer, "\r\n\r\n") != NULL);
 }
