@@ -41,6 +41,7 @@ public:
 	void	initializeBodyStorage(Server &server);
 
 	void	handleGetRequest(Server &server);
+	void	handleHeadRequest(Server &server);
 	void	handlePostRequest(Server &server);
 	
 	bool	headersCompleted(const char *buffer) const;

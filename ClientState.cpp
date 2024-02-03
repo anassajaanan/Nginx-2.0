@@ -87,6 +87,14 @@ void	ClientState::parseHeaders(Server &server)
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		handleGetRequest(server);
 	}
+	else if (request.getMethod() == "HEAD")
+	{
+		std::ostringstream logStream;
+		logStream << "Received a 'HEAD' request for '" << request.getUri() << "' from IP '"
+				<< clientIpAddr << "', processing on socket descriptor " << fd;
+		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
+		server.processHeadRequest(fd, request);
+	}
 	else if (request.getMethod() == "POST")
 	{
 		std::ostringstream logStream;

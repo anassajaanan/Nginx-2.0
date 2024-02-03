@@ -74,6 +74,7 @@ public:
 	// Request Handling
 	void		handleClientRequest(int clientSocket);
 	void		processGetRequest(int clientSocket, HttpRequest &request);
+	void		processHeadRequest(int clientSocket, HttpRequest &request);
 	void		processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection = false);
 	void		processDeleteRequest(int clientSocket, HttpRequest &request);
 

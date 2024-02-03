@@ -57,6 +57,8 @@ bool	HttpRequest::validateRequestLine(const std::string &requestLine)
 	possibleHttpRequests.push_back("GET");
 	possibleHttpRequests.push_back("POST");
 	possibleHttpRequests.push_back("DELETE");
+	possibleHttpRequests.push_back("PUT");
+	possibleHttpRequests.push_back("HEAD");
 	while (std::getline(ss, token, ' '))
 	{
 		if (i == 0 && std::find(possibleHttpRequests.begin(), possibleHttpRequests.end(), token) == possibleHttpRequests.end())

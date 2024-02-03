@@ -253,6 +253,25 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 	}
 }
 
+void	Server::processHeadRequest(int clientSocket, HttpRequest &request)
+{
+	ResponseState *responseState;
+	RequestHandler handler(_config, _mimeTypes);
+	HttpResponse response = handler.handleRequest(request);
+	response.setBody("");
+
+	if (_clients.count(clientSocket) > 0)
+		_clients[clientSocket]->resetClientState();
+	
+	if (response.getType() == SMALL_RESPONSE)
+		responseState = new ResponseState(response.buildResponse());
+	else
+		responseState = new ResponseState(response.buildResponse(), response.getFilePath(), response.getFileSize());
+
+	_responses[clientSocket] = responseState;
+	_eventManager->registerEvent(clientSocket, WRITE);
+}
+
 void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool closeConnection)
 {
 
@@ -398,7 +417,6 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 			if (responseState->closeConnection)
 			{
 				Logger::log(Logger::INFO, "Closing connection after sending small response to client with socket fd " + std::to_string(clientSocket), "Server::sendSmallResponse");
-				_eventManager->unregisterEvent(clientSocket, READ);
 				close(clientSocket);
 			}
 			delete responseState;
