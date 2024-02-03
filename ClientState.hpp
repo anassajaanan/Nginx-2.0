@@ -43,8 +43,6 @@ public:
 	void	handleGetRequest(Server &server);
 	void	handleHeadRequest(Server &server);
 	void	handlePostRequest(Server &server);
-	
-	bool	headersCompleted(const char *buffer) const;
 
 	int					getFd() const;
 	const std::string	&getClientIpAddr() const;
