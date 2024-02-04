@@ -66,6 +66,7 @@ int main()
 
 
 	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
+	// Logger::init(Logger::DEBUG);
 
 	ServerManager serverManager(serverConfigs, eventManager, mimeTypeConfig);
 	Logger::log(Logger::DEBUG, "Starting server manager", "main");

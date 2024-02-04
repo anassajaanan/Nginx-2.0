@@ -55,7 +55,7 @@ endif
 CXXFLAGS_PROD = $(CXXFLAGS_COMMON) -O3 -march=native -flto -fstack-protector-strong -D_FORTIFY_SOURCE=2
 
 # Default Build (Set to debug)
-all: debug
+all: prod
 
 # Debug Build
 debug: CXXFLAGS = $(CXXFLAGS_DEV)
