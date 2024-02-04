@@ -1,4 +1,5 @@
 #include "HttpRequest.hpp"
+#include <string>
 
 HttpRequest::HttpRequest()
 {
@@ -15,6 +16,11 @@ HttpRequest::HttpRequest(const std::string &requestStr)
 	}
 	this->status = 200;
 	this->recursionDepth = 0;
+	std::cout << requestStr << std::endl;
+	if (requestStr.find("\r\n\r\n") != std::string::npos)
+		std::cout << "completed" << std::endl;
+	else
+		std::cout << "incompleted" << std::endl;
 	this->requestTokenizer(requestStr);
 	this->normalizeUri();
 }

@@ -23,5 +23,5 @@ std::string	MimeTypeConfig::getMimeType(const std::string &filePath)
 	std::map<std::string, std::string>::iterator it = mimeTypeMap.find(extension);
 	if (it != mimeTypeMap.end())
 		return (it->second);
-	return ("application/octet-stream");
+	return ("text/plain");
 }

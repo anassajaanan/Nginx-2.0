@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PUT Request Example</title>
+</head>
+<body>
+
+  <h1>PUT Request Example</h1>
+
+  <form id="putForm">
+    <label for="data">Data to Send:</label>
+    <input type="text" id="data" name="data" required>
+    <br>
+    <input type="button" value="Send PUT Request" onclick="sendPutRequest()">
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    async function sendPutRequest() {
+      const inputData = document.getElementById("data").value;
+
+      try {
+        const response = await fetch("https://your-api-endpoint.com", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            // You may need to include additional headers if required by your server
+          },
+          body: JSON.stringify({ data: inputData }),
+        });
+
+        const responseData = await response.json();
+
+        // Display the response
+        document.getElementById("response").innerHTML = `<p>Response: ${JSON.stringify(responseData)}</p>`;
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+      }
+    }
+  </script>
+
+</body>
+</html>

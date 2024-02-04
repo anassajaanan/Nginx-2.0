@@ -40,10 +40,16 @@ void	ClientState::incrementRequestCount()
 
 void	ClientState::processIncomingData(Server &server, const char *buffer, size_t bytesRead)
 {	
-		if (!areHeaderComplete)
+	if (!areHeaderComplete)
+	{
+		std::cout << "here" << std::endl;
 		processHeaders(server, buffer, bytesRead);
+	}
 	else
+	{
+		std::cout << "there" << std::endl;
 		processBody(server, buffer, bytesRead);
+	}
 }
 
 void	ClientState::processHeaders(Server &server, const char *buffer, size_t bytesRead)
@@ -95,7 +101,7 @@ void	ClientState::parseHeaders(Server &server)
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		server.processHeadRequest(fd, request);
 	}
-	else if (request.getMethod() == "POST")
+	else if (request.getMethod() == "POST" || request.getMethod() == "PUT")
 	{
 		std::ostringstream logStream;
 		logStream << "Received a 'POST' request for '" << request.getUri() << "' from IP '"
@@ -143,7 +149,7 @@ void	ClientState::handlePostRequest(Server &server)
 	if (request.getHeader("Transfer-Encoding") == "chunked")
 	{
 		Logger::log(Logger::WARN, "Chunked Transfer-Encoding not supported for client with socket fd " + std::to_string(fd), "ClientState::handlePostRequest");
-		server.handleInvalidRequest(fd, 501, "Chunked Transfer-Encoding Not Supported for Client Requests");
+		server.handleInvalidRequest(fd, 405, "Chunked Transfer-Encoding Not Supported for Client Requests");
 		return;
 	}
 
