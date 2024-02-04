@@ -10,9 +10,11 @@
 class TryFilesDirective
 {
 private:
+	
 	std::vector<std::string>	paths;
 	std::string					fallBackUri;
 	int							fallBackStatusCode;
+	bool						_isEnabled;
 
 public:
 	TryFilesDirective();
@@ -21,14 +23,14 @@ public:
 	void					addPath(const std::string &path);
 	void					setFallBackUri(const std::string &uri);
 	void					setFallBackStatusCode(int code);
+	bool					isEnabled() const;
+
+	const std::vector<std::string>		&getPaths() const;
+	const std::string					&getFallBackUri()const;
+	int									getFallBackStatusCode() const;
+
 };
 
 
-
-
-
-
-
-
-
 #endif /* TRYFILESDIRECTIVE_HPP */
+

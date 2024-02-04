@@ -30,7 +30,7 @@ void	ConfigParser::readConfigFile()
 		throw std::runtime_error("Error: Unable to open the configuration file ('"
 		+ configFileName + "') for reading. Please check file permissions and try again.");
 	while (std::getline(file, line))
-		configFileContent += line;
+		configFileContent += line + "\n";
 	file.close();
 }
 
@@ -61,6 +61,29 @@ void	ConfigParser::tokenizeConfigFile()
 				configTokens.push_back(currentToken);
 				currentToken.clear();
 			}
+		}
+		else if (ch == '"' && currentToken.empty())
+		{
+			it++;
+			while (it != configFileContent.end() && *it != '"')
+			{
+				currentToken += *it;
+				it++;
+			}
+			if (it == configFileContent.end())
+				throw std::runtime_error("unexpected end of file, expecting \";\" or \"}\"");
+			configTokens.push_back(currentToken);
+			currentToken.clear();
+		}
+		else if (ch == '#')
+		{
+			if (!currentToken.empty())
+			{
+				configTokens.push_back(currentToken);
+				currentToken.clear();
+			}
+			while (it != configFileContent.end() && *it != '\n')
+				it++;
 		}
 		else
 			currentToken += ch;

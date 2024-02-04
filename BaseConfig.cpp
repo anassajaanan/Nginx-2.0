@@ -1,14 +1,22 @@
 #include "BaseConfig.hpp"
+#include <string>
 
 
 void	BaseConfig::setRoot(const std::string &rootValue)
 {
-	if (!rootValue.empty())
+	if (rootValue.back() == '/')
+		this->root = rootValue.substr(0, rootValue.size() - 1);
+	else
 		this->root = rootValue;
 }
 
 void		BaseConfig::setIndex(const std::vector<std::string> &indexValues)
 {
+	for (size_t i = 0; i < indexValues.size() - 1; i++)
+	{
+		if (indexValues[i][0] == '/')
+			throw std::runtime_error("Only the last index in \"index\" directive should be an absolute path");
+	}
 	this->index = indexValues;
 }
 
@@ -26,7 +34,7 @@ void	BaseConfig::setAutoindex(const std::string &autoindexValue)
 	this->autoindex = autoindexValue;
 }
 
-void	BaseConfig::setErrorPage(const std::string &statusCode, const std::string &uri)
+void	BaseConfig::setErrorPage(const std::string &statusCode, const std::string &uri, const std::string &currentContext)
 {
 	if (statusCode.empty() || statusCode.size() > 3)
 		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + statusCode + "\"");
@@ -38,7 +46,26 @@ void	BaseConfig::setErrorPage(const std::string &statusCode, const std::string &
 	int codeInt = std::stoi(statusCode);
 	if (codeInt < 300 || codeInt > 599)
 		throw std::runtime_error("invalid code in \"error_page\" directive: \"" + statusCode + "\"" + " (must be between 300 and 599)");
-	errorPages[codeInt] = uri;
+	if (errorPages.find(codeInt) == errorPages.end())
+	{
+		errorPages[codeInt] = uri;
+		errorPagesContext[codeInt] = currentContext;
+	}
+	else
+	{
+		if (errorPagesContext[codeInt] != currentContext)
+		{
+			errorPages[codeInt] = uri;
+			errorPagesContext[codeInt] = currentContext;
+		}
+	}
+}
+
+void	BaseConfig::setErrorPage(const std::vector<std::string> &errorPageValues, const std::string &currentContext)
+{
+	const std::string &fileOrUri = errorPageValues.back();
+	for (size_t i = 0; i < errorPageValues.size() - 1; i++)
+		setErrorPage(errorPageValues[i], fileOrUri, currentContext);
 }
 
 void	BaseConfig::splitValueAndUnit(const std::string &bodySize, std::string &value, std::string &unit)
@@ -91,6 +118,7 @@ void	BaseConfig::setClientMaxBodySize(const std::string &bodySize)
 	// check for overflow
 	if (totalSize / multiplier != numericValue)
 		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
+	this->clientMaxBodySize = totalSize;
 }
 
 void	BaseConfig::processFallbackStatusCode(const std::string &statusCode)
@@ -133,13 +161,7 @@ void	BaseConfig::setReturn(const std::vector<std::string> &returnValues)
 			throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"");
 	}
 	int codeInt = std::stoi(code);
-	if (codeInt < 300 || codeInt > 599)
-		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 300 and 599)");
+	if (codeInt < 100 || codeInt > 999)
+		throw std::runtime_error("invalid code in \"return\" directive: \"" + code + "\"" + " (must be between 100 and 599)");
 	this->returnDirective.setStatusCode(codeInt);
-}
-
-void	BaseConfig::setRewrite(const std::vector<std::string> &rewriteValues)
-{
-	this->rewriteDirective.setPattern(rewriteValues[0]);
-	this->rewriteDirective.setSubstitution(rewriteValues[1]);
 }

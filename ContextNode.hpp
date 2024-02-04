@@ -39,13 +39,15 @@ public:
 		Check for Duplicate Children: Depending on your requirements,
 		you might want to check if a similar child already exists before adding a new one.
 
-		Removing a Child: Implement a method to remove a child, either by reference or by some identifier.
+		Removing a Child: Implement a HttpRequest to remove a child, either by reference or by some identifier.
 
-		Finding a Child: A method to find a child based on some criteria (like name or type) could be helpful.
+		Finding a Child: A HttpRequest to find a child based on some criteria (like name or type) could be helpful.
 
-		Clearing All Children: A method to remove all children, useful for cleanup or re-initialization.
+		Clearing All Children: A HttpRequest to remove all children, useful for cleanup or re-initialization.
 	*/
+
 
 };
 
 #endif /* CONTEXTNODE_HPP */
+

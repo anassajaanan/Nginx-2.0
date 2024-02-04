@@ -9,7 +9,6 @@
 #include "DirectiveNode.hpp"
 #include "TryFilesDirective.hpp"
 #include "ReturnDirective.hpp"
-#include "RewriteDirective.hpp"
 
 #include <sstream>
 
@@ -29,21 +28,22 @@ public:
 	std::vector<std::string>				index;
 	std::string								autoindex;
 	std::map<int, std::string>				errorPages;
+	std::map<int, std::string>				errorPagesContext;
 	size_t									clientMaxBodySize;
 	TryFilesDirective						tryFiles;
 	ReturnDirective							returnDirective;
-	RewriteDirective						rewriteDirective;
 
 	void					setRoot(const std::string &rootValue);
 	void					setIndex(const std::vector<std::string> &indexValues);
 	void					setAutoindex(const std::string &autoindexValue);
-	void					setErrorPage(const std::string &statusCode, const std::string &uri);
+	void					setErrorPage(const std::string &statusCode, const std::string &uri, const std::string &context);
+	void					setErrorPage(const std::vector<std::string> &errorPageValues, const std::string &context);
 	void					setClientMaxBodySize(const std::string &bodySize);
 	void					setTryFiles(const std::vector<std::string> &tryFilesValues);
 	void					setReturn(const std::vector<std::string> &returnValues);
-	void					setRewrite(const std::vector<std::string> &rewriteValues);
 
 };
 
 
 #endif /* BASECONFIG_HPP */
+

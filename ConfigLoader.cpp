@@ -1,4 +1,5 @@
 #include "ConfigLoader.hpp"
+#include "ConfigNode.hpp"
 
 
 ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
@@ -6,8 +7,9 @@ ConfigLoader::ConfigLoader(ConfigNode *treeRoot)
 	this->root = DEFAULT_HTTP_ROOT_VALUE;
 	this->index.push_back(DEFAULT_HTTP_INDEX_VALUE);
 	this->autoindex = DEFAULT_HTTP_AUTOINDEX_VALUE;
+	this->keepalive_timeout = DEFAULT_HTTP_KEEPALIVE_TIMEOUT;
 	this->client_max_body_size = DEFAULT_HTTP_CLIENT_MAX_BODY_SIZE;
-	this->treeRoot = treeRoot;
+	this->treeRootNode = treeRoot;
 }
 
 
@@ -28,13 +30,13 @@ void ConfigLoader::processLocationNode(ContextNode* locationNode, LocationConfig
 			else if (directive->getKey() == "client_max_body_size")
 				locationConfig.setClientMaxBodySize(directive->getValues()[0]);
 			else if (directive->getKey() == "error_page")
-				locationConfig.setErrorPage(directive->getKey(), directive->getValues()[0]);
+				locationConfig.setErrorPage(directive->getValues(), "Location");
 			else if (directive->getKey() == "try_files")
 				locationConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
 				locationConfig.setReturn(directive->getValues());
-			else if (directive->getKey() == "rewrite")
-				locationConfig.setRewrite(directive->getValues());
+			else if (directive->getKey() == "limit_except")
+				locationConfig.setAllowedMethods(directive->getValues());
 		}
 	}
 }
@@ -55,32 +57,36 @@ void	ConfigLoader::processServerNode(ContextNode* serverNode, ServerConfig &serv
 			else if (directive->getKey() == "client_max_body_size")
 				serverConfig.setClientMaxBodySize(directive->getValues()[0]);
 			else if (directive->getKey() == "error_page")
-				serverConfig.setErrorPage(directive->getKey(), directive->getValues()[0]);
+				serverConfig.setErrorPage(directive->getValues(), "Server");
 			else if (directive->getKey() == "root")
 				serverConfig.setRoot(directive->getValues()[0]);
 			else if (directive->getKey() == "index")
 				serverConfig.setIndex(directive->getValues());
 			else if (directive->getKey() == "autoindex")
 				serverConfig.setAutoindex(directive->getValues()[0]);
+			else if (directive->getKey() == "keepalive_timeout")
+				serverConfig.setKeepaliveTimeout(directive->getValues()[0]);
 			else if (directive->getKey() == "try_files")
 				serverConfig.setTryFiles(directive->getValues());
 			else if (directive->getKey() == "return")
 				serverConfig.setReturn(directive->getValues());
-			else if (directive->getKey() == "rewrite")
-				serverConfig.setRewrite(directive->getValues());
+			else if (directive->getKey() == "cgi_extension")
+				serverConfig.setCgiExtension(directive->getValues());
 		}
-		else
+	}
+	for (size_t i = 0; i < serverChildren.size(); i++)
+	{
+		if (serverChildren[i]->getType() == Context)
 		{
 			ContextNode	*locationNode = static_cast<ContextNode *>(serverChildren[i]);
 			if (locationNode->getName() == "location")
 			{
-				LocationConfig location(serverConfig);
+				LocationConfig location(locationNode->getPath(), serverConfig);
 				processLocationNode(locationNode, location);
 				serverConfig.addLocation(locationNode->getPath(), location);
 			}
 		}
 	}
-
 }
 
 void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConfig> &servers)
@@ -100,17 +106,22 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 				this->index = directive->getValues();
 			else if (directive->getKey() == "autoindex")
 				this->autoindex = directive->getValues()[0];
+			else if (directive->getKey() == "keepalive_timeout")
+				this->keepalive_timeout = directive->getValues()[0];
 			else if (directive->getKey() == "client_max_body_size")
 				this->client_max_body_size = directive->getValues()[0];
 			else if (directive->getKey() == "error_page")
 				this->errorPagesDirectives.push_back(directive);
 		}
-		else
+	}
+	for (size_t i = 0; i < httpChildren.size(); i++)
+	{
+		if (httpChildren[i]->getType() == Context)
 		{
 			ContextNode *serverNode = static_cast<ContextNode *>(httpChildren[i]);
 			if (serverNode->getName() == "server")
 			{
-				servers.push_back(ServerConfig(this->root, this->index, this->autoindex, this->client_max_body_size, this->errorPagesDirectives));
+				servers.push_back(ServerConfig(this->root, this->index, this->autoindex, this->keepalive_timeout, this->client_max_body_size, this->errorPagesDirectives));
 				ServerConfig &server = servers.back();
 				processServerNode(serverNode, server);
 			}
@@ -120,6 +131,6 @@ void	ConfigLoader::processHttpNode(ContextNode *treeRoot, std::vector<ServerConf
 
 void	ConfigLoader::loadServers(std::vector<ServerConfig> &servers)
 {
-	ContextNode *httpNode = static_cast<ContextNode *>(treeRoot);
+	ContextNode *httpNode = static_cast<ContextNode *>(treeRootNode);
 	processHttpNode(httpNode, servers);
 }

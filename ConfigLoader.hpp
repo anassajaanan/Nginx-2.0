@@ -12,6 +12,7 @@
 #define DEFAULT_HTTP_ROOT_VALUE "/var/www/html"
 #define DEFAULT_HTTP_INDEX_VALUE "index.html"
 #define DEFAULT_HTTP_AUTOINDEX_VALUE "off"
+#define DEFAULT_HTTP_KEEPALIVE_TIMEOUT "15s"
 #define DEFAULT_HTTP_CLIENT_MAX_BODY_SIZE "1m"
 
 
@@ -20,7 +21,7 @@
 class ConfigLoader
 {
 private:
-	ConfigNode	*treeRoot;
+	ConfigNode	*treeRootNode;
 
 	void processHttpNode(ContextNode* httpNode, std::vector<ServerConfig> &servers);
     void processServerNode(ContextNode* serverNode, ServerConfig &serverConfig);
@@ -28,9 +29,9 @@ private:
 
 public:
 	std::string						root;
-	// std::string						index;
 	std::vector<std::string>		index;
 	std::string						autoindex;
+	std::string						keepalive_timeout;		
 	std::string						client_max_body_size;
 	std::vector<DirectiveNode *>	errorPagesDirectives;
 
@@ -38,11 +39,6 @@ public:
 
 	void	loadServers(std::vector<ServerConfig> &servers);
 };
-
-
-
-
-
 
 
 #endif /* CONFIGLOADER_HPP */

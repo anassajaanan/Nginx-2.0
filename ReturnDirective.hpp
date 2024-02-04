@@ -13,15 +13,23 @@ class ReturnDirective
 private:
 	int			statusCode;
 	std::string	responseTextOrUrl;
+	bool		_isEnabled;
 
 public:
 	ReturnDirective();
 	~ReturnDirective();
 
-	void	setStatusCode(int statusCode);
-	void	setResponseTextOrUrl(const std::string &responseTextOrUrl);
+	void	setStatusCode(int statusCodeValue);
+	void	setResponseTextOrUrl(const std::string &responseTextOrUrlValue);
+	
+
+	int					getStatusCode() const;
+	const std::string	&getResponseTextOrUrl() const;
+	bool				isEnabled() const;
+
 	
 };
 
 
 #endif /* RETURNDIRECTIVE_HPP */
+

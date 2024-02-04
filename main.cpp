@@ -1,56 +1,79 @@
 
-
-// #include "ConfigParser.hpp"
-#include "ConfigNode.hpp"
-#include "ServerConfig.hpp"
 #include "ConfigParser.hpp"
 #include "ConfigLoader.hpp"
-#include "Server.hpp"
-#include "KqueueManager.hpp"
+#include "EventPoller.hpp"
+#include "MimeTypeConfig.hpp"
+#include "ServerManager.hpp"
+#include "Logger.hpp"
 
-#include <csignal>
 
-int running = 1;
 
-void	signalHandler(int signum)
+static void	signalHandler(int signum)
 {
-	std::cout << "Signal " << signum << " received" << std::endl;
 	if (signum == SIGINT || signum == SIGTERM)
-		running = 0;
+	{
+		ServerManager::running = 0;
+	}
+	else if (signum == SIGCHLD)
+	{
+		int status;
+		pid_t pid;
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+		{
+			
+		}
+	}
 }
 
 int main()
 {
+	std::vector<ServerConfig>	serverConfigs;
+	MimeTypeConfig				mimeTypeConfig;
+	EventPoller					*eventManager;
+
     try
 	{
-		signal(SIGINT, signalHandler);
-		signal(SIGTERM, signalHandler);
-
-		ConfigParser parser("nginx.conf");
+		ConfigParser parser("conf/nginx.conf");
 		parser.parseConfigFile();
 
-		ConfigNode *treeRoot = parser.getConfigTreeRoot();
+		MimeTypeParser mimeTypeParser("./conf/mime.types");
+		mimeTypeParser.parseMimeTypeFile(mimeTypeConfig);
 
-		std::vector<ServerConfig>	serverConfigs;
-		std::vector<Server *> 		servers;
-		
-		ConfigLoader loader(treeRoot);
+		ConfigLoader loader(parser.getConfigTreeRoot());
 		loader.loadServers(serverConfigs);
 
-		
-
-		std::cout << "Successfully parsed config file" << std::endl;
-
-
-		
-		
+		eventManager = new EventManager();
+	
 	}
 	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
+		return 1;
 	}
 
-	return 0;
 
-	
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
+	struct sigaction sa;
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;	
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
+	sigaction(SIGCHLD, &sa, NULL);
+
+
+	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
+
+	ServerManager serverManager(serverConfigs, eventManager, mimeTypeConfig);
+	Logger::log(Logger::DEBUG, "Starting server manager", "main");
+	serverManager.start();
+
+	Logger::cleanup();
+
+	delete eventManager;
+
+	return 0;
 }

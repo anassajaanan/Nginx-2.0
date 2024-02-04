@@ -5,32 +5,39 @@
 #ifndef KQUEUE_MANAGER_HPP
 # define KQUEUE_MANAGER_HPP
 
-#include <unistd.h>
-#include <iostream>
-#include <stdexcept>
-#include <sys/types.h>
-#include <sys/event.h>
-#include <sys/time.h>
+#if defined(__APPLE__) || defined(__FreeBSD__)
+
+	#include "Logger.hpp"
+	#include "EventPoller.hpp"
 
 
-#define MAX_EVENTS 64
+	#include <unistd.h>
+	#include <string.h>
+	#include <sys/event.h>
 
 
-class KqueueManager
-{
-public:
-	KqueueManager();
-	~KqueueManager();
+	#define MAX_EVENTS 100
+
+	#define KEVENT_TIMEOUT_SEC 5
 
 
-	int				kq;
-	struct kevent	events[MAX_EVENTS];
+	class KqueueManager : public EventPoller
+	{
+	public:
+		KqueueManager();
+		~KqueueManager();
 
-	void			registerEvent(int fd, int16_t filter);
-	void			unregisterEvent(int fd, int16_t filter);
-	int				waitForEvents();
+		int				kq;
+		struct kevent	events[MAX_EVENTS];
 
-};
+		void			registerEvent(int fd, EventType event);
+		void			unregisterEvent(int fd, EventType event);
+		int				waitForEvents();
 
+		void			getNextEvent(int index, EventInfo &eventInfo);
+	};
+
+#endif
 
 #endif /* KQUEUE_MANAGER_HPP */
+

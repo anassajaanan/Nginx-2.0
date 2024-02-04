@@ -15,7 +15,7 @@
 enum NodeType
 {
 	Context,
-	Directive,
+	Directive
 };
 
 class ConfigNode
@@ -36,3 +36,4 @@ public:
 
 
 #endif /* CONFIGNODE_HPP */
+

@@ -43,7 +43,4 @@ public:
 
 
 
-
-
-
 #endif // CONFIGPARSER_HPP
