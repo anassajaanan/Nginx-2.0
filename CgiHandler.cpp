@@ -41,7 +41,7 @@ std::string	CgiHandler::buildCgiResponse()
 	// // if (message.find("Content-Type") == std::string::npos)
 	// /*2*/ response.setHeader("Content-Type", "text/plain");
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	response.setHeader("Content-Type", "text/plain");
+	response.setHeader("Content-Type", "text/html");
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");
 

@@ -40,7 +40,7 @@ void	ClientState::incrementRequestCount()
 
 void	ClientState::processIncomingData(Server &server, const char *buffer, size_t bytesRead)
 {	
-		if (!areHeaderComplete)
+	if (!areHeaderComplete)
 		processHeaders(server, buffer, bytesRead);
 	else
 		processBody(server, buffer, bytesRead);
@@ -161,6 +161,8 @@ void	ClientState::initializeBodyStorage(Server &server)
 {
 	std::string filename = "post_body_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + "_" + std::to_string(fd) + ".tmp";
 	requestBodyFilePath = TEMP_FILE_DIRECTORY + filename;
+
+	
 
 	requestBodyFile.open(requestBodyFilePath.c_str(), std::ios::out | std::ios::binary);
 	if (!requestBodyFile.is_open())
