@@ -247,7 +247,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
     
     ```bash
     location / {
-        index index.html index.htm;
+        index index.html index.htm /fallback;
     }
     ```
     
@@ -255,26 +255,43 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 ### **`return`**
 
 - **Contexts Allowed:** **`server`**, **`location`**
-- **Validation Policy:** Must be unique within its context, supports one or two arguments for redirection or setting response codes.
-- **Example:**
+- **Validation Policy:** Supports either one argument as a status code to return a predefined status message, or two arguments where the first is the status code and the second is a URL for redirection or text to return as the body. When used for redirection, common status codes are 301 (permanent redirect) or 302 (temporary redirect).
+- **Example 1: Returning a Status Code with Text:**
     
     ```bash
-    location =/oldpage {
-        return 301 http://example.com/newpage;
+    location /gone {
+
+        return 410 "The resource is no longer available";
+
     }
     ```
+    
+    This configuration returns a 410 status code with a custom message indicating that the resource is no longer available.
+    
+- **Example 2: Redirection:**
+    
+    ```bash
+    location /oldpage {
+
+        return 301 http://example.com/newpage;
+
+    }
+    ```
+    
+    This directive redirects requests for **`/oldpage`** to a new URL with a 301 status code, indicating a permanent redirect.
     
 
 ### **`limit_except`**
 
 - **Contexts Allowed:** **`location`**
-- **Validation Policy:** Must be unique within its context, supports one or more arguments. It restricts the allowed HTTP methods for a location.
+- **Validation Policy:** Must be unique within its context, supports one or more arguments to specify allowed HTTP methods.
 - **Example:**
+	This directive restricts the allowed methods for the **`/api`** endpoint to GET and POST, denying all other methods.
     
     ```bash
     location /api {
-        limit_except GET POST PUT HEAD;
-    }
+    	limit_except GET POST;
+	}
     ```
     
 
