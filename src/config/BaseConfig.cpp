@@ -106,11 +106,11 @@ void	BaseConfig::setClientMaxBodySize(const std::string &bodySize)
 	if (unit.size() == 1 && unit.find_first_not_of("kKmMgG") != std::string::npos)
 		throw (std::runtime_error("invalid value \"" + bodySize + "\" in \"client_max_body_size\" directive"));
 	if (unit == "k" || unit == "K")
-		multiplier = 1000;
+		multiplier = 1024;
 	else if (unit == "m" || unit == "M")
-		multiplier = 1000000;
+		multiplier = 1048576;
 	else if (unit == "g" || unit == "G")
-		multiplier = 1000000000;
+		multiplier = 1073741824;
 	
 	numericValue = safeStringToSizeT(bodySize, value);
 	totalSize = numericValue * multiplier;

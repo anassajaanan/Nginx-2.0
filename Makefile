@@ -20,7 +20,7 @@ SRCS += src/main.cpp
 CXX = clang++
 # CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++11 -I$(INCL_DIR)
 
-CXXFLAGS_COMMON = -Wall -Wextra -Werror -I$(INCL_DIR)
+CXXFLAGS_COMMON = -Wall -Wextra -Werror -std=c++98 -I$(INCL_DIR)
 
 # Build Directories
 BUILD_DIR = build/

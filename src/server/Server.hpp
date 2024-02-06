@@ -31,9 +31,9 @@
 #define MAX_URI_SIZE 4096 // 4 KB
 
 // #define TEMP_FILE_DIRECTORY "./uploads/"
-#define TEMP_FILE_DIRECTORY "uploads/"
+#define TEMP_FILE_DIRECTORY "content/WebServer/uploads/"
 
-#define CGI_TIMEOUT 70 // 10 seconds
+#define CGI_TIMEOUT 20 // 10 seconds
 
 // define max size of cgi output
 #define CGI_MAX_OUTPUT_SIZE 2097152 // 2 MB in bytes

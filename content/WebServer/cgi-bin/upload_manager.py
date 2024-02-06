@@ -48,7 +48,7 @@ def parse_multipart_form_data(stdin, boundary, buffer_size=1000000):
 	file_data = rest_of_data[:file_start] if file_start > 0 else rest_of_data
 
 	# Write file data
-	filepath = f"./uploads/{filename}"
+	filepath = f"content/WebServer/uploads/{filename}"
 	with open(filepath, 'wb') as f:
 		f.write(file_data)
 		while True:
