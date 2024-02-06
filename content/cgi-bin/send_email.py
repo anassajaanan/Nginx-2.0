@@ -48,5 +48,4 @@ headers = {
 
 response = requests.post("https://api.sendgrid.com/v3/mail/send", json=data, headers=headers, verify=False)
 
-print(response.status_code)
-print(response.text)
+print(f"Email has been sent to {receiver_email}")

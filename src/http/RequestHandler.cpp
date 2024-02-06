@@ -554,6 +554,7 @@ HttpResponse	RequestHandler::handlePostRequest(HttpRequest &request)
 	}
 	
 	(void)request;
+	(void)config;
 	HttpResponse response;
 
 	response.setVersion("HTTP/1.1");
