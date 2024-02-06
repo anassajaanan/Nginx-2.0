@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html style="font-size: 16px" lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta
+      name="keywords"
+      content="Design Studio, What we Do, Our Features &amp;amp; Services, ​We turn your design into a live Webflow project."
+    />
+    <meta name="description" content="" />
+    <title>WebServer Nginx 2.0</title>
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="assets/images/favicon/site.webmanifest">
+    <!-- css -->
+    <link rel="stylesheet" href="assets/css/styles.css" media="screen" />
+    <link rel="stylesheet" href="assets/css/Home.css" media="screen" />
+    <!-- icon  -->
+    <script src="https://kit.fontawesome.com/35cfa74a7d.js" crossorigin="anonymous"></script>
+    
+    
+    <!-- javascript -->
+    <script
+      class="u-script"
+      type="text/javascript"
+      src="assets/js/jquery.js"
+      defer=""
+    ></script>
+    <script
+      class="u-script"
+      type="text/javascript"
+      src="assets/js/javascript.js"
+      defer=""
+    ></script>
+    <meta name="referrer" content="origin" />
+    <link
+      id="u-theme-google-font"
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i"
+    />
+    <link
+      id="u-page-google-font"
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i"
+    />
+    <!--    bootstrap-->
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org",
+        "@type": "Organization",
+        "name": ""
+      }
+    </script>
+    <meta name="theme-color" content="#029fe7" />
+    <meta property="og:title" content="Home" />
+    <meta property="og:type" content="website" />
+  </head>
+  <body class="u-body u-xl-mode" data-lang="en">
+    <header class="u-clearfix u-header u-header" id="sec-4ed0">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-text u-text-default u-text-1 logo" style="margin-top: 15px;"><a href="./index.html" >Web Server</a></p>
+        <nav
+          class="u-menu u-menu-hamburger u-offcanvas u-menu-1"
+          data-responsive-from="XL"
+        >
+          <div
+            class="menu-collapse"
+            style="font-size: 1rem; letter-spacing: 0px; font-weight: 700"
+          >
+            <a
+              class="u-button-style u-custom-border u-custom-border-color u-custom-borders u-custom-left-right-menu-spacing u-custom-padding-bottom u-custom-text-active-color u-custom-text-color u-custom-top-bottom-menu-spacing u-nav-link u-text-active-palette-1-base u-text-hover-palette-2-base"
+              href="#"
+            >
+              <svg class="u-svg-link" viewBox="0 0 24 24">
+                <use
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  xlink:href="#menu-hamburger"
+                ></use>
+              </svg>
+              <svg
+                class="u-svg-content"
+                version="1.1"
+                id="menu-hamburger"
+                viewBox="0 0 16 16"
+                x="0px"
+                y="0px"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g>
+                  <rect y="1" width="16" height="2"></rect>
+                  <rect y="7" width="16" height="2"></rect>
+                  <rect y="13" width="16" height="2"></rect>
+                </g>
+              </svg>
+            </a>
+          </div>
+          <div class="u-nav-container">
+            <ul class="u-nav u-spacing-20 u-unstyled u-nav-1">
+              <li class="u-nav-item">
+                <a
+                  class="u-button-style u-nav-link u-text-active-palette-2-base u-text-grey-90 u-text-hover-palette-2-base"
+                  href="./index.html"
+                  style="padding: 10px"
+                  >Home</a
+                >
+              </li>
+              <li class="u-nav-item">
+                <a
+                  class="u-button-style u-nav-link u-text-active-palette-2-base u-text-grey-90 u-text-hover-palette-2-base"
+                  href="https://anasajaanan.onrender.com/"
+                  target="_blank"
+                  style="padding: 10px"
+                  >About</a
+                >
+              </li>
+              <li class="u-nav-item">
+                <a
+                  class="u-button-style u-nav-link u-text-active-palette-2-base u-text-grey-90 u-text-hover-palette-2-base"
+                  href="#sec-a6fb"
+                  style="padding: 10px"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="u-nav-container-collapse">
+            <div
+              class="u-black u-container-style u-inner-container-layout u-opacity u-opacity-95 u-sidenav"
+            >
+              <div class="u-inner-container-layout u-sidenav-overflow">
+                <div class="u-menu-close"></div>
+                <ul
+                  class="u-align-center u-nav u-popupmenu-items u-unstyled u-nav-2"
+                >
+                  <li class="u-nav-item">
+                    <a class="u-button-style u-nav-link" href="./index.html"
+                      >Home</a
+                    >
+                  </li>
+                  <li class="u-nav-item">
+                    <a
+                      class="u-button-style u-nav-link"
+                      href="https://anasajaanan.onrender.com/"
+                      target="_blank"
+                      >About</a
+                    >
+                  </li>
+                  <li class="u-nav-item">
+                    <a class="u-button-style u-nav-link" href="#sec-a6fb"
+                      >Contact</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="u-black u-menu-overlay u-opacity u-opacity-70"></div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <section
+      class="u-clearfix u-image u-section-1"
+      id="carousel_adc7"
+      data-image-width="1980"
+      data-image-height="1200"
+    >
+      <div class="u-clearfix u-layout-wrap u-layout-wrap-1">
+        <div class="u-layout">
+          <div class="u-layout-row">
+            <div
+              class="u-align-right u-container-style u-image u-layout-cell u-size-35-lg u-size-35-xl u-size-60-md u-size-60-sm u-size-60-xs u-image-1"
+              data-image-width="1022"
+              data-image-height="904"
+            >
+              <div
+                class="u-container-layout u-valign-middle-lg u-valign-middle-xl u-container-layout-1"
+              >
+                <img
+                  class="u-expanded-width-sm u-expanded-width-xs u-image u-image-contain u-image-default u-image-2"
+                  src="assets/images/img2.png"
+                  style="border-radius: 10px"
+                  alt=""
+                  data-image-width="1197"
+                  data-image-height="916"
+                />
+              </div>
+            </div>
+            <div
+              class="u-align-left u-container-style u-layout-cell u-shape-rectangle u-size-25-lg u-size-25-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-2">
+			<!-- <img
+			class="u-expanded-width-sm u-expanded-width-xs u-image u-image-contain u-image-default u-image-2"
+			src="assets/images/img2.png"
+			style="border-radius: 10px"
+			alt=""
+			data-image-width="1197"
+			data-image-height="916"
+		  /> -->
+              <div
+                class="u-container-layout u-valign-middle-lg u-valign-middle-md u-valign-middle-sm u-valign-middle-xs u-container-layout-2"
+              >
+                <div
+                  class="u-border-6 u-border-palette-2-base u-line u-line-horizontal u-line-1"
+                ></div>
+                <h1
+                  class="u-custom-font u-font-raleway u-text u-text-palette-2-base u-title u-text-1"
+                >
+                  Web Server: Nginx 2.0
+                </h1>
+                <p class="u-text u-text-2">
+					Our web server project represents a robust, efficient solution designed to meet the modern web's 
+					demands through adherence to HTTP standards and optimized for high concurrency and cross-platform 
+					compatibility. Built from the ground up with a focus on performance and scalability.
+                </p>
+                <a
+                  href="#sec-03b8"
+                  class="u-active-palette-2-light-1 u-border-none u-btn u-btn-round u-button-style u-hover-palette-2-light-1 u-palette-4-base u-radius-10 u-text-active-white u-text-hover-white u-btn-2"
+                >
+					Core Features:
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section
+      class="u-align-center u-clearfix u-gradient u-section-2"
+      id="sec-03b8"
+    >
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <div class="u-layout-row">
+          <div
+            class="u-size-30-lg u-size-30-xl u-size-60-md u-size-60-sm u-size-60-xs"
+            style="padding: 20px"
+          >
+            <div class="u-layout-col">
+              <div
+                class="u-align-left u-container-style u-grey-5 u-layout-cell u-radius-20 u-shape-round u-size-30 u-layout-cell-2"
+              >
+                <div
+                  class="u-container-layout u-valign-middle u-container-layout-2"
+                >
+                  <h3 class="u-text u-text-default u-text-palette-2-base u-text-1">
+                    Core Features:
+                  </h3>
+
+                  <p
+                    class="u-large-text u-text u-text-default u-text-variant u-text-4"
+                  >
+                    Color Palette can extract color palettes from images. It
+                    will find you the most representative colors in a Image.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="u-size-30-lg u-size-30-xl u-size-60-md u-size-60-sm u-size-60-xs"
+          >
+            <div class="u-layout-col">
+              <div
+                class="u-container-style u-layout-cell u-size-60 u-layout-cell-1"
+              >
+                <div class="u-container-layout u-container-layout-1">
+                  <img
+                    class="u-expanded-width u-image u-image-round u-radius-20 u-image-1"
+                    src="assets/images/img4.png"
+                    data-image-width="1000"
+                    data-image-height="854"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container container-desktop">
+          <div class="row">
+            <div class="col-lg-4 col-md-4" style="margin-bottom: 1rem">
+              <div
+                class="u-align-left u-border-2 u-border-palette-2-light-2 u-container-style u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-1"
+              >
+                <div
+                  class="u-container-layout u-similar-container u-valign-top u-container-layout-1"
+                  style="padding: 1.4rem"
+                >
+                  <div
+                    class="u-align-center u-container-style u-group u-palette-2-light-3 u-radius-50 u-shape-round u-group-1"
+                  >
+                    <div class="u-container-layout u-valign-middle">
+                      <h6 class="u-text u-text-palette-2-base u-text-3">1</h6>
+                    </div>
+                  </div>
+                  <h5 class="u-text u-text-palette-2-base u-text-4">
+                    HTTP Protocol Compliance
+                  </h5>
+                  <p class="u-text u-text-default u-text-grey-50 u-text-5">
+                    Our web server fully embraces the HTTP/1.1 standard, providing robust support for key methods such as GET, HEAD, POST, and DELETE. 
+					This ensures broad compatibility and a flexible foundation for web development.
+                  </p>
+                  <a
+                    href="#carousel_40b8"
+                    class="u-border-2 u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-6 u-text-hover-white u-btn-2"
+                    style="margin-bottom: 2rem"
+                  >
+                    more
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4" style="margin-bottom: 1rem">
+              <div
+                class="u-align-left u-border-2 u-border-palette-2-light-2 u-container-style u-list-item u-radius-20 u-repeater-item u-shape-round u-video-cover u-white"
+              >
+                <div
+                  class="u-container-layout u-similar-container u-valign-top u-container-layout-5"
+                  style="padding: 1.4rem"
+                >
+                  <div
+                    class="u-align-center u-container-style u-group u-palette-2-light-3 u-radius-50 u-shape-round u-group-3"
+                  >
+                    <div class="u-container-layout u-valign-middle">
+                      <h6
+                        class="u-text u-text-default u-text-palette-2-base u-text-9"
+                      >
+                        2
+                      </h6>
+                    </div>
+                  </div>
+                  <h5 class="u-text u-text-palette-2-base u-text-10">
+                    Custom Parsing Strategy
+                  </h5>
+                  <p class="u-text u-text-default u-text-grey-50 u-text-11">
+						Our web server uses a recursive descent parser for efficient and precise configuration management, 
+						akin to Nginx's hierarchical model. This allows for easy handling of complex settings and inheritance 
+						within nested contexts, ensuring a reliable and developer-friendly platform.
+                  </p>
+                  <a
+                    href="#carousel_40b8"
+                    class="u-border-2 u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-6 u-text-hover-white u-btn-2"
+                    style="margin-bottom: 2rem"
+                  >
+                    more
+                  </a>
+                </div>
+              </div>
+            </div>
+			<div class="col-lg-4 col-md-4" style="margin-bottom: 1rem">
+				<div
+				  class="u-align-left u-border-2 u-border-palette-2-light-2 u-container-style u-list-item u-radius-20 u-repeater-item u-shape-round u-video-cover u-white"
+				>
+				  <div
+					class="u-container-layout u-similar-container u-valign-top u-container-layout-3"
+					style="padding: 1.4rem"
+				  >
+					<div
+					  class="u-align-center u-container-style u-group u-palette-2-light-3 u-radius-50 u-shape-round u-group-2"
+					>
+					  <div class="u-container-layout u-valign-middle">
+						<h6
+						  class="u-text u-text-default u-text-palette-2-base u-text-6"
+						>
+						  3
+						</h6>
+					  </div>
+					</div>
+					<h5 class="u-text u-text-palette-2-base u-text-7">
+					  Cross-Platform I/O Multiplexing
+					</h5>
+					<p class="u-text u-text-default u-text-grey-50 u-text-8">
+					  Utilizes advanced I/O multiplexing techniques, with a custom abstraction layer that seamlessly adapts between 
+					  kqueue on macOS and epoll on Linux. This approach guarantees optimal performance across different operating 
+					  systems by leveraging the best available system calls for non-blocking I/O operations.
+					</p>
+					<a
+					  href="#carousel_40b8"
+					  class="u-border-2 u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-6 u-text-hover-white u-btn-2"
+					  style="margin-bottom: 2rem"
+					>
+					  more
+					</a>
+				  </div>
+				</div>
+			  </div>
+          </div>
+        </div>
+		<div class="row">
+			<div class="col-lg-4 col-md-4" style="margin-bottom: 1rem">
+				<div
+				  class="u-align-left u-border-2 u-border-palette-2-light-2 u-container-style u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-1">
+				  <div
+					class="u-container-layout u-similar-container u-valign-top u-container-layout-1"
+					style="padding: 1.4rem"
+				  >
+					<div
+					  class="u-align-center u-container-style u-group u-palette-2-light-3 u-radius-50 u-shape-round u-group-1"
+					>
+					  <div class="u-container-layout u-valign-middle">
+						<h6 class="u-text u-text-palette-2-base u-text-3">4</h6>
+					  </div>
+					</div>
+					<h5 class="u-text u-text-palette-2-base u-text-4">
+						Efficient Large Response Handling and Video Streaming:
+					</h5>
+					<p class="u-text u-text-default u-text-grey-50 u-text-5">
+						Our web server is expertly designed to manage and deliver large responses, including video streaming, with 
+						exceptional efficiency. By implementing advanced techniques such as Transfer-Encoding: chunked and full support 
+						for Range requests, we enable seamless, resource-efficient content delivery. This allows for optimized streaming 
+						of video content directly from our server, ensuring users experience smooth playback without excessive buffering 
+						or delays.
+					</p>
+					<a
+					  href="#carousel_40b8"
+					  class="u-border-2 u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-6 u-text-hover-white u-btn-2"
+					  style="margin-bottom: 2rem"
+					>
+					  more
+					</a>
+				  </div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-4" style="margin-bottom: 1rem">
+				<div
+				  class="u-align-left u-border-2 u-border-palette-2-light-2 u-container-style u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-1">
+				  <div
+					class="u-container-layout u-similar-container u-valign-top u-container-layout-1"
+					style="padding: 1.4rem"
+				  >
+					<div
+					  class="u-align-center u-container-style u-group u-palette-2-light-3 u-radius-50 u-shape-round u-group-1"
+					>
+					  <div class="u-container-layout u-valign-middle">
+						<h6 class="u-text u-text-palette-2-base u-text-3">5</h6>
+					  </div>
+					</div>
+					<h5 class="u-text u-text-palette-2-base u-text-4">
+						Dynamic Content Execution with CGI Support
+					</h5>
+					<p class="u-text u-text-default u-text-grey-50 u-text-5">
+						Our web server introduces comprehensive CGI support, enabling the execution of external programs for a wide array of tasks, 
+						including form processing and dynamic content generation. This feature offers unparalleled flexibility, allowing developers 
+						to extend web applications beyond static content to include interactive and personalized user experiences. By seamlessly 
+						integrating CGI, we are able to leverage server-side scripting for real-time data processing, content 
+						customization ...
+					</p>
+					<a
+					  href="#carousel_40b8"
+					  class="u-border-2 u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-6 u-text-hover-white u-btn-2"
+					  style="margin-bottom: 2rem"
+					>
+					  more
+					</a>
+				  </div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-4" style="margin-bottom: 1rem">
+				<div
+				  class="u-align-left u-border-2 u-border-palette-2-light-2 u-container-style u-list-item u-radius-20 u-repeater-item u-shape-round u-white u-list-item-1">
+				  <div
+					class="u-container-layout u-similar-container u-valign-top u-container-layout-1"
+					style="padding: 1.4rem"
+				  >
+					<div
+					  class="u-align-center u-container-style u-group u-palette-2-light-3 u-radius-50 u-shape-round u-group-1"
+					>
+					  <div class="u-container-layout u-valign-middle">
+						<h6 class="u-text u-text-palette-2-base u-text-3">6</h6>
+					  </div>
+					</div>
+					<h5 class="u-text u-text-palette-2-base u-text-4">
+						Configurable Logging Framework
+					</h5>
+					<p class="u-text u-text-default u-text-grey-50 u-text-5">
+						Our web server incorporates a highly configurable logging framework designed to give a comprehensive 
+						insights into its operations. With support for multiple log levels—DEBUG, INFO, WARN, ERROR, and FATAL—this 
+						framework allows for granular control over log output, catering to diverse debugging and monitoring needs. 
+						The logging system supports dynamic output configuration to various 
+						streams and files, along with customizable format strings for log messages, ensuring flexibility in log management. 
+					</p>
+					<a
+					  href="#carousel_40b8"
+					  class="u-border-2 u-border-palette-2-base u-btn u-btn-round u-button-style u-hover-palette-2-base u-none u-radius-6 u-text-hover-white u-btn-2"
+					  style="margin-bottom: 2rem"
+					>
+					  more
+					</a>
+				  </div>
+				</div>
+			</div>
+		</div>
+      </div>
+    </section>
+    <section class="u-align-left u-clearfix u-section-4" id="carousel_40b8">
+      <div class="u-clearfix u-sheet u-sheet-1" style="padding: 5rem 0 5rem">
+        <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
+          <div class="u-gutter-0 u-layout">
+            <div class="u-layout-row">
+              <div
+                class="u-container-style u-layout-cell u-left-cell u-shape-rectangle u-size-20-lg u-size-20-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-1"
+              >
+                <div
+                  class="u-container-layout u-valign-middle u-container-layout-1"
+                >
+                  <h2
+                    class="u-align-left u-text u-text-palette-2-base u-text-1"
+                  >
+                    Upload Image
+                  </h2>
+                  <form action="../cgi-bin/upload_manager.py" method="POST" enctype="multipart/form-data">
+                    <input
+                      type="file"
+                      name="file"
+                      class="btn btn-outline-danger btn-lg"
+                      style="
+                        width: 100%;
+                        margin: 12rem 0 3rem;
+                        border-color: #f01965;
+                      "
+                    />
+                    <input
+                      type="submit"
+                      class="btn btn-danger btn-lg"
+                      style="background-color: #f01965"
+                    />
+                  </form>
+                </div>
+              </div>
+              <div
+                class="u-align-center u-container-style u-layout-cell u-right-cell u-size-40-lg u-size-40-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-2"
+              >
+                <div
+                  class="u-container-layout u-valign-middle u-container-layout-2"
+                >
+                  <img
+                    class="u-expanded-width u-image u-image-contain u-image-1"
+                    src="assets/images/Untitled-21.png"
+                    data-image-width="1200"
+                    data-image-height="700"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+	<!-- Videos -->
+	<section class="" id="">
+		<div class="iframe-container">
+			<iframe width="1280" height="720" src="https://www.youtube.com/embed/pivQ0Uex2Yw" title="42 Abu Dhabi: Showcasing Future Tech Leaders" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+			<iframe width="1280" height="720" src="https://www.youtube.com/embed/HBx-VRKjUHU" title="Meet Your Peers -  Hussain Awadh" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+		</div>
+	  </section>
+
+
+    <section
+      class="u-align-center u-clearfix u-gradient u-section-8"
+      id="sec-a6fb"
+    >
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <div class="u-clearfix u-expanded-width u-layout-wrap u-layout-wrap-1">
+          <div class="u-layout">
+            <div class="u-layout-row">
+              <div
+                class="u-container-style u-layout-cell u-size-30-lg u-size-30-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-1"
+              >
+                <div
+                  class="u-container-layout u-valign-middle u-container-layout-1"
+                >
+                  <h2 class="u-text u-text-palette-2-base u-text-1">CONTACT</h2>
+                  <p class="u-text u-text-2">
+                    If you have any question or just fancy saying hey, then get
+                    in touch.
+                  </p>
+                  <div class="title-box-2 pt-4 pt-md-0">
+                    <h5 class="title-left">Get in Touch</h5>
+                  </div>
+                  
+				  <div class="more-info">
+					<div class="more-info-holder">
+						<img src="assets/images/tukka.jpeg" alt="Anas Ajaanan" style="border-radius: 50%; width: 100px; height: 100px; margin-bottom: 1rem">
+						<a href="https://github.com/tukka25"
+						><i class="fa-brands fa-github"></i></a>
+					</div>
+					<div class="more-info-holder">
+						<img src="assets/images/anas.png" alt="Anas Ajaanan" style="border-radius: 50%; width: 100px; height: 100px; margin-bottom: 1rem">
+						<a href="https://github.com/anassajaanan"
+						><i class="fa-brands fa-github"></i></a>
+					</div>
+				  </div>
+                </div>
+              </div>
+              <div
+                class="u-container-style u-layout-cell u-size-30-lg u-size-30-xl u-size-60-md u-size-60-sm u-size-60-xs u-layout-cell-2"
+              >
+                <div
+                  class="u-container-layout u-valign-top u-container-layout-2"
+                >
+                  <div
+                    class="u-align-center u-container-style u-expanded-width u-group u-radius-30 u-shape-round u-white u-group-1"
+                  >
+                    <div class="u-container-layout u-container-layout-3">
+                      <h4 class="u-text u-text-3">Let's talk.</h4>
+                      <div class="u-form u-form-1">
+                        <form
+                          action="/content/cgi-bin/send_email.py"
+                          class="u-clearfix u-form-spacing-15 u-form-vertical u-inner-form"
+                          method="post"
+                          style="padding: 0px"
+                        >
+                          <div class="u-form-group u-form-name">
+                            <label for="name-4c18" class="u-label">Name</label>
+                            <input
+                              type="text"
+                              placeholder="Enter your Name"
+                              id="name-4c18"
+                              name="name"
+                              class="u-border-2 u-border-grey-5 u-grey-5 u-input u-input-rectangle u-radius-10"
+                              required=""
+                            />
+                          </div>
+                          <div class="u-form-email u-form-group">
+                            <label for="email-4c18" class="u-label"
+                              >Email</label
+                            >
+                            <input
+                              type="email"
+                              placeholder="Enter a valid email address"
+                              id="email-4c18"
+                              name="email"
+                              class="u-border-2 u-border-grey-5 u-grey-5 u-input u-input-rectangle u-radius-10"
+                              required=""
+                            />
+                          </div>
+                          <div class="u-form-group u-form-message">
+                            <label for="message-4c18" class="u-label"
+                              >Message</label
+                            >
+                            <textarea
+                              placeholder="Enter your message"
+                              rows="4"
+                              cols="50"
+                              id="message-4c18"
+                              name="message"
+                              class="u-border-2 u-border-grey-5 u-grey-5 u-input u-input-rectangle u-radius-10"
+                              spellcheck="false"
+                              required=""
+                            ></textarea>
+                          </div>
+							
+
+						  <button class=" u-active-palette-4-light-2 u-border-5 u-border-active-palette-4-light-2 u-border-hover-palette-4-light-2 u-border-palette-4-base u-btn u-btn-round u-btn-submit u-button-style u-hover-palette-4-light-2 u-palette-4-base u-radius-10 u-text-active-white u-text-hover-white u-btn-1" type="submit">Send Message</button>
+                          
+                          <!-- <div class="u-form-send-error u-form-send-message">
+                            Thank you! Your message has been sent.
+                          </div>
+                          <div class="u-form-send-message u-form-send-success">
+                            Unable to send your message. Please fix errors then
+                            try again.
+                          </div> -->
+                          <!-- <input
+                            type="hidden"
+                            value=""
+                            name="recaptchaResponse"
+                          />
+                          <input
+                            type="hidden"
+                            name="formServices"
+                            value="dd92d284a49ca3b32e56ef6f547ada41"
+                          /> -->
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer
+      class="u-align-center u-clearfix u-footer u-grey-80 u-footer"
+      id="sec-410c"
+    >
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">
+          <p class="copyright">&copy; Copyright <strong>Anas Ajaanan & Abderahman Tukka</strong>. All Rights Reserved</p>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
