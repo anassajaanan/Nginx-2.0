@@ -427,8 +427,14 @@ HttpResponse	RequestHandler::deletePath(HttpRequest &request, BaseConfig *config
 		return handleErrorPage(request, config, 403);
 	else if (fileExists(path))
 	{
+		if (!fileExistsAndAccessible(path))
+		{
+			return handleErrorPage(request, config, 403);
+		}
 		if (remove(path.c_str()) != 0)
+		{
 			return handleErrorPage(request, config, 500);
+		}
 		else
 			return serveError(204);
 	}

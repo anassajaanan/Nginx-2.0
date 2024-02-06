@@ -125,7 +125,6 @@ std::vector<std::string>	HttpRequest::parseQueryString(const std::string &uriVal
 		if (!queryString.empty())
         	queryVector.push_back((queryString));
 	}
-    // std::vector<std::string>::iterator it = queryVector.begin();
 	return (queryVector);
 }
 
@@ -133,9 +132,6 @@ bool	HttpRequest::validateUri(const std::string &str)
 {
 	if (str.empty() || str.find("/") == std::string::npos)
 		return (false);
-	// if (str.length() >= MAX_URL_LENGTH)
-	// 	return (this->setStatus(414), false);
-	// replaceUri()
 	if (str.find('?') != std::string::npos && str.find('?') != str.length())
 		this->queries = parseQueryString(str);
 	return (true);

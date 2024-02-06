@@ -95,7 +95,7 @@ void	ClientState::parseHeaders(Server &server)
 		Logger::log(Logger::INFO, logStream.str(), "ClientState::parseHeaders");
 		server.processHeadRequest(fd, request);
 	}
-	else if (request.getMethod() == "POST" || request.getMethod() == "PUT")
+	else if (request.getMethod() == "POST")
 	{
 		std::ostringstream logStream;
 		logStream << "Received a 'POST' request for '" << request.getUri() << "' from IP '"

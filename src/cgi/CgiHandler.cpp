@@ -134,7 +134,6 @@ void	CgiHandler::handleCgiDirective(HttpRequest &request, ServerConfig &config, 
 		}
 		if (execve(parameters[0], parameters, envp) < 0)
 		{
-			// Logger::log(Logger::ERROR, "Failed To Execute Cgi Script", "CgiHandler::handleCgiDirective");
 			this->delete2dArray(parameters);
 			this->delete2dArray(envp);
 			exit(EXIT_FAILURE);
