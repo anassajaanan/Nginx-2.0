@@ -254,9 +254,6 @@ HttpResponse	RequestHandler::serverSmallFile(const std::string &path)
 	std::string content = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	response.setBody(content);
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	// std::cout << "path = " << path << std::endl;
-	// std::cout << "type = " << mimeTypeConfig.getMimeType(path) << std::endl;
-	// std::cout << "end = " << mimeTypeConfig.getMimeType(const std::string &filePath) << std::endl;
 	response.setHeader("Content-Type", mimeTypeConfig.getMimeType(path));
 	response.setHeader("Server", "Nginx 2.0");
 	response.setHeader("Connection", "keep-alive");

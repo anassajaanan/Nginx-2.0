@@ -48,7 +48,7 @@ def parse_multipart_form_data(stdin, boundary, buffer_size=1000000):
 	file_data = rest_of_data[:file_start] if file_start > 0 else rest_of_data
 
 	# Write file data
-	filepath = f"./content/uploads/{filename}"
+	filepath = f"./uploads/{filename}"
 	with open(filepath, 'wb') as f:
 		f.write(file_data)
 		while True:
@@ -82,25 +82,25 @@ def parse_multipart_form_data(stdin, boundary, buffer_size=1000000):
 			<meta name="description" content="" />
 			<title>Web Server Nginx 2.0</title>
 			<!-- favicon -->
-			<link rel="apple-touch-icon" sizes="180x180" href="/content/WebServer/assets/images/favicon/apple-touch-icon.png">
-			<link rel="icon" type="image/png" sizes="32x32" href="/content/WebServer/assets/images/favicon/favicon-32x32.png">
-			<link rel="icon" type="image/png" sizes="16x16" href="/content/WebServer/assets/images/favicon/favicon-16x16.png">
-			<link rel="manifest" href="/content/WebServer/assets/images/favicon/site.webmanifest">
+			<link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
+			<link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
+			<link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
+			<link rel="manifest" href="../assets/images/favicon/site.webmanifest">
 			<link
 			rel="stylesheet"
-			href="/content/WebServer/assets/css/image-colors.css"
+			href="../assets/css/image-colors.css"
 			media="screen"
 			/>
 			<script
 			class="u-script"
 			type="text/javascript"
-			src="/content/WebServer/assets/js/jquery.js"
+			src="../assets/js/jquery.js"
 			defer=""
 			></script>
 			<script
 			class="u-script"
 			type="text/javascript"
-			src="/content/WebServer/assets/js/javascript.js"
+			src="../assets/js/javascript.js"
 			defer=""
 			></script>
 			<meta name="referrer" content="origin" />
@@ -294,7 +294,7 @@ def parse_multipart_form_data(stdin, boundary, buffer_size=1000000):
 							<div class="u-container-layout u-container-layout-1" style="margin-left: 2rem !important;">
 							<img
 								class="u-expanded-width u-image u-image-round u-radius-20 u-image-1"
-								src="/content/WebServer/assets/images/img1.png"
+								src="../assets/images/img1.png"
 								data-image-width="1000"
 								data-image-height="854"
 							/>

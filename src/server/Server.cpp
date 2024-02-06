@@ -397,8 +397,6 @@ void	Server::sendSmallResponse(int clientSocket, ResponseState *responseState)
 	size_t totalLength = response.length();
 	size_t remainingLength = totalLength - responseState->bytesSent;
 	const char *responsePtr = response.c_str() + responseState->bytesSent;
-	std::cout << "Response ==> " << std::endl << responsePtr << std::endl;
-
 	ssize_t bytesSent = send(clientSocket, responsePtr, remainingLength, 0);
 
 	if (bytesSent < 0)
@@ -477,7 +475,6 @@ void	Server::sendLargeResponseChunk(int clientSocket, ResponseState *responseSta
 	const char *chunkPtr = chunk.c_str() + responseState->currentChunkPosition;
 	ssize_t bytesSent = send(clientSocket, chunkPtr, remainingLength, 0);
 
-	std::cout << "Response ==> " << std::endl << chunkPtr << std::endl;
 	if (bytesSent < 0)
 	{
 		Logger::log(Logger::ERROR, "Failed to send Large Response chunk to client with socket fd " + std::to_string(clientSocket) + ". Error: " + strerror(errno), "Server::sendLargeResponseChunk");
