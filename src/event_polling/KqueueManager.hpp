@@ -7,8 +7,8 @@
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
 
-	#include "Logger.hpp"
 	#include "EventPoller.hpp"
+	#include "../logging/Logger.hpp"
 
 
 	#include <unistd.h>

@@ -6,8 +6,8 @@
 
 #ifdef __linux__
 
-	#include "Logger.hpp"
 	#include "EventPoller.hpp"
+	#include "../logging/Logger.hpp"
 
 	#include <set>
 	#include <unistd.h>

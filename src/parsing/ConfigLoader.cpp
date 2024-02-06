@@ -1,5 +1,4 @@
 #include "ConfigLoader.hpp"
-#include "ConfigNode.hpp"
 
 
 ConfigLoader::ConfigLoader(ConfigNode *treeRoot)

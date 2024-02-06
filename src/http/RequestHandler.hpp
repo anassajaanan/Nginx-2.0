@@ -4,12 +4,12 @@
 #ifndef REQUEST_HANDLER_HPP
 #define REQUEST_HANDLER_HPP
 
-#include "ServerConfig.hpp"
-#include "LocationConfig.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
-#include "MimeTypeParser.hpp"
-#include "Logger.hpp"
+#include "../config/ServerConfig.hpp"
+#include "../config/LocationConfig.hpp"
+#include "../parsing/MimeTypeParser.hpp"
+#include "../logging/Logger.hpp"
 
 #include <sys/stat.h>
 #include <dirent.h>

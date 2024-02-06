@@ -4,7 +4,7 @@
 #ifndef RESPONSESTATE_HPP
 #define RESPONSESTATE_HPP
 
-#include "HttpResponse.hpp"
+#include "../http/HttpResponse.hpp"
 
 #include <sstream>
 

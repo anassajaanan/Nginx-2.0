@@ -1,5 +1,4 @@
 #include "BaseConfig.hpp"
-#include <string>
 
 
 void	BaseConfig::setRoot(const std::string &rootValue)

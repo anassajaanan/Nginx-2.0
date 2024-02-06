@@ -5,7 +5,7 @@
 #ifndef CLIENTSTATE_HPP
 #define CLIENTSTATE_HPP
 
-#include "Server.hpp"
+#include "../server/Server.hpp"
 
 class ClientState
 {

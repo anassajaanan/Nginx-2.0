@@ -6,19 +6,15 @@ RELEASE_NAME = $(NAME)_release
 # Detect Operating System
 UNAME_S := $(shell uname -s)
 
-# Source and Include Directories
-# replace it later with src/
-SRCS_DIR = ./
 # replace it later with include/
-INCL_DIR = ./
+INCL_DIR = src/
 
-# Source and Header Files
-SRCS = 	BaseConfig.cpp CgiDirective.cpp ClientState.cpp ConfigLoader.cpp ConfigNode.cpp ConfigParser.cpp ConfigTokenizer.cpp ContextNode.cpp \
-		DirectiveNode.cpp HttpRequest.cpp HttpResponse.cpp KqueueManager.cpp LocationConfig.cpp Logger.cpp LogicValidator.cpp MimeTypeConfig.cpp \
-		MimeTypeParser.cpp RequestHandler.cpp ResponseState.cpp ReturnDirective.cpp Server.cpp ServerConfig.cpp ServerManager.cpp SyntaxValidator.cpp \
-		TreeBuilder.cpp TryFilesDirective.cpp CgiHandler.cpp main.cpp EventPoller.cpp EpollManager.cpp
 
-HEADERS = $(wildcard $(INCL_DIR)*.hpp)
+# Source Files Organized by Directory
+SRC_DIRS = cgi config event_polling http logging parsing server
+SRCS = $(foreach dir,$(SRC_DIRS),$(wildcard src/$(dir)/*.cpp))
+SRCS += src/main.cpp
+
 
 # Compiler and Common Flags
 CXX = clang++
@@ -31,11 +27,12 @@ BUILD_DIR = build/
 DEBUG_DIR = $(BUILD_DIR)debug/
 RELEASE_DIR = $(BUILD_DIR)release/
 
-# Object and Dependency Files for Different Configurations
-OBJS_DEBUG = $(addprefix $(DEBUG_DIR), $(SRCS:.cpp=.o))
-DEPS_DEBUG = $(OBJS_DEBUG:.o=.d)
+# Object Files for Different Configurations
+OBJS_DEBUG = $(SRCS:src/%.cpp=$(DEBUG_DIR)%.o)
+OBJS_RELEASE = $(SRCS:src/%.cpp=$(RELEASE_DIR)%.o)
 
-OBJS_RELEASE = $(addprefix $(RELEASE_DIR), $(SRCS:.cpp=.o))
+# Include Dependency Files
+DEPS_DEBUG = $(OBJS_DEBUG:.o=.d)
 DEPS_RELEASE = $(OBJS_RELEASE:.o=.d)
 
 # Development Flags
@@ -67,19 +64,21 @@ prod: $(RELEASE_NAME)
 
 # Linking for Debug
 $(DEBUG_NAME): $(OBJS_DEBUG)
+	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 # Linking for Release
 $(RELEASE_NAME): $(OBJS_RELEASE)
+	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Compilation for Debug
-$(DEBUG_DIR)%.o: $(SRCS_DIR)%.cpp $(HEADERS)
+
+# Compilation for Debug and Release
+$(DEBUG_DIR)%.o: src/%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
-# Compilation for Release
-$(RELEASE_DIR)%.o: $(SRCS_DIR)%.cpp $(HEADERS)
+$(RELEASE_DIR)%.o: src/%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 

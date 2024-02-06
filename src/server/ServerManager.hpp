@@ -5,15 +5,15 @@
 #define SERVER_MANAGER_HPP
 
 #include "Server.hpp"
-#include "ServerConfig.hpp"
+#include "../config/ServerConfig.hpp"
 
 #ifdef __linux__
     // Linux-specific implementation
-    #include "EpollManager.hpp"
+    #include "./event_polling/EpollManager.hpp"
     typedef EpollManager EventManager;
 #elif defined(__APPLE__) || defined(__FreeBSD__)
     // macOS or FreeBSD-specific implementation
-    #include "KqueueManager.hpp"
+    #include "../event_polling/KqueueManager.hpp"
     typedef KqueueManager EventManager;
 #endif
 

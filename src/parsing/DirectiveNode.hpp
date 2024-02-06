@@ -1,6 +1,5 @@
 
 #pragma once
-#include <vector>
 #ifndef DIRECTIVENODE_HPP
 #define DIRECTIVENODE_HPP
 

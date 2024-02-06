@@ -5,8 +5,8 @@
 #ifndef CONFIGLOADER_HPP
 # define CONFIGLOADER_HPP
 
-#include "ServerConfig.hpp"
-#include "LocationConfig.hpp"
+#include "../config/ServerConfig.hpp"
+#include "../config/LocationConfig.hpp"
 
 // define default values
 #define DEFAULT_HTTP_ROOT_VALUE "/var/www/html"

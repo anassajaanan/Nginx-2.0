@@ -1,8 +1,6 @@
 #include "ServerConfig.hpp"
-#include "BaseConfig.hpp"
 #include "LocationConfig.hpp"
-#include <stdexcept>
-#include <string>
+
 
 ServerConfig::ServerConfig() { }
 

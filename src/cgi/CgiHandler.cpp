@@ -1,5 +1,5 @@
 #include "CgiHandler.hpp"
-#include "Server.hpp"
+#include "../server/Server.hpp"
 
 CgiHandler::CgiHandler(HttpRequest &request, ServerConfig &config, EventPoller *eventManager, int clientSocket,  const std::string &postPath)
 	: pid(-1), postBodyFd(-1), cgiClientSocket(clientSocket), isValid(true)

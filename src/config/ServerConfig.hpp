@@ -2,12 +2,11 @@
 
 
 #pragma once
-#include <vector>
 #ifndef SERVERCONFIG_HPP
 # define SERVERCONFIG_HPP
 
 #include "BaseConfig.hpp"
-#include "CgiDirective.hpp"
+#include "../cgi/CgiDirective.hpp"
 
 // Default configuration values
 #define DEFAULT_SERVER_PORT 80

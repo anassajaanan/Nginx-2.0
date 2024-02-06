@@ -1,7 +1,4 @@
 #include "ServerManager.hpp"
-#include "EpollManager.hpp"
-#include "EventPoller.hpp"
-#include "Logger.hpp"
 
 
 int	ServerManager::running = 1;

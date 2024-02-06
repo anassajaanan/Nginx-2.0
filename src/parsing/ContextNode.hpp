@@ -1,11 +1,11 @@
 
 
 #pragma once
-#include <string>
 #ifndef CONTEXTNODE_HPP
 #define CONTEXTNODE_HPP
 
 
+#include <string>
 #include "ConfigNode.hpp"
 
 class ContextNode : public ConfigNode

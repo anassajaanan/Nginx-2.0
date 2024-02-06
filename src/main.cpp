@@ -1,10 +1,10 @@
 
-#include "ConfigParser.hpp"
-#include "ConfigLoader.hpp"
-#include "EventPoller.hpp"
-#include "MimeTypeConfig.hpp"
-#include "ServerManager.hpp"
-#include "Logger.hpp"
+#include "parsing/ConfigParser.hpp"
+#include "parsing/ConfigLoader.hpp"
+#include "event_polling/EventPoller.hpp"
+#include "config/MimeTypeConfig.hpp"
+#include "server/ServerManager.hpp"
+#include "logging/Logger.hpp"
 
 
 
@@ -36,7 +36,7 @@ int main()
 		ConfigParser parser("conf/nginx.conf");
 		parser.parseConfigFile();
 
-		MimeTypeParser mimeTypeParser("./conf/mime.types");
+		MimeTypeParser mimeTypeParser("conf/mime.types");
 		mimeTypeParser.parseMimeTypeFile(mimeTypeConfig);
 
 		ConfigLoader loader(parser.getConfigTreeRoot());
@@ -65,7 +65,7 @@ int main()
 	sigaction(SIGCHLD, &sa, NULL);
 
 
-	Logger::init(Logger::DEBUG, "./logs/WebServer.log");
+	Logger::init(Logger::DEBUG, "logs/WebServer.log");
 	// Logger::init(Logger::DEBUG);
 
 	ServerManager serverManager(serverConfigs, eventManager, mimeTypeConfig);

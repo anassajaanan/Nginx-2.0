@@ -3,9 +3,9 @@
 #ifndef CGI_HANDLER_HPP
 #define CGI_HANDLER_HPP
 
-#include "RequestHandler.hpp"
-#include "ServerConfig.hpp"
-#include "EventPoller.hpp"
+#include "../http/RequestHandler.hpp"
+#include "../config/ServerConfig.hpp"
+#include "../event_polling/EventPoller.hpp"
 
 
 

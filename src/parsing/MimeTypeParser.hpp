@@ -4,7 +4,7 @@
 #ifndef MIMETYPEPARSER_HPP
 #define MIMETYPEPARSER_HPP
 
-#include "MimeTypeConfig.hpp"
+#include "../config/MimeTypeConfig.hpp"
 
 #include <set>
 #include <string>

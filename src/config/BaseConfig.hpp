@@ -5,8 +5,8 @@
 # define BASECONFIG_HPP
 
 
-#include "ContextNode.hpp"
-#include "DirectiveNode.hpp"
+#include "../parsing/ContextNode.hpp"
+#include "../parsing/DirectiveNode.hpp"
 #include "TryFilesDirective.hpp"
 #include "ReturnDirective.hpp"
 
