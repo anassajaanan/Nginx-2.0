@@ -31,15 +31,20 @@ void	CgiHandler::addCgiResponseMessage(const std::string &cgiOutput)
 
 std::string	CgiHandler::buildCgiResponse()
 {
+	if (this->cgiResponseMessage.empty())
+	{
+		HttpResponse response;
+
+		response.generateStandardErrorResponse("502", "Bad Gateway", "Bad Gateway", "The server encountered an unexpected condition which prevented it from fulfilling the request.");
+		return (response.buildResponse());
+	}
+
 	HttpResponse response;
 
 	response.setVersion("HTTP/1.1");
 	response.setStatusCode(std::to_string(200));
 	response.setStatusMessage("OK");
 	response.setBody(this->cgiResponseMessage);
-	// /*1*/ response.setHeader("Content-Length", std::to_string(response.getBody().length()));
-	// // if (message.find("Content-Type") == std::string::npos)
-	// /*2*/ response.setHeader("Content-Type", "text/plain");
 	response.setHeader("Content-Length", std::to_string(response.getBody().length()));
 	response.setHeader("Content-Type", "text/html");
 	response.setHeader("Server", "Nginx 2.0");

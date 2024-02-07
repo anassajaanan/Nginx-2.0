@@ -243,7 +243,8 @@ void	Server::processGetRequest(int clientSocket, HttpRequest &request)
 		HttpResponse response = handler.handleRequest(request);
 		if (_clients.count(clientSocket) > 0)
 			_clients[clientSocket]->resetClientState();
-		
+		if (!request.getHeader("Cookie").empty())
+			response.setHeader("Set-Cookie", request.getHeader("Cookie"));
 		if (response.getType() == SMALL_RESPONSE)
 			responseState = new ResponseState(response.buildResponse());
 		else
@@ -263,6 +264,9 @@ void	Server::processHeadRequest(int clientSocket, HttpRequest &request)
 
 	if (_clients.count(clientSocket) > 0)
 		_clients[clientSocket]->resetClientState();
+
+	if (!request.getHeader("Cookie").empty())
+		response.setHeader("Set-Cookie", request.getHeader("Cookie"));
 	
 	if (response.getType() == SMALL_RESPONSE)
 		responseState = new ResponseState(response.buildResponse());
@@ -294,6 +298,9 @@ void	Server::processPostRequest(int clientSocket, HttpRequest &request, bool clo
 		HttpResponse response = handler.handleRequest(request);
 		if (_clients.count(clientSocket) > 0)
 			_clients[clientSocket]->resetClientState();
+
+		if (!request.getHeader("Cookie").empty())
+			response.setHeader("Set-Cookie", request.getHeader("Cookie"));
 		
 		responseState = new ResponseState(response.buildResponse(), closeConnection);
 
@@ -309,6 +316,9 @@ void	Server::processDeleteRequest(int clientSocket, HttpRequest &request)
 	HttpResponse response = handler.handleRequest(request);
 	if (_clients.count(clientSocket) > 0)
 		_clients[clientSocket]->resetClientState();
+
+	if (!request.getHeader("Cookie").empty())
+		response.setHeader("Set-Cookie", request.getHeader("Cookie"));
 	
 	responseState = new ResponseState(response.buildResponse());
 
