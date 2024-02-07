@@ -5,6 +5,7 @@
 #include "config/MimeTypeConfig.hpp"
 #include "server/ServerManager.hpp"
 #include "logging/Logger.hpp"
+#include <string>
 
 
 
@@ -18,22 +19,34 @@ static void	signalHandler(int signum)
 	{
 		int status;
 		pid_t pid;
-		while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
-		{
-			
-		}
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0) { }
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	std::vector<ServerConfig>	serverConfigs;
 	MimeTypeConfig				mimeTypeConfig;
 	EventPoller					*eventManager;
+	std::string					configFile;
+
+	if (argc == 1)
+	{
+		configFile = "conf/nginx.conf";
+	}
+	else if (argc == 2)
+	{
+		configFile = argv[1];
+	}
+	else
+	{
+		std::cerr << "Usage: " << argv[0] << " [config file]" << std::endl;
+		return 1;
+	}
 
     try
 	{
-		ConfigParser parser("conf/nginx.conf");
+		ConfigParser parser(configFile);
 		parser.parseConfigFile();
 
 		MimeTypeParser mimeTypeParser("conf/mime.types");
