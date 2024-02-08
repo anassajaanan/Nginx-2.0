@@ -2,7 +2,7 @@
 
 ## **Introduction**
 
-Nginx 2.0 is a cutting-edge, event-driven web server designed with efficiency, scalability, and HTTP protocol compliance at its core. Inspired by the original Nginx architecture, our goal was to create a web server that not only matches but surpasses its predecessor in performance, flexibility, and ease of use. Nginx 2.0 embodies our commitment to innovation, offering a robust platform for both static and dynamic web content, optimized for modern web applications and services.
+Nginx 2.0 is a cutting-edge, event-driven web server designed with efficiency, scalability, and HTTP protocol compliance at its core. Inspired by the original Nginx architecture, our goal was to create a web server that matches its predecessor in performance, flexibility, and ease of use. Developed through the collaborative efforts of myself and [Tukka](https://github.com/tukka25), Nginx 2.0 embodies our commitment to innovation, offering a robust platform for both static and dynamic web content, optimized for modern web applications and services.
 
 ---
 
@@ -96,17 +96,20 @@ Nginx 2.0 uses a Makefile for building from source. Follow these steps to clone 
         
 3. **Running Nginx 2.0**
     
-    After building, you can start the server with the default configuration or specify a configuration file in conf directory:
+    To start the server, specify a configuration file path if desired. If no path is provided, the server will use the default configuration located at  **`[conf/nginx.conf]`**
+    
+    ```bash
+    ./webserver [configfile_path]  # For release build
+    ```
+    
+    Replace **`[configfile_path]`** with the path to your configuration file. If omitted, Nginx 2.0 will use the default configuration.
+    
+	 For a debug build:
+    
+    ```bash
+    ./webserver_debug [configfile_path]  # For debug build
+    ```
 
-    ```bash
-    ./webserver_release  # For release build
-    ```
-    
-    Or for a debug build:
-    
-    ```bash
-    ./webserver  # For debug build
-    ```
     
 
 ## **Clean Build**
@@ -329,16 +332,18 @@ This comprehensive example demonstrates a server setup with nested contexts and 
 http {
     client_max_body_size 20M; # Apply to all servers
 
+	keepalive_timeout 15; # Connection keep-alive timeout
+
     server {
-        listen 80;
-        server_name example.com;
+        listen 8080;
+        server_name localhost;
 
         root /var/www/example;
-        index index.html index.htm;
+        index index.html index.htm index.php;
 
         # Serve static files directly
         location / {
-            try_files $uri $uri/ /index.html;
+            try_files $uri $uri/ /fallback;
         }
 
         # Enable directory listing for /images
@@ -359,10 +364,154 @@ http {
         # CGI script execution for specific extensions
         cgi_extension .cgi .pl;
 
-        keepalive_timeout 15; # Connection keep-alive timeout
     }
 }
 
 ```
 
 This guide and example should equip you with the knowledge to configure Nginx 2.0 effectively, ensuring your web server is tailored to your specific requirements and operational contexts.
+
+
+---
+
+## **Project Structure**
+
+Below is an overview of the Nginx 2.0 project structure, providing insight into the organization of the codebase and the purpose of each directory and key files:
+
+```bash
+/web-server-project
+├── src                     # Source files
+│   ├── config              # Configuration-related classes and files
+│   │   ├── BaseConfig.cpp
+│   │   ├── BaseConfig.hpp
+│   │   ├── LocationConfig.cpp
+│   │   ├── LocationConfig.cpp
+│   │   ├── MimeTypeConfig.cpp
+│   │   ├── MimeTypeConfig.hpp
+│   │   ├── ReturnDirective.cpp
+│   │   ├── ReturnDirective.hpp
+│   │   ├── ServerConfig.cpp
+│   │   ├── ServerConfig.hpp
+│   │   ├── TryFilesDirective.cpp
+│   │   └── TryFilesDirective.hpp
+│   │
+│   ├── cgi                 # CGI handling classes
+│   │   ├── CgiDirective.hpp
+│   │   ├── CgiDirective.cpp
+│   │   ├── CgiHandler.hpp
+│   │   └── CgiHandler.cpp
+│   │
+│   ├── http                # HTTP protocol handling classes
+│   │   ├── HttpRequest.hpp
+│   │   ├── HttpRequest.cpp
+│   │   ├── HttpResponse.hpp
+│   │   ├── HttpResponse.cpp
+│   │   ├── HttpRequest.cpp
+│   │   ├── RequestHandler.hpp
+│   │   └── RequestHandler.cpp
+│   │
+│   ├── logging             # Logging functionality
+│   │   ├── Logger.hpp
+│   │   └── Logger.cpp
+│   │
+│   ├── parsing             # Dedicated parsing logic
+│   │   ├── ConfigLoader.cpp
+│   │   ├── ConfigLoader.hpp
+│   │   ├── ConfigNode.cpp
+│   │   ├── ConfigNode.hpp
+│   │   ├── ConfigParser.cpp
+│   │   ├── ConfigParser.hpp
+│   │   ├── ConfigTokenizer.cpp
+│   │   ├── ConfigTokenizer.hpp
+│   │   ├── ContextNode.cpp
+│   │   ├── ContextNode.hpp
+│   │   ├── DirectiveNode.cpp
+│   │   ├── DirectiveNode.hpp
+│   │   ├── LogicValidator.cpp
+│   │   ├── LogicValidator.hpp
+│   │   ├── MimeTypeParser.cpp
+│   │   ├── MimeTypeParser.hpp
+│   │   ├── SyntaxValidator.cpp
+│   │   ├── SyntaxValidator.hpp
+│   │   ├── TreeBuilder.cpp
+│   │   └── TreeBuilder.hpp
+│   │
+│   ├── event_polling       # Abstraction over kqueue and Epoll
+│   │   ├── EpollManager.cpp
+│   │   ├── EpollManager.hpp
+│   │   ├── EventPoller.cpp
+│   │   ├── EventPoller.hpp
+│   │   ├── KqueueManager.cpp
+│   │   └── KqueueManager.hpp
+│   │
+│   ├── server              # Core server functionality
+│   │   ├── ClientState.cpp
+│   │   ├── ClientState.hpp
+│   │   ├── ResponseState.cpp
+│   │   ├── ResponseState.hpp
+│   │   ├── Server.cpp
+│   │   ├── Server.hpp
+│   │   ├── ServerManager.cpp
+│   │   └── ServerManager.hpp
+│   │
+│   └── main.cpp            # Entry point of the application
+│
+├── conf                    # Configuration files (e.g., nginx.conf, mime.types)
+├── content                 # Static content served by the server
+├── logs                    # Log files generated by the server
+├── uploads                 # Directory for handling uploaded files
+└── Makefile                # Build instructions for your project
+
+```
+
+This structure is designed to enhance maintainability and scalability, ensuring that anyone can easily navigate and contribute to the project.
+
+---
+
+## **Resources & Further Reading**
+
+To aid in further exploration and mastery of web server development, networking, and programming concepts, we recommend the following curated list of resources:
+
+### **Web Server Development and Networking**
+
+- [Building Web: Sockets and Servers for Dummies](https://levelup.gitconnected.com/building-the-web-sockets-and-servers-for-dummies-886d1595a4f8)
+- [Socket Programming in C/C++](https://www.geeksforgeeks.org/socket-programming-cc/)
+- [Set Socket Nonblocking](https://jameshfisher.com/2017/04/05/set_socket_nonblocking/)
+- [A Simple HTTP Server from Scratch](https://trungams.github.io/2020-08-23-a-simple-http-server-from-scratch/)
+- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/#client-server-background)
+
+### **HTTP and HTTPS**
+
+- [The HTTP/3 Protocol (RFC 9112)](https://www.rfc-editor.org/rfc/rfc9112.html)
+- [HTTP Headers for Dummies](https://code.tutsplus.com/http-headers-for-dummies--net-8039)
+- [HTTP Status Codes Explained](https://www.hostinger.com/tutorials/http-status-codes)
+
+### **Nginx Specific**
+
+- [Understanding the Nginx Configuration File Structure and Configuration Contexts](https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts#the-core-contexts)
+- [Understanding Nginx Server and Location Block Selection Algorithms](https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms)
+- [Nginx Documentation - Core Module](http://nginx.org/en/docs/http/ngx_http_core_module.html)
+
+### **Programming and Asynchronous Development**
+
+- [libhttpserver for Creating HTTP Servers](https://github.com/etr/libhttpserver)
+- [Go HTTP Programming](https://fideloper.com/go-http)
+
+### **Video Lectures**
+
+- [Introduction to Networking | TCP IP & Socket Programming](https://www.youtube.com/watch?v=2-hmRHmsVCM) by Abdelaziz Eroui, part of The Missing Semester series.
+- [Missing Semester 0x01 | Introduction to Networking | Introduction to Async Programming](https://www.youtube.com/watch?v=gEmiqMWUbg8) by Mehdi Cheracher, offering insights into asynchronous programming and networking.
+
+### **Additional Learning Resources**
+
+- [Understanding WebSockets and Servers (YouTube Playlist)](https://www.youtube.com/watch?v=bqj4dWG7v3c&list=PLhnN2F9NiVmAMn9iGB_Rtjs3aGef3GpSm)
+- [Analysis of High-Performance Web Server Architectures (Academic Paper)](https://arrow.tudublin.ie/cgi/viewcontent.cgi?article=1255&context=scschcomdis)
+- [The C10k Problem](https://en.wikipedia.org/wiki/C10k_problem)
+
+## **Special Thanks**
+
+Special thanks are extended to Abdelaziz Eroui for his informative lecture on TCP/IP and socket programming, part of The Missing Semester series, which provided deep insights into the fundamentals of networking critical to our project's success.
+
+We would also like to express our gratitude to Mehdi Cheracher for his lecture on networking and asynchronous programming. His teachings have been instrumental in guiding our approach to handling network communications efficiently.
+
+Their contributions to the field and dedication to education have been invaluable to both our project and the wider community.
