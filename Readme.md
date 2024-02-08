@@ -6,14 +6,29 @@ Nginx 2.0 is a cutting-edge, event-driven web server designed with efficiency, s
 
 ---
 
-# **Features at a Glance**
+## **Table of Contents**
 
-- [HTTP Protocol Compliance](#http-protocol-compliance)
-- [Custom Parsing Strategy](#custom-parsing-strategy)
-- [Cross-Platform I/O Multiplexing](#cross-platform-io-multiplexing)
-- [Efficient Large Response Handling and Video Streaming](#efficient-large-response-handling-and-video-streaming)
-- [Dynamic Content Execution with CGI Support](#dynamic-content-execution-with-cgi-support)
-- [Configurable Logging Framework](#configurable-logging-framework)
+
+- [Features at a Glance](#feature-deep-dive)
+    - [HTTP Protocol Compliance](#http-protocol-compliance)
+	- [Custom Parsing Strategy](#custom-parsing-strategy)
+	- [Cross-Platform I/O Multiplexing](#cross-platform-io-multiplexing)
+	- [Efficient Large Response Handling and Video Streaming](#efficient-large-response-handling-and-video-streaming)
+	- [Dynamic Content Execution with CGI Support](#dynamic-content-execution-with-cgi-support)
+	- [Configurable Logging Framework](#configurable-logging-framework)
+- [Getting Started with Nginx 2.0](#getting-started-with-nginx-20)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Running Nginx 2.0](#running-Nginx-2.0)
+    - [Clean Build](#clean-build)
+    - [Advanced Usage](#advanced-usage)
+- [Configuration Guide for Nginx 2.0](#configuration-guide-for-nginx-20)
+    - [Directive Details](#directive-details)
+- [Project Structure](#project-structure)
+- [Resources & Further Reading](#resources--further-reading)
+- [Special Thanks](#special-thanks)
+- [Contributing to Nginx 2.0](#contributing-to-nginx-20)
+
 
 ---
 
