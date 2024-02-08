@@ -48,4 +48,21 @@ headers = {
 
 response = requests.post("https://api.sendgrid.com/v3/mail/send", json=data, headers=headers, verify=False)
 
-print(f"Email has been sent to {receiver_email}")
+response = """
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+<section class="mail-seccess section">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-6 offset-lg-3 col-12">
+				<!-- Error Inner -->
+				<div class="success-inner">
+					<h1><i class="fa fa-envelope"></i><span>Your Mail Sent Successfully!</span></h1>
+				</div>
+				<!--/ End Error Inner -->
+			</div>
+		</div>
+	</div>
+</section>
+"""
+
+print(response)

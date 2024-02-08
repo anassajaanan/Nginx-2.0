@@ -3,7 +3,4 @@ a.out
 a.out.dSYM/
 .DS_Store
 build/
-tmp.cpp
-uploads/*
-logs/*
 

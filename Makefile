@@ -1,7 +1,7 @@
 # Project Name
 NAME = webserver
-DEBUG_NAME = $(NAME)
-RELEASE_NAME = $(NAME)_release
+DEBUG_NAME = $(NAME)_debug
+RELEASE_NAME = $(NAME)
 
 # Detect Operating System
 UNAME_S := $(shell uname -s)
