@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f1f2f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+
+      position: relative;
+    }
+
+    #background-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .container {
+      /* position: relative; */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 1); /* Adjust opacity as needed */
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+
+    label {
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 300px;
+      padding: 10px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    input[type="submit"] {
+      background-color: #3498db;
+      color: #ffffff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+
+    .robot {
+      background-image: url(Robot_icon.png); /* Replace with your icon */
+      width: 64px; /* Adjust size as needed */
+      height: 64px;
+      background-size: cover;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .main_svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    .main_container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    #response {
+      margin-top: 20px;
+    }
+
+    #postForm {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #postForm textarea {
+      resize: none  ;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- <svg id="background-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" viewBox="0 0 1696 917">
+    <g transform="translate(848,458.5) scale(1,1) translate(-848,-458.5)"> -->
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="main_svg"  preserveAspectRatio="xMidYMid" viewBox="0 0 1696 917">
+        <g transform="translate(848,458.5) scale(1,1) translate(-848,-458.5)"><linearGradient id="lg-0.6650114421856201" x1="0" x2="1" y1="0" y2="0">
+          <stop stop-color="#93dbe9" offset="0"></stop>
+          <stop stop-color="#689cc5" offset="1"></stop>
+        </linearGradient><path d="" fill="url(#lg-0.6650114421856201)" opacity="0.4">
+          <animate attributeName="d" dur="7.142857142857142s" repeatCount="indefinite" keyTimes="0;0.333;0.667;1" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="0s" values="M0 0L 0 823.4156947324602Q 169.6 779.2604003949464  339.2 741.8223714313573T 678.4 680.3636012217901T 1017.6 609.7886727919754T 1356.8 439.82244273911937T 1696 422.3496059879234L 1696 0 Z;M0 0L 0 911.3231128438322Q 169.6 791.8887179541917  339.2 771.247007298934T 678.4 632.8219563724963T 1017.6 583.3052574866633T 1356.8 501.7042304357773T 1696 279.15665039613714L 1696 0 Z;M0 0L 0 832.408473473047Q 169.6 774.0793572218907  339.2 741.7465123584456T 678.4 611.5025395259081T 1017.6 584.9931329619665T 1356.8 460.1255843645438T 1696 339.6395098432031L 1696 0 Z;M0 0L 0 823.4156947324602Q 169.6 779.2604003949464  339.2 741.8223714313573T 678.4 680.3636012217901T 1017.6 609.7886727919754T 1356.8 439.82244273911937T 1696 422.3496059879234L 1696 0 Z"></animate>
+        </path><path d="" fill="url(#lg-0.6650114421856201)" opacity="0.4">
+          <animate attributeName="d" dur="7.142857142857142s" repeatCount="indefinite" keyTimes="0;0.333;0.667;1" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-1.4285714285714284s" values="M0 0L 0 882.7719552499008Q 169.6 772.0531822815697  339.2 752.8012974782899T 678.4 666.9181136375419T 1017.6 521.8502796086465T 1356.8 424.38844291480405T 1696 323.7102280772415L 1696 0 Z;M0 0L 0 837.4778871709877Q 169.6 799.0332452842647  339.2 779.749285760848T 678.4 717.6043206071945T 1017.6 504.5812967896971T 1356.8 459.97734550143133T 1696 272.5006466347247L 1696 0 Z;M0 0L 0 832.6279626521871Q 169.6 708.0483700504248  339.2 674.3015498504806T 678.4 637.0461168002068T 1017.6 534.7780085522036T 1356.8 435.66963048966454T 1696 310.26429932002816L 1696 0 Z;M0 0L 0 882.7719552499008Q 169.6 772.0531822815697  339.2 752.8012974782899T 678.4 666.9181136375419T 1017.6 521.8502796086465T 1356.8 424.38844291480405T 1696 323.7102280772415L 1696 0 Z"></animate>
+        </path><path d="" fill="url(#lg-0.6650114421856201)" opacity="0.4">
+          <animate attributeName="d" dur="7.142857142857142s" repeatCount="indefinite" keyTimes="0;0.333;0.667;1" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-2.8571428571428568s" values="M0 0L 0 849.6472128675804Q 169.6 749.4181567508451  339.2 719.3620874056536T 678.4 611.4730548596187T 1017.6 491.25381163634535T 1356.8 409.2911945312094T 1696 342.645037706136L 1696 0 Z;M0 0L 0 846.3993557107858Q 169.6 741.8149201773506  339.2 709.5064577644428T 678.4 670.6737325535801T 1017.6 477.24100042693556T 1356.8 504.8850230617513T 1696 389.0324260893163L 1696 0 Z;M0 0L 0 803.8824011985723Q 169.6 791.2915191319626  339.2 760.6094269011404T 678.4 710.6280323152178T 1017.6 619.8203944532669T 1356.8 563.4572505687706T 1696 367.61863395008385L 1696 0 Z;M0 0L 0 849.6472128675804Q 169.6 749.4181567508451  339.2 719.3620874056536T 678.4 611.4730548596187T 1017.6 491.25381163634535T 1356.8 409.2911945312094T 1696 342.645037706136L 1696 0 Z"></animate>
+        </path><path d="" fill="url(#lg-0.6650114421856201)" opacity="0.4">
+          <animate attributeName="d" dur="7.142857142857142s" repeatCount="indefinite" keyTimes="0;0.333;0.667;1" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-4.285714285714286s" values="M0 0L 0 865.8486499317931Q 169.6 716.6321591133193  339.2 694.023433633771T 678.4 633.2108240101152T 1017.6 578.5702937673127T 1356.8 495.8089127293757T 1696 356.2442410766362L 1696 0 Z;M0 0L 0 830.6369723476046Q 169.6 860.7194645501725  339.2 828.6139808904416T 678.4 723.4065464120097T 1017.6 604.2929451626326T 1356.8 467.0002484626915T 1696 347.75900475656107L 1696 0 Z;M0 0L 0 777.6267535719786Q 169.6 848.1836073126434  339.2 813.9831009389038T 678.4 706.1115845523566T 1017.6 490.94622795424505T 1356.8 406.76945710625944T 1696 407.7359803888032L 1696 0 Z;M0 0L 0 865.8486499317931Q 169.6 716.6321591133193  339.2 694.023433633771T 678.4 633.2108240101152T 1017.6 578.5702937673127T 1356.8 495.8089127293757T 1696 356.2442410766362L 1696 0 Z"></animate>
+        </path><path d="" fill="url(#lg-0.6650114421856201)" opacity="0.4">
+          <animate attributeName="d" dur="7.142857142857142s" repeatCount="indefinite" keyTimes="0;0.333;0.667;1" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1;0.5 0 0.5 1" begin="-5.7142857142857135s" values="M0 0L 0 777.2851879730432Q 169.6 716.4846706973706  339.2 687.6369912863653T 678.4 610.7304971407452T 1017.6 592.2713942676202T 1356.8 456.7962149464521T 1696 423.1429770576311L 1696 0 Z;M0 0L 0 815.1957489325525Q 169.6 715.3351066401539  339.2 686.0360666107346T 678.4 645.5197190019455T 1017.6 526.597255297839T 1356.8 434.7150528640318T 1696 423.19386050947196L 1696 0 Z;M0 0L 0 858.1574619822334Q 169.6 744.4451133858812  339.2 725.6798811922076T 678.4 592.1577237153529T 1017.6 625.7660825970785T 1356.8 534.1924445803136T 1696 372.2528737061267L 1696 0 Z;M0 0L 0 777.2851879730432Q 169.6 716.4846706973706  339.2 687.6369912863653T 678.4 610.7304971407452T 1017.6 592.2713942676202T 1356.8 456.7962149464521T 1696 423.1429770576311L 1696 0 Z"></animate>
+        </path></g>
+        </svg>
+    <!-- </g>
+  </svg> -->
+
+  <div class="main_container">
+    <div class="container">
+      <div class="robot"></div>
+      <form action="/cgi-bin/chatbot.py" method="POST" id="postForm">
+        <label for="message">Enter Your Message:</label>
+        <textarea id="message" name="message" rows="8" placeholder="Type your message here..." required></textarea>
+        <br>
+        <input type="submit" value="🤖 Submit">
+      </form>
+      <div id="response"></div>
+    </div>
+  </div>
+  
+  
+</body>
+</html>

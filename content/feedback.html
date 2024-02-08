@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Form</title>
+  <style>
+    body {
+      background-image: url("background.jpeg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      color: #ffffff;
+    }
+
+    form {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      width: 300px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+    }
+
+    input[type="button"] {
+      background-color: #963619;
+      color: #ffffff;
+      padding: 15px 30px; /* Adjusted padding to make the button bigger */
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 18px; /* Adjusted font size */
+    }
+
+    input[type="button"]:hover {
+      background-color: #963619;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="feedbackForm">
+    <label for="username">Your Name:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="feedback">Your Feedback:</label>
+    <textarea id="feedback" name="feedback" rows="4" required></textarea>
+    <br>
+    <input type="button" value="Submit Feedback" onclick="showAcknowledgment()">
+  </form>
+
+  <script>
+    function showAcknowledgment() {
+      alert("Thank you for your feedback!");
+    }
+  </script>
+
+</body>
+</html>

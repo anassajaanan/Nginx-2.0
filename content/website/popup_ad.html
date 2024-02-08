@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funny Pop-up</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-container {
+      background-color: #fff;
+      border: 2px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #close-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #963619;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #close-btn:hover {
+      background-color: #6b2c13;
+    }
+
+    #icon-button {
+      font-size: 24px;
+      background-color: #3498db;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      padding: 15px;
+      cursor: pointer;
+    }
+
+    #icon-button:hover {
+      background-color: #2980b9;
+    }
+    
+    #moving-image {
+        position: absolute;
+        width: 500px; /* Adjust the size as needed */
+        height: 500px; /* Adjust the size as needed */
+        transition: left 1s ease-in-out, top 1s ease-in-out;
+        animation-name: moving;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+    }
+    /* .moving {
+        
+    } */
+    @keyframes moving {
+        from {transform:rotateX(60deg) rotateY(60deg) }
+        to {transform:translateX(200px) translateY(200px)}
+    }
+  </style>
+</head>
+<body>
+
+  <button id="icon-button">🎉</button>
+
+  <div id="popup">
+    <div class="popup-container">
+      <p>This is a funny pop-up message!<br>Hope it brought a smile to your face!</p>
+      <button id="close-btn">Close</button>
+    </div>
+  </div>
+
+  <img id="moving-image" src="https://www.dexerto.com/cdn-cgi/image/width=750,quality=75,format=auto/https://editors.dexerto.com/wp-content/uploads/2022/06/07/MrBeast-slams-fake-YouTube-ads.jpg" alt="Moving Image">
+
+</body>
+</html>
