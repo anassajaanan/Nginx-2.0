@@ -515,3 +515,11 @@ Special thanks are extended to Abdelaziz Eroui for his informative lecture on TC
 We would also like to express our gratitude to Mehdi Cheracher for his lecture on networking and asynchronous programming. His teachings have been instrumental in guiding our approach to handling network communications efficiently.
 
 Their contributions to the field and dedication to education have been invaluable to both our project and the wider community.
+
+## **Contributing to Nginx 2.0**
+
+We warmly welcome contributions from the community and are thrilled to have you join us in improving Nginx 2.0! Whether you're fixing bugs, adding new features, or improving documentation, your contributions are invaluable to making Nginx 2.0 better for everyone.
+
+### **Seeking Help?**
+
+If you have any questions or need assistance, feel free to reach out by opening an issue. We're here to help and look forward to your contributions!
