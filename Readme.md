@@ -172,7 +172,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context.
 - **Example:**
     
-    ```bash
+    ```nginx
     server {
         root /var/www/html; # Document root
     }
@@ -185,7 +185,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context.
 - **Example:**
     
-    ```bash
+    ```nginx
     server {
         listen 8080; # Server listens on port 8080
     }
@@ -198,7 +198,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context.
 - **Example:**
     
-    ```bash
+    ```nginx
     location /images {
         autoindex on; # Enables directory listing
     }
@@ -211,7 +211,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context.
 - **Example:**
     
-    ```bash
+    ```nginx
     server {
         server_name example.com;
     }
@@ -224,7 +224,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context.
 - **Example:**
     
-    ```bash
+    ```nginx
     http {
         client_max_body_size 20M; # Limits request body size
     }
@@ -237,7 +237,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Supports two or more arguments.
 - **Example:**
     
-    ```bash
+    ```nginx
     server {
         error_page 404 /404.html;
     }
@@ -250,7 +250,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context, supports two or more arguments. The last argument is treated as a fallback.
 - **Example:**
     
-    ```bash
+    ```nginx
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -263,7 +263,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Supports one or more arguments. The server will use the first found file as the index. The last argument is treated as a fallback if it starts with a slash. If no index is found, a directory listing is shown.
 - **Example:**
     
-    ```bash
+    ```nginx
     location / {
         index index.html index.htm /fallback;
     }
@@ -276,7 +276,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Supports either one argument as a status code to return a predefined status message, or two arguments where the first is the status code and the second is a URL for redirection or text to return as the body. When used for redirection, common status codes are 301 (permanent redirect) or 302 (temporary redirect).
 - **Example 1: Returning a Status Code with Text:**
     
-    ```bash
+    ```nginx
     location /gone {
 
         return 410 "The resource is no longer available";
@@ -288,7 +288,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
     
 - **Example 2: Redirection:**
     
-    ```bash
+    ```nginx
     location /oldpage {
 
         return 301 http://example.com/newpage;
@@ -306,7 +306,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Example:**
 	This directive restricts the allowed methods for the **`/api`** endpoint to GET and POST, denying all other methods.
     
-    ```bash
+    ```nginx
     location /api {
     	limit_except GET POST;
 	}
@@ -319,7 +319,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context.
 - **Example:**
     
-    ```bash
+    ```nginx
     server {
         keepalive_timeout 15; # Keep connections alive for 15 seconds
     }
@@ -332,7 +332,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 - **Validation Policy:** Must be unique within its context, supports one or more arguments. Specifies the file extensions to be treated as CGI scripts.
 - **Example:**
     
-    ```bash
+    ```nginx
     server {
         cgi_extension .cgi .pl .py .sh .extension; # Handle .cgi .pl .py files as CGI scripts
     }
@@ -343,7 +343,7 @@ This section outlines the directives available in Nginx 2.0, their applicable co
 
 This comprehensive example demonstrates a server setup with nested contexts and multiple directives, showcasing a realistic configuration for Nginx 2.0.
 
-```bash
+```nginx
 http {
     client_max_body_size 20M; # Apply to all servers
 
@@ -487,13 +487,38 @@ This structure is designed to enhance maintainability and scalability, ensuring 
 
 To aid in further exploration and mastery of web server development, networking, and programming concepts, we recommend the following curated list of resources:
 
+
 ### **Web Server Development and Networking**
 
-- [Building Web: Sockets and Servers for Dummies](https://levelup.gitconnected.com/building-the-web-sockets-and-servers-for-dummies-886d1595a4f8)
-- [Socket Programming in C/C++](https://www.geeksforgeeks.org/socket-programming-cc/)
-- [Set Socket Nonblocking](https://jameshfisher.com/2017/04/05/set_socket_nonblocking/)
-- [A Simple HTTP Server from Scratch](https://trungams.github.io/2020-08-23-a-simple-http-server-from-scratch/)
-- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/#client-server-background)
+- [Building Web: Sockets and Servers for Dummies](https://levelup.gitconnected.com/building-the-web-sockets-and-servers-for-dummies-886d1595a4f8) - A beginner-friendly guide to understanding the basics of web servers and network programming.
+- [Socket Programming in C/C++](https://www.geeksforgeeks.org/socket-programming-cc/) - Comprehensive tutorials on how to implement socket programming in C/C++.
+- [Create a simple HTTP server in C](https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa) - Step-by-step guide to building a basic HTTP server.
+- [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/) - An extensive guide to network programming in C, a must-read resource.
+- [A Simple HTTP Server from Scratch](https://trungams.github.io/2020-08-23-a-simple-http-server-from-scratch/) - Demonstrates building an HTTP server from the ground up.
+- Videos on Networking Concepts:
+    - [Create a simple web server in C](https://www.youtube.com/watch?v=esXw4bdaZkc&ab_channel=JacobSorber)
+    - [Explaining **`select()`**](https://www.youtube.com/watch?v=Y6pFtgRdUts&ab_channel=JacobSorber) - Understanding the **`select()`** system call for multiplexing.
+    - [IBM - Nonblocking I/O and **`select()`**](https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_72/rzab6/xnonblock.htm) - Deep dive into non-blocking I/O operations and the use of **`select()`**.
+- [All about sockets blocking](http://dwise1.net/pgm/sockets/blocking.html) - Discusses the differences between blocking and non-blocking sockets.
+- [TCP Socket Programming: HTTP](https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/csf/html/TCPSockets.html) - A detailed look into implementing TCP socket programming for HTTP communications.
+
+### **HTTP and HTTPS**
+
+- [The HTTP/3 Protocol (RFC 9112)](https://www.rfc-editor.org/rfc/rfc9112.html) - The official RFC for HTTP/3, detailing the latest protocol specifications.
+- [HTTP Headers for Dummies](https://code.tutsplus.com/http-headers-for-dummies--net-8039) - An introductory guide to understanding HTTP headers.
+- [MDN - HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) - Mozilla Developer Network's comprehensive resource on HTTP.
+- [How the web works: HTTP and CGI explained](https://www.garshol.priv.no/download/text/http-tut.html) - A tutorial on HTTP and the Common Gateway Interface (CGI).
+- [MIME Types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) - MDN's guide on MIME types and their importance in HTTP communications.
+
+### **RFCs (Request for Comments)**
+
+- [How to Read an RFC](https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm) - Guidelines on understanding the structure and content of RFC documents.
+- RFCs related to HTTP and web technologies:
+    - [RFC 9110 - HTTP Semantics](https://www.rfc-editor.org/info/rfc9110)
+    - [RFC 9112 - HTTP/1.1](https://www.rfc-editor.org/info/rfc9112)
+    - [RFC 3986 - URI Generic Syntax](https://www.ietf.org/rfc/rfc3986)
+    - [RFC 6265 - HTTP State Management Mechanism (Cookies)](https://www.rfc-editor.org/rfc/rfc6265)
+    - [RFC 3875 - The Common Gateway Interface (CGI)](https://datatracker.ietf.org/doc/html/rfc3875)
 
 ### **HTTP and HTTPS**
 
@@ -511,6 +536,18 @@ To aid in further exploration and mastery of web server development, networking,
 
 - [libhttpserver for Creating HTTP Servers](https://github.com/etr/libhttpserver)
 - [Go HTTP Programming](https://fideloper.com/go-http)
+
+### **CGI (Common Gateway Interface)**
+
+- [Python Web Programming](https://www.tutorialspoint.com/python/python_cgi_programming.htm) - A guide to CGI programming with Python.
+- [C++ Web Programming](https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm) - Introduction to web programming in C++.
+- [Video: Creating a file upload page](https://www.youtube.com/watch?v=_j5spdsJdV8&t=562s) - Tutorial on handling file uploads via a web form.
+
+### **Tools**
+
+- [Postman](https://www.postman.com/downloads/) - A tool for testing APIs and web server responses.
+- [Wireshark](https://www.wireshark.org/) - A network protocol analyzer for capturing and interpreting network traffic.
+- [Siege](https://www.linode.com/docs/guides/load-testing-with-siege/) - A tool for load testing web servers to evaluate performance under stress.
 
 ### **Video Lectures**
 
