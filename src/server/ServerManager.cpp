@@ -27,6 +27,19 @@ void	ServerManager::initializeServers(std::vector<ServerConfig> &serverConfigs, 
 		eventManager->registerEvent(server->_socket, READ);
 		servers.push_back(server);
 	}
+	displayStartupDetails();
+}
+
+void	ServerManager::displayStartupDetails()
+{
+	std::cout << "\n🔌 Overview of Active Servers:\n│\n";
+	for (size_t i = 0; i < servers.size(); i++)
+	{
+		if (i < servers.size() - 1)
+			std::cout << "├── \033[0;36m🔵 Listening on Port \033[1;33m" << std::to_string(servers[i]->_config.port) << "\033[0;36m 🌐\033[0m\n│\n";
+		else
+			std::cout << "└── \033[0;32m🟢 Listening on Port \033[1;33m" << std::to_string(servers[i]->_config.port) << "\033[0;32m 🌟\033[0m\n";
+	}
 }
 
 void	ServerManager::checkTimeouts()

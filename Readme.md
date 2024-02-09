@@ -510,7 +510,7 @@ To aid in further exploration and mastery of web server development, networking,
 - [How the web works: HTTP and CGI explained](https://www.garshol.priv.no/download/text/http-tut.html) - A tutorial on HTTP and the Common Gateway Interface (CGI).
 - [MIME Types](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) - MDN's guide on MIME types and their importance in HTTP communications.
 
-### **RFCs (Request for Comments)**
+### **RFCs**
 
 - [How to Read an RFC](https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm) - Guidelines on understanding the structure and content of RFC documents.
 - RFCs related to HTTP and web technologies:

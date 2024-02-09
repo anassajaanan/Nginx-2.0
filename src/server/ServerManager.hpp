@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include <vector>
 #ifndef SERVER_MANAGER_HPP
 #define SERVER_MANAGER_HPP
 
@@ -39,6 +40,7 @@ public:
 	
 
 	void				initializeServers(std::vector<ServerConfig> &serverConfigs, MimeTypeConfig &mimeTypes);
+	void				displayStartupDetails();
 	void 				checkTimeouts();
 	void				processReadEvent(EventInfo &event);
 	void				processWriteEvent(EventInfo &event);

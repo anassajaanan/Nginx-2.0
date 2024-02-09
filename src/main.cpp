@@ -6,8 +6,6 @@
 #include "server/ServerManager.hpp"
 #include "logging/Logger.hpp"
 
-
-
 static void	signalHandler(int signum)
 {
 	if (signum == SIGINT || signum == SIGTERM)
@@ -22,13 +20,23 @@ static void	signalHandler(int signum)
 	}
 }
 
-int main(int argc, char **argv)
+static void	setupSignalHandlers()
 {
-	std::vector<ServerConfig>	serverConfigs;
-	MimeTypeConfig				mimeTypeConfig;
-	EventPoller					*eventManager;
-	std::string					configFile;
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
+	struct sigaction sa;
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = signalHandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;	
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGTERM, &sa, NULL);
+	sigaction(SIGCHLD, &sa, NULL);
+}
 
+static void	initializeConfigFile(int argc, char **argv, std::string &configFile)
+{
 	if (argc == 1)
 	{
 		configFile = "conf/nginx.conf";
@@ -40,8 +48,18 @@ int main(int argc, char **argv)
 	else
 	{
 		std::cerr << "Usage: " << argv[0] << " [config file]" << std::endl;
-		return 1;
+		exit(EXIT_FAILURE);
 	}
+}
+
+int main(int argc, char **argv)
+{
+	std::vector<ServerConfig>	serverConfigs;
+	MimeTypeConfig				mimeTypeConfig;
+	EventPoller					*eventManager;
+	std::string					configFile;
+
+	initializeConfigFile(argc, argv, configFile);
 
     try
 	{
@@ -63,29 +81,15 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	setupSignalHandlers();
 
-	signal(SIGPIPE, SIG_IGN);
-	signal(SIGINT, signalHandler);
-	signal(SIGTERM, signalHandler);
-	struct sigaction sa;
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = signalHandler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;	
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGTERM, &sa, NULL);
-	sigaction(SIGCHLD, &sa, NULL);
-
-
-	Logger::init(Logger::ERROR, "logs/WebServer.log");
-	// Logger::init(Logger::DEBUG);
+	Logger::init(Logger::DEBUG, "logs/WebServer.log");
 
 	ServerManager serverManager(serverConfigs, eventManager, mimeTypeConfig);
 	Logger::log(Logger::DEBUG, "Starting server manager", "main");
 	serverManager.start();
 
 	Logger::cleanup();
-
 	delete eventManager;
 
 	return 0;

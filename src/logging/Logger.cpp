@@ -59,6 +59,9 @@ void	Logger::init(Logger::Level logLevel, const std::string &logFilePath)
 {
 	currentLevel = logLevel;
 	
+	std::cout << "\n\033[0;32m🚀 Nginx 2.0 is running.\033[0m\n" 
+          << "\n📁 You can find logs at: \033[1;34mlogs/WebServer.log\033[0m" 
+          << std::endl;
 	if (!logFilePath.empty())
 	{
 		logFile.open(logFilePath, std::ios::out | std::ios::trunc);
